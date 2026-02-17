@@ -66,12 +66,16 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
 
   return (
     <div className="space-y-4">
-      <Card className=" fade-in slide-in-from-right-4 duration-500" style={{ animationDelay: '500ms' }}>
-        <CardHeader>
+      <Card className="fade-in slide-in-from-right-4 duration-500" style={{ animationDelay: '500ms' }}>
+        <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              <CardTitle>История растения</CardTitle>
+            <div>
+              <CardTitle className="text-lg">История растения</CardTitle>
+              <CardDescription className="mt-1">
+                {history.length > 0
+                  ? `Всего записей: ${history.length}`
+                  : 'История пока пуста'}
+              </CardDescription>
             </div>
             <Button
               onClick={() => setIsAddModalOpen(true)}
@@ -82,13 +86,8 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
               Добавить запись
             </Button>
           </div>
-          <CardDescription>
-            {history.length > 0
-              ? `Всего записей: ${history.length}`
-              : 'История пока пуста'}
-          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           {history.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">

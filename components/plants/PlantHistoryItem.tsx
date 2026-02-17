@@ -39,105 +39,100 @@ export function PlantHistoryItem({
 
   const photoUrls = historyItem.photos.map(photo => getPlantHistoryPhotoUrl(photo)!);
 
+  const formattedDate = new Date(historyItem.date).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
   return (
     <>
-      <div className="relative flex gap-4">
-        {/* Timeline line and dot */}
-        <div className="relative flex flex-col items-center">
-          {/* Dot */}
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center z-10 shadow-lg">
-            <Calendar className="w-5 h-5 text-primary-foreground" />
+      <div className="relative flex gap-3 group">
+        {/* Timeline line and icon */}
+        <div className="relative flex flex-col items-center pt-1">
+          {/* Icon circle */}
+          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center z-10 flex-shrink-0">
+            <Calendar className="w-4 h-4 text-muted-foreground" />
           </div>
           {/* Vertical line */}
           {!isLast && (
-            <div className="absolute top-10 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 to-border" />
+            <div className="absolute top-11 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-border" />
           )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 pb-8">
-          {/* Date badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-3">
-            {new Date(historyItem.date).toLocaleDateString('ru-RU', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+        <div className="flex-1 pb-8 pt-1">
+          {/* Date at top */}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-muted-foreground">
+              {formattedDate}
+            </span>
+            <div className="flex gap-0.5">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditModalOpen(true)}
+                className="h-7 w-7 p-0 text-muted-foreground hover:bg-muted"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Удалить запись?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Это действие нельзя отменить. Запись и все её фотографии будут удалены.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">
+                      Отмена
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={onDelete}
+                      className="transition-all hover:scale-105 active:scale-95"
+                    >
+                      Удалить
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
-          {/* Card */}
-          <Card className="p-4 transition-all hover:shadow-lg border-l-4 border-l-primary/30 hover:border-l-primary">
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <p className="text-sm whitespace-pre-wrap flex-1 leading-relaxed">
-                {historyItem.comment}
-              </p>
+          {/* Comment */}
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed mb-3">
+            {historyItem.comment}
+          </p>
 
-              <div className="flex gap-1 flex-shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsEditModalOpen(true)}
-                  className="transition-all hover:scale-110 active:scale-95"
+          {/* Photos grid with wrap */}
+          {historyItem.photos.length > 0 && (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+              {historyItem.photos.map((photo, index) => (
+                <button
+                  key={photo}
+                  onClick={() => setSelectedPhotoIndex(index)}
+                  className="aspect-square rounded-lg overflow-hidden bg-muted transition-all hover:scale-105 hover:shadow-md active:scale-95"
                 >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-destructive transition-all hover:scale-110 active:scale-95"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Удалить запись?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Это действие нельзя отменить. Запись и все её фотографии будут удалены.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">
-                        Отмена
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={onDelete}
-                        className="transition-all hover:scale-105 active:scale-95"
-                      >
-                        Удалить
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                  <img
+                    src={getPlantHistoryPhotoUrl(photo)}
+                    alt={`Фото ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
-
-            {historyItem.photos.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>{historyItem.photos.length} {historyItem.photos.length === 1 ? 'фото' : 'фотографии'}</span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {historyItem.photos.map((photo, index) => (
-                    <button
-                      key={photo}
-                      onClick={() => setSelectedPhotoIndex(index)}
-                      className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 transition-all hover:scale-105 hover:shadow-md active:scale-95 group"
-                    >
-                      <img
-                        src={getPlantHistoryPhotoUrl(photo)}
-                        alt={`Фото ${index + 1}`}
-                        className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </Card>
+          )}
         </div>
       </div>
 
