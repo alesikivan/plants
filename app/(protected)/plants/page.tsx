@@ -39,7 +39,7 @@ export default function MyPlantsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Мои<br className="sm:hidden" /> растения</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Мои растения</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Управляйте своей<br className="sm:hidden" /> коллекцией растений
           </p>

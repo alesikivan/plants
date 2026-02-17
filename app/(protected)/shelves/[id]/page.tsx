@@ -265,8 +265,8 @@ export default function ShelfDetailPage() {
       {/* Plants on Shelf */}
       <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '300ms' }}>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1">
               <CardTitle>Растения на полке</CardTitle>
               <CardDescription>
                 {plants.length > 0
@@ -277,7 +277,7 @@ export default function ShelfDetailPage() {
             <Button
               onClick={() => setIsManagePlantsModalOpen(true)}
               variant="outline"
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               <Leaf className="w-4 h-4" />
               Управление растениями

@@ -52,8 +52,8 @@ export default function ProfilePage() {
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Профиль</h1>
-        <p className="text-lg text-muted-foreground">
+        <h1 className="text-4xl font-bold tracking-tight hidden sm:block">Профиль</h1>
+        <p className="text-lg text-muted-foreground hidden sm:block">
           Управляйте информацией вашего аккаунта и настройками
         </p>
       </div>
