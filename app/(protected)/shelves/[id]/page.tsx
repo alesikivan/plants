@@ -113,13 +113,13 @@ export default function ShelfDetailPage() {
             className="gap-2 transition-all hover:scale-105 active:scale-95"
           >
             <Pencil className="w-4 h-4" />
-            Редактировать
+            <span className="hidden sm:inline">Редактировать</span>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all hover:scale-105 active:scale-95">
                 <Trash2 className="w-4 h-4" />
-                Удалить
+                <span className="hidden sm:inline">Удалить</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
