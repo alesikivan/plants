@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Button } from '@/components/ui/button';
-import { Leaf, LayoutDashboard, User, Settings, LogOut, Layers } from 'lucide-react';
+import { Leaf, LayoutDashboard, User, Settings, LogOut, Layers, Users } from 'lucide-react';
 
 export default function ProtectedLayout({
   children,
@@ -67,6 +67,13 @@ export default function ProtectedLayout({
                   >
                     <Layers className="w-4 h-4" />
                     Полки
+                  </Link>
+                  <Link
+                    href="/users"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
+                  >
+                    <Users className="w-4 h-4" />
+                    Пользователи
                   </Link>
                   <Link
                     href="/profile"

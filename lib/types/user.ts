@@ -17,3 +17,16 @@ export interface UserResponse {
 export interface UpdateUserDto {
   preferredLanguage?: string;
 }
+
+export interface UserProfileWithStats {
+  id: string;
+  name: string;
+  role: Role;
+  preferredLanguage?: string;
+  createdAt: string;
+  updatedAt: string;
+  stats: {
+    totalPlants: number;
+    totalShelves: number;
+  };
+}
