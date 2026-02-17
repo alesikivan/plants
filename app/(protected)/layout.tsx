@@ -105,9 +105,45 @@ export default function ProtectedLayout({
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 lg:px-8 py-8">
+      <main className="container mx-auto px-4 lg:px-8 py-8 pb-24 md:pb-8">
         {children}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      {user && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex items-center justify-around h-16 px-4">
+            <Link
+              href="/dashboard"
+              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LayoutDashboard className="w-5 h-5" />
+              <span className="text-xs font-medium">Панель</span>
+            </Link>
+            <Link
+              href="/plants"
+              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Leaf className="w-5 h-5" />
+              <span className="text-xs font-medium">Растения</span>
+            </Link>
+            <Link
+              href="/shelves"
+              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Layers className="w-5 h-5" />
+              <span className="text-xs font-medium">Полки</span>
+            </Link>
+            <Link
+              href="/users"
+              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Users className="w-5 h-5" />
+              <span className="text-xs font-medium">Польз.</span>
+            </Link>
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
