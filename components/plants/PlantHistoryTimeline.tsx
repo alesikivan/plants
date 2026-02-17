@@ -68,14 +68,14 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
     <div className="space-y-4">
       <Card className=" fade-in slide-in-from-right-4 duration-500" style={{ animationDelay: '500ms' }}>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
               <CardTitle>История растения</CardTitle>
             </div>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="gap-2 transition-all hover:scale-105 active:scale-95"
+              className="gap-2 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
               size="sm"
             >
               <Plus className="w-4 h-4" />

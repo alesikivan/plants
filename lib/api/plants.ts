@@ -51,7 +51,7 @@ export interface PlantHistory {
 
 export interface CreatePlantHistoryDto {
   date: string;
-  comment: string;
+  comment?: string;
   photos?: File[];
 }
 
@@ -169,7 +169,10 @@ export const plantHistoryApi = {
   create: async (plantId: string, data: CreatePlantHistoryDto): Promise<PlantHistory> => {
     const formData = new FormData();
     formData.append('date', data.date);
-    formData.append('comment', data.comment);
+
+    if (data.comment) {
+      formData.append('comment', data.comment);
+    }
 
     if (data.photos && data.photos.length > 0) {
       data.photos.forEach((photo) => {

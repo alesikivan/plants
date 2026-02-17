@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { User, Shield, Calendar, Leaf, Layers, Search, Users as UsersIcon } from 'lucide-react';
+import { User, Shield, Calendar, Leaf, Layers, Search, Users as UsersIcon, X } from 'lucide-react';
 import { usersApi, UserProfileWithStats } from '@/lib/api';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,7 @@ export default function UsersPage() {
 
   const handleClearSearch = () => {
     setSearchQuery('');
+    setIsSearching(true);
     loadUsers();
   };
 
@@ -76,17 +77,21 @@ export default function UsersPage() {
               placeholder="Поиск по имени пользователя..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
           <Button type="submit" disabled={isSearching}>
             {isSearching ? 'Поиск...' : 'Найти'}
           </Button>
-          {searchQuery && (
-            <Button type="button" variant="outline" onClick={handleClearSearch}>
-              Очистить
-            </Button>
-          )}
         </form>
       </div>
 

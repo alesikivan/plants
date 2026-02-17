@@ -37,14 +37,14 @@ export default function ShelvesPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
       {/* Header */}
-      <div className="flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
         <div>
-          <h1 className="text-3xl font-bold">Мои полки</h1>
-          <p className="text-muted-foreground mt-1">
-            Организуйте свои растения по полкам
+          <h1 className="text-2xl sm:text-3xl font-bold">Мои полки</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+            Организуйте свои<br className="sm:hidden" /> растения по полкам
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all hover:scale-105 active:scale-95">
+        <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           Создать полку
         </Button>

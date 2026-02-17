@@ -79,11 +79,13 @@ export function AddHistoryModal({
 
     setIsSubmitting(true);
     try {
-      await plantHistoryApi.create(plantId, {
+      const historyData: CreatePlantHistoryDto = {
         date: date.toISOString(),
-        comment,
+        comment: comment.trim() || undefined,
         photos,
-      });
+      };
+
+      await plantHistoryApi.create(plantId, historyData);
       toast.success('Запись добавлена');
       onSuccess();
       onOpenChange(false);
