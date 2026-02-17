@@ -90,15 +90,6 @@ export default function UsersPage() {
         </form>
       </div>
 
-      {/* Results Count */}
-      <div className="text-sm text-muted-foreground">
-        {searchQuery ? (
-          <p>Найдено пользователей: {users.length}</p>
-        ) : (
-          <p>Всего пользователей: {users.length}</p>
-        )}
-      </div>
-
       {/* Users Grid */}
       {users.length === 0 ? (
         <Card>
@@ -115,49 +106,37 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {users.map((user) => (
             <Card
               key={user.id}
-              className="transition-all hover:shadow-lg cursor-pointer"
+              className="transition-all hover:border-primary/50 cursor-pointer p-4"
               onClick={() => router.push(`/profile/${user.id}`)}
             >
-              <CardHeader>
+              <div className="space-y-3">
+                {/* User Info */}
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 flex-shrink-0">
-                    <User className="w-6 h-6 text-primary" />
+                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <CardTitle className="text-lg truncate">{user.name}</CardTitle>
-                    <div className="flex items-center gap-1 mt-1">
-                      <Shield className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground capitalize">
-                        {user.role}
-                      </span>
-                    </div>
+                    <p className="font-medium truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
                   </div>
                 </div>
-              </CardHeader>
 
-              <CardContent className="space-y-4">
                 {/* Stats */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                    <Leaf className="w-4 h-4 text-green-600" />
-                    <div>
-                      <p className="text-lg font-bold">{user.stats.totalPlants}</p>
-                      <p className="text-xs text-muted-foreground">Растений</p>
-                    </div>
+                <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <Leaf className="w-4 h-4" />
+                    <span>{user.stats.totalPlants}</span>
                   </div>
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                    <Layers className="w-4 h-4 text-blue-600" />
-                    <div>
-                      <p className="text-lg font-bold">{user.stats.totalShelves}</p>
-                      <p className="text-xs text-muted-foreground">Полок</p>
-                    </div>
+                  <div className="flex items-center gap-1.5">
+                    <Layers className="w-4 h-4" />
+                    <span>{user.stats.totalShelves}</span>
                   </div>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
