@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Apple-inspired minimalist palette */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    /* Primary - Olive green */
+    --primary: 75 40% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - soft gray */
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 10%;
+
+    /* Muted - light gray */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 50%;
+
+    /* Accent - subtle highlight */
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 0% 10%;
+
+    /* Destructive - Apple red */
+    --destructive: 0 90% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 0 0% 90%;
+    --input: 0 0% 92%;
+    --ring: 75 40% 45%;
+
+    /* Increased radius for Apple-style rounded corners */
+    --radius: 0.75rem;
+
+    --chart-1: 75 40% 45%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 48 96% 53%;
+    --chart-5: 14 100% 57%;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 75 40% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 90% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 75 40% 45%;
+    --chart-1: 75 40% 45%;
+    --chart-2: 142 76% 36%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 48 96% 53%;
+    --chart-5: 14 100% 57%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Toast notifications styling */
+@layer components {
+  [data-sonner-toast] {
+    font-family: inherit;
+  }
+
+  [data-sonner-toast][data-styled='true'] {
+    padding: 16px;
+  }
+
+  [data-sonner-toast][data-styled='true'] [data-content] {
+    gap: 8px;
+  }
+
+  [data-sonner-toast][data-styled='true'] [data-title] {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  [data-sonner-toast][data-styled='true'] [data-description] {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  /* Success toast animation */
+  [data-sonner-toast][data-type='success'] {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
+  /* Error toast animation */
+  [data-sonner-toast][data-type='error'] {
+    animation: shakeAndSlideIn 0.5s ease-out;
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes shakeAndSlideIn {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    50% {
+      transform: translateX(-10px);
+      opacity: 1;
+    }
+    65% {
+      transform: translateX(5px);
+    }
+    80% {
+      transform: translateX(-3px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  /* Loading spinner color */
+  [data-sonner-toast][data-type='loading'] [data-icon] {
+    color: hsl(var(--primary));
+  }
+}
