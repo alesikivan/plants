@@ -1,15 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { User, Mail, Shield, Calendar, Languages } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { User, Mail, Shield, Calendar, Languages, LogOut } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);
+  const logout = useAuthStore((state) => state.logout);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleLanguageChange = async (language: string) => {
@@ -22,6 +26,17 @@ export default function ProfilePage() {
       console.error('Failed to update language:', error);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+      toast.success('Вы успешно вышли из аккаунта');
+    } catch (error) {
+      toast.error('Ошибка при выходе из аккаунта');
+      console.error('Failed to logout:', error);
     }
   };
 
@@ -141,6 +156,25 @@ export default function ProfilePage() {
                 Выберите язык для отображения названий родов и сортов растений
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Выход из аккаунта</CardTitle>
+            <CardDescription>
+              Завершите текущий сеанс
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleLogout}
+              className="w-full gap-2"
+              variant="outline"
+            >
+              <LogOut className="w-4 h-4" />
+              Выйти из аккаунта
+            </Button>
           </CardContent>
         </Card>
       </div>

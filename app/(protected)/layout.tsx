@@ -1,20 +1,16 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
-import { Button } from '@/components/ui/button';
-import { Leaf, LayoutDashboard, User, Settings, LogOut, Layers, Users } from 'lucide-react';
+import { Leaf, LayoutDashboard, Settings, Layers, Users } from 'lucide-react';
 
 export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const initialized = useAuthStore((state) => state.initialized);
 
@@ -24,11 +20,6 @@ export default function ProtectedLayout({
       fetchUser();
     }
   }, [fetchUser, initialized]);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login');
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -75,13 +66,6 @@ export default function ProtectedLayout({
                     <Users className="w-4 h-4" />
                     Пользователи
                   </Link>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <User className="w-4 h-4" />
-                    Профиль
-                  </Link>
                   {user.role === 'admin' && (
                     <Link
                       href="/admin"
@@ -97,21 +81,13 @@ export default function ProtectedLayout({
 
             {/* User Menu */}
             {user && (
-              <div className="flex items-center gap-4">
-                <div className="hidden lg:flex flex-col items-end">
-                  <p className="text-sm font-semibold text-foreground">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                </div>
-                <Button
-                  onClick={handleLogout}
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Выйти</span>
-                </Button>
-              </div>
+              <Link
+                href="/profile"
+                className="hidden lg:flex flex-col items-end hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
+              </Link>
             )}
           </div>
         </div>
