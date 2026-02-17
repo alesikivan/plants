@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
-import { Leaf, LayoutDashboard, Settings, Layers, Users } from 'lucide-react';
+import { Leaf, LayoutDashboard, Settings, Layers, Users, User } from 'lucide-react';
 
 export default function ProtectedLayout({
   children,
@@ -81,13 +81,24 @@ export default function ProtectedLayout({
 
             {/* User Menu */}
             {user && (
-              <Link
-                href="/profile"
-                className="hidden lg:flex flex-col items-end hover:opacity-80 transition-opacity cursor-pointer"
-              >
-                <p className="text-sm font-semibold text-foreground">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
-              </Link>
+              <>
+                {/* Desktop User Info */}
+                <Link
+                  href="/profile"
+                  className="hidden lg:flex flex-col items-end hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </Link>
+
+                {/* Mobile User Icon */}
+                <Link
+                  href="/profile"
+                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
+                >
+                  <User className="w-5 h-5 text-primary" />
+                </Link>
+              </>
             )}
           </div>
         </div>
