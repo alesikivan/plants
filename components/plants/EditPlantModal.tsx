@@ -20,6 +20,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { genusApi, varietyApi, plantsApi, shelvesApi, Genus, Variety, Plant, Shelf, getPlantPhotoUrl } from '@/lib/api';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { toast } from 'sonner';
+import { CreateGenusModal } from './CreateGenusModal';
+import { CreateVarietyModal } from './CreateVarietyModal';
 
 interface EditPlantModalProps {
   open: boolean;
@@ -54,6 +56,10 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [removeCurrentPhoto, setRemoveCurrentPhoto] = useState(false);
+  const [createGenusOpen, setCreateGenusOpen] = useState(false);
+  const [createVarietyOpen, setCreateVarietyOpen] = useState(false);
+  const [createGenusQuery, setCreateGenusQuery] = useState('');
+  const [createVarietyQuery, setCreateVarietyQuery] = useState('');
 
   const debouncedGenusSearch = useDebounce(genusSearch, 300);
   const debouncedVarietySearch = useDebounce(varietySearch, 300);
@@ -222,6 +228,26 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
     setValue('varietyId', value);
   };
 
+  const handleCreateNewGenus = (searchValue: string) => {
+    setCreateGenusQuery(searchValue);
+    setCreateGenusOpen(true);
+  };
+
+  const handleGenusCreated = (genus: Genus) => {
+    setGenuses((prev) => [...prev, genus]);
+    handleGenusChange(genus._id);
+  };
+
+  const handleCreateNewVariety = (searchValue: string) => {
+    setCreateVarietyQuery(searchValue);
+    setCreateVarietyOpen(true);
+  };
+
+  const handleVarietyCreated = (variety: Variety) => {
+    setVarieties((prev) => [...prev, variety]);
+    handleVarietyChange(variety._id);
+  };
+
   const handleShelfToggle = (shelfId: string) => {
     setSelectedShelfIds(prev => {
       if (prev.includes(shelfId)) {
@@ -252,6 +278,20 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
   }));
 
   return (
+    <>
+    <CreateGenusModal
+      open={createGenusOpen}
+      onOpenChange={setCreateGenusOpen}
+      initialQuery={createGenusQuery}
+      onCreated={handleGenusCreated}
+    />
+    <CreateVarietyModal
+      open={createVarietyOpen}
+      onOpenChange={setCreateVarietyOpen}
+      initialQuery={createVarietyQuery}
+      genusId={selectedGenusId}
+      onCreated={handleVarietyCreated}
+    />
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -276,6 +316,8 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
                 emptyText="Ничего не найдено"
                 isLoading={isLoadingGenuses}
                 onSearchChange={setGenusSearch}
+                onCreateNew={handleCreateNewGenus}
+                createNewLabel="Создать род"
               />
               {errors.genusId && (
                 <p className="text-sm text-destructive">Это поле обязательно</p>
@@ -299,6 +341,8 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
                 isLoading={isLoadingVarieties}
                 disabled={!selectedGenusId}
                 onSearchChange={setVarietySearch}
+                onCreateNew={selectedGenusId ? handleCreateNewVariety : undefined}
+                createNewLabel="Создать сорт"
               />
             </div>
 
@@ -387,5 +431,6 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
         </form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

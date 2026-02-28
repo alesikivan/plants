@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +33,8 @@ interface ComboBoxProps {
   isLoading?: boolean;
   disabled?: boolean;
   onSearchChange?: (search: string) => void;
+  onCreateNew?: (searchValue: string) => void;
+  createNewLabel?: string;
 }
 
 export function ComboBox({
@@ -45,6 +47,8 @@ export function ComboBox({
   isLoading = false,
   disabled = false,
   onSearchChange,
+  onCreateNew,
+  createNewLabel = 'Создать новый',
 }: ComboBoxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState('');
@@ -55,6 +59,13 @@ export function ComboBox({
     setSearchValue(search);
     if (onSearchChange) {
       onSearchChange(search);
+    }
+  };
+
+  const handleCreateNew = () => {
+    setOpen(false);
+    if (onCreateNew) {
+      onCreateNew(searchValue);
     }
   };
 
@@ -94,7 +105,21 @@ export function ComboBox({
                 <span className="ml-2 text-sm text-muted-foreground">Загрузка...</span>
               </div>
             ) : options.length === 0 ? (
-              <CommandEmpty>{emptyText}</CommandEmpty>
+              <div>
+                <CommandEmpty>{emptyText}</CommandEmpty>
+                {onCreateNew && searchValue.trim() && (
+                  <div className="p-1 border-t">
+                    <button
+                      type="button"
+                      onClick={handleCreateNew}
+                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-primary hover:bg-accent cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {createNewLabel} «{searchValue.trim()}»
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <CommandGroup>
                 {options.map((option) => (

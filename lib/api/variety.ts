@@ -18,6 +18,10 @@ export interface CreateVarietyDto {
   description?: string;
 }
 
+export interface ValidateVarietyResult {
+  suggestion: { recognized: boolean; nameRu: string; nameEn: string };
+}
+
 export const varietyApi = {
   getAll: async (genusId?: string, search?: string): Promise<Variety[]> => {
     const params: any = {};
@@ -34,6 +38,11 @@ export const varietyApi = {
 
   create: async (data: CreateVarietyDto): Promise<Variety> => {
     const response = await apiClient.post<Variety>('/variety', data);
+    return response.data;
+  },
+
+  validate: async (query: string, genusId: string): Promise<ValidateVarietyResult> => {
+    const response = await apiClient.post<ValidateVarietyResult>('/variety/validate', { query, genusId });
     return response.data;
   },
 

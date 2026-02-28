@@ -15,6 +15,16 @@ export interface CreateGenusDto {
   description?: string;
 }
 
+export interface PlantNameSuggestion {
+  recognized: boolean;
+  nameRu: string;
+  nameEn: string;
+}
+
+export interface ValidateResult {
+  suggestion: PlantNameSuggestion;
+}
+
 export const genusApi = {
   getAll: async (search?: string): Promise<Genus[]> => {
     const params = search ? { search } : {};
@@ -29,6 +39,11 @@ export const genusApi = {
 
   create: async (data: CreateGenusDto): Promise<Genus> => {
     const response = await apiClient.post<Genus>('/genus', data);
+    return response.data;
+  },
+
+  validate: async (query: string): Promise<ValidateResult> => {
+    const response = await apiClient.post<ValidateResult>('/genus/validate', { query });
     return response.data;
   },
 

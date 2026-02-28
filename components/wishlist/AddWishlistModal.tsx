@@ -10,81 +10,48 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ComboBox } from '@/components/ui/combobox';
-import { DatePicker } from '@/components/ui/date-picker';
 import { FileInput } from '@/components/ui/file-input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { genusApi, varietyApi, plantsApi, shelvesApi, Genus, Variety, Shelf } from '@/lib/api';
+import { genusApi, varietyApi, wishlistApi, Genus, Variety } from '@/lib/api';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { toast } from 'sonner';
-import { CreateGenusModal } from './CreateGenusModal';
-import { CreateVarietyModal } from './CreateVarietyModal';
 
-interface AddPlantModalProps {
+interface AddWishlistModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-interface PlantFormData {
+interface WishlistFormData {
   genusId: string;
   varietyId?: string;
-  shelfIds?: string[];
-  purchaseDate?: Date;
   photo?: FileList;
-  description?: string;
 }
 
-export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalProps) {
+export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistModalProps) {
   const [genuses, setGenuses] = useState<Genus[]>([]);
   const [varieties, setVarieties] = useState<Variety[]>([]);
-  const [shelves, setShelves] = useState<Shelf[]>([]);
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
-  const [selectedShelfIds, setSelectedShelfIds] = useState<string[]>([]);
   const [genusSearch, setGenusSearch] = useState<string>('');
   const [varietySearch, setVarietySearch] = useState<string>('');
-  const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGenuses, setIsLoadingGenuses] = useState(false);
   const [isLoadingVarieties, setIsLoadingVarieties] = useState(false);
-  const [isLoadingShelves, setIsLoadingShelves] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [createGenusOpen, setCreateGenusOpen] = useState(false);
-  const [createVarietyOpen, setCreateVarietyOpen] = useState(false);
-  const [createGenusQuery, setCreateGenusQuery] = useState('');
-  const [createVarietyQuery, setCreateVarietyQuery] = useState('');
 
   const debouncedGenusSearch = useDebounce(genusSearch, 300);
   const debouncedVarietySearch = useDebounce(varietySearch, 300);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<PlantFormData>();
-
-  // Сброс состояния при закрытии модального окна
-  useEffect(() => {
-    if (!open) {
-      reset();
-      setSelectedGenusId('');
-      setSelectedVarietyId('');
-      setSelectedShelfIds([]);
-      setGenusSearch('');
-      setVarietySearch('');
-      setPurchaseDate(new Date());
-      setPhotoPreview(null);
-      setSelectedFile(null);
-    }
-  }, [open]);
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<WishlistFormData>();
 
   // Загрузка родов при открытии модального окна или изменении поиска
   useEffect(() => {
     if (open) {
       loadGenuses(debouncedGenusSearch);
-      loadShelves();
     }
   }, [open, debouncedGenusSearch]);
 
@@ -123,45 +90,27 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     }
   };
 
-  const loadShelves = async () => {
-    setIsLoadingShelves(true);
-    try {
-      const data = await shelvesApi.getAll();
-      setShelves(data);
-    } catch (error) {
-      toast.error('Ошибка загрузки полок');
-      console.error('Failed to load shelves:', error);
-    } finally {
-      setIsLoadingShelves(false);
-    }
-  };
-
-  const onSubmit = async (data: PlantFormData) => {
+  const onSubmit = async (data: WishlistFormData) => {
     setIsLoading(true);
     try {
-      await plantsApi.create({
+      await wishlistApi.create({
         genusId: data.genusId,
         varietyId: data.varietyId || undefined,
-        shelfIds: selectedShelfIds.length > 0 ? selectedShelfIds : undefined,
-        purchaseDate: purchaseDate ? purchaseDate.toISOString() : undefined,
         photo: selectedFile || undefined,
-        description: data.description || undefined,
       });
-      toast.success('Растение успешно добавлено!');
+      toast.success('Растение добавлено в список желаний!');
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
-      setSelectedShelfIds([]);
       setGenusSearch('');
       setVarietySearch('');
-      setPurchaseDate(new Date());
       setPhotoPreview(null);
       setSelectedFile(null);
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      toast.error('Ошибка при добавлении растения');
-      console.error('Failed to create plant:', error);
+      toast.error('Ошибка при добавлении в список желаний');
+      console.error('Failed to create wishlist item:', error);
     } finally {
       setIsLoading(false);
     }
@@ -214,36 +163,6 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     setValue('varietyId', value);
   };
 
-  const handleCreateNewGenus = (searchValue: string) => {
-    setCreateGenusQuery(searchValue);
-    setCreateGenusOpen(true);
-  };
-
-  const handleGenusCreated = (genus: Genus) => {
-    setGenuses((prev) => [...prev, genus]);
-    handleGenusChange(genus._id);
-  };
-
-  const handleCreateNewVariety = (searchValue: string) => {
-    setCreateVarietyQuery(searchValue);
-    setCreateVarietyOpen(true);
-  };
-
-  const handleVarietyCreated = (variety: Variety) => {
-    setVarieties((prev) => [...prev, variety]);
-    handleVarietyChange(variety._id);
-  };
-
-  const handleShelfToggle = (shelfId: string) => {
-    setSelectedShelfIds(prev => {
-      if (prev.includes(shelfId)) {
-        return prev.filter(id => id !== shelfId);
-      } else {
-        return [...prev, shelfId];
-      }
-    });
-  };
-
   const getDisplayName = (nameRu: string, nameEn: string) => {
     return `${nameRu} / ${nameEn}`;
   };
@@ -258,32 +177,13 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     label: getDisplayName(variety.nameRu, variety.nameEn),
   }));
 
-  const shelfOptions = shelves.map((shelf) => ({
-    value: shelf._id,
-    label: shelf.name,
-  }));
-
   return (
-    <>
-    <CreateGenusModal
-      open={createGenusOpen}
-      onOpenChange={setCreateGenusOpen}
-      initialQuery={createGenusQuery}
-      onCreated={handleGenusCreated}
-    />
-    <CreateVarietyModal
-      open={createVarietyOpen}
-      onOpenChange={setCreateVarietyOpen}
-      initialQuery={createVarietyQuery}
-      genusId={selectedGenusId}
-      onCreated={handleVarietyCreated}
-    />
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Добавить растение</DialogTitle>
+          <DialogTitle>Добавить в список желаний</DialogTitle>
           <DialogDescription>
-            Заполните информацию о вашем растении
+            Выберите растение, которое хотите приобрести
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -302,8 +202,6 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
                 emptyText="Ничего не найдено"
                 isLoading={isLoadingGenuses}
                 onSearchChange={setGenusSearch}
-                onCreateNew={handleCreateNewGenus}
-                createNewLabel="Создать род"
               />
               {errors.genusId && (
                 <p className="text-sm text-destructive">Это поле обязательно</p>
@@ -327,57 +225,12 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
                 isLoading={isLoadingVarieties}
                 disabled={!selectedGenusId}
                 onSearchChange={setVarietySearch}
-                onCreateNew={selectedGenusId ? handleCreateNewVariety : undefined}
-                createNewLabel="Создать сорт"
-              />
-            </div>
-
-            {/* Полки */}
-            <div className="grid gap-2">
-              <Label>Полки</Label>
-              {isLoadingShelves ? (
-                <div className="text-sm text-muted-foreground">Загрузка полок...</div>
-              ) : shelves.length === 0 ? (
-                <div className="text-sm text-muted-foreground">Нет доступных полок</div>
-              ) : (
-                <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-3">
-                  {shelves.map((shelf) => (
-                    <div key={shelf._id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`shelf-${shelf._id}`}
-                        checked={selectedShelfIds.includes(shelf._id)}
-                        onCheckedChange={() => handleShelfToggle(shelf._id)}
-                      />
-                      <label
-                        htmlFor={`shelf-${shelf._id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {shelf.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {selectedShelfIds.length > 0 && (
-                <div className="text-sm text-muted-foreground">
-                  Выбрано полок: {selectedShelfIds.length}
-                </div>
-              )}
-            </div>
-
-            {/* Дата покупки */}
-            <div className="grid gap-2">
-              <Label htmlFor="purchaseDate">Дата покупки</Label>
-              <DatePicker
-                date={purchaseDate}
-                onDateChange={setPurchaseDate}
-                placeholder="Выберите дату покупки"
               />
             </div>
 
             {/* Фото растения */}
             <div className="grid gap-2">
-              <Label htmlFor="photo">Фото растения</Label>
+              <Label htmlFor="photo">Фото растения (необязательно)</Label>
               <FileInput
                 id="photo"
                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -386,17 +239,6 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
                 onRemove={handleRemovePhoto}
                 maxSize={5 * 1024 * 1024}
                 acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP']}
-              />
-            </div>
-
-            {/* Описание */}
-            <div className="grid gap-2">
-              <Label htmlFor="description">Описание</Label>
-              <Textarea
-                id="description"
-                placeholder="Добавьте описание вашего растения..."
-                {...register('description')}
-                rows={3}
               />
             </div>
           </div>
@@ -417,6 +259,5 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
         </form>
       </DialogContent>
     </Dialog>
-    </>
   );
 }
