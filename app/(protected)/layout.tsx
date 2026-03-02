@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
-import { Leaf, LayoutDashboard, Settings, Layers, Users, User } from 'lucide-react';
+import { Logo } from '@/components/logo';
+import { LayoutDashboard, Settings, Layers, Users, User, Leaf } from 'lucide-react';
 
 export default function ProtectedLayout({
   children,
@@ -22,7 +23,7 @@ export default function ProtectedLayout({
   }, [fetchUser, initialized]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 lg:px-8">
@@ -30,10 +31,10 @@ export default function ProtectedLayout({
             {/* Logo & Nav */}
             <div className="flex items-center gap-8">
               <Link href="/dashboard" className="flex items-center gap-2 group">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
-                  <Leaf className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors text-primary">
+                  <Logo size="sm" />
                 </div>
-                <span className="text-xl font-bold">Растения</span>
+                <span className="text-xl font-bold">Plantsheep</span>
               </Link>
 
               {user && (
@@ -105,9 +106,27 @@ export default function ProtectedLayout({
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 lg:px-8 py-8 pb-24 md:pb-8">
+      <main className="flex-1 container mx-auto px-4 lg:px-8 py-8 pb-24 md:pb-8">
         {children}
       </main>
+
+      {/* Footer */}
+      <footer className="w-full border-t border-border/30 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/40 mt-16 md:mb-0 mb-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex h-20 items-center justify-center">
+            <p className="text-base text-muted-foreground text-center">
+              Нужна помощь или есть предложение?{' '}
+              <br className='sm:hidden' />
+              <a
+                href="mailto:grushevskayyy7@gmail.com"
+                className="font-medium text-primary hover:underline transition-all"
+              >
+                Напишите нам – мы всё читаем :)
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {/* Mobile Bottom Navigation */}
       {user && (

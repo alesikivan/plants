@@ -8,9 +8,13 @@ export function middleware(request: NextRequest) {
   const publicPaths = ['/login', '/register'];
   const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
 
-  // Check for accessToken cookie
-  const token = request.cookies.get('accessToken');
-  const isAuthenticated = !!token;
+  // Check for accessToken OR refreshToken cookie.
+  // accessToken expires in 15 min, but refreshToken lives 7 days.
+  // If only refreshToken is present, let the request through — the axios
+  // interceptor on the client will refresh the access token automatically.
+  const accessToken = request.cookies.get('accessToken');
+  const refreshToken = request.cookies.get('refreshToken');
+  const isAuthenticated = !!accessToken || !!refreshToken;
 
   // If user is NOT authenticated and trying to access protected page
   if (!isAuthenticated && !isPublicPath && pathname !== '/') {

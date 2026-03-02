@@ -31,6 +31,7 @@ export interface CreatePlantDto {
 export interface UpdatePlantDto {
   genusId?: string;
   varietyId?: string;
+  removeVariety?: boolean;
   shelfIds?: string[];
   purchaseDate?: string;
   photo?: File;
@@ -124,6 +125,9 @@ export const plantsApi = {
     if (data.varietyId) {
       formData.append('varietyId', data.varietyId);
     }
+    if (data.removeVariety) {
+      formData.append('removeVariety', 'true');
+    }
     if (data.shelfIds !== undefined) {
       data.shelfIds.forEach((shelfId) => {
         formData.append('shelfIds[]', shelfId);
@@ -152,6 +156,15 @@ export const plantsApi = {
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/plants/${id}`);
+  },
+
+  adminGetAll: async (): Promise<Plant[]> => {
+    const response = await apiClient.get<Plant[]>('/plants/admin/all');
+    return response.data;
+  },
+
+  adminDelete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/plants/admin/${id}`);
   },
 };
 
@@ -230,5 +243,14 @@ export const plantHistoryApi = {
 
   delete: async (plantId: string, historyId: string): Promise<void> => {
     await apiClient.delete(`/plants/${plantId}/history/${historyId}`);
+  },
+
+  adminGetAll: async (): Promise<PlantHistory[]> => {
+    const response = await apiClient.get<PlantHistory[]>('/plants/admin/history');
+    return response.data;
+  },
+
+  adminDelete: async (historyId: string): Promise<void> => {
+    await apiClient.delete(`/plants/admin/history/${historyId}`);
   },
 };

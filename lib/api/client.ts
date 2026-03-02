@@ -43,22 +43,58 @@ if (process.env.NODE_ENV === 'development') {
   );
 }
 
+// Clear session cookies and redirect to login page
+async function forceLogout(reason?: string) {
+  if (typeof window === 'undefined') return;
+  const currentPath = window.location.pathname;
+  if (currentPath.startsWith('/login') || currentPath.startsWith('/register') || currentPath === '/') return;
+
+  try {
+    // Clear httpOnly cookies server-side so middleware doesn't loop
+    await axios.post(
+      `${API_BASE_URL}/auth/clear-session`,
+      {},
+      { withCredentials: true, timeout: 5000 },
+    );
+  } catch {
+    // If clear-session fails, redirect anyway
+  }
+
+  const url = reason
+    ? `/login?reason=${encodeURIComponent(reason)}`
+    : '/login';
+  window.location.href = url;
+}
+
 // Response interceptor for automatic token refresh and error handling
 apiClient.interceptors.response.use(
   (response) => {
     // Log successful responses in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🟢 API Response:', {
-        method: response.config.method?.toUpperCase(),
-        url: response.config.url,
-        status: response.status,
-        data: response.data,
-      });
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.log('🟢 API Response:', {
+    //     method: response.config.method?.toUpperCase(),
+    //     url: response.config.url,
+    //     status: response.status,
+    //     data: response.data,
+    //   });
+    // }
     return response;
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    // Handle 403 - Forbidden (blocked account) — JWT strategy throws this
+    if (
+      error.response?.status === 403 &&
+      !originalRequest?.url?.includes('/auth/clear-session')
+    ) {
+      const msg = (error.response?.data as any)?.message || '';
+      if (msg.includes('заблокирован') || msg.includes('blocked')) {
+        await forceLogout('blocked');
+        handleApiError(error);
+        return Promise.reject(error);
+      }
+    }
 
     // Handle 401 - Unauthorized (token refresh logic)
     if (
@@ -98,13 +134,8 @@ apiClient.interceptors.response.use(
         processQueue(refreshError as Error);
         isRefreshing = false;
 
-        // Redirect to login (only if not already on login/register page)
-        if (typeof window !== 'undefined') {
-          const currentPath = window.location.pathname;
-          if (!currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
-            window.location.href = '/login';
-          }
-        }
+        // Clear cookies then redirect — prevents middleware loop
+        await forceLogout();
 
         return Promise.reject(refreshError);
       }

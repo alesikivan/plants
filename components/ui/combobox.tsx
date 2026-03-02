@@ -98,7 +98,7 @@ export function ComboBox({
             value={searchValue}
             onValueChange={handleSearchChange}
           />
-          <CommandList>
+          <CommandList onWheel={(e) => e.stopPropagation()}>
             {isLoading ? (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />

@@ -114,7 +114,7 @@ export function formatErrorMessage(error: ApiError): string {
 }
 
 // Check if error should be shown to user
-export function shouldShowError(errorType: ErrorType, url?: string): boolean {
+export function shouldShowError(errorType: ErrorType, url?: string, message?: string): boolean {
   // Show UNAUTHORIZED errors for login/register pages (invalid credentials)
   if (errorType === ErrorType.UNAUTHORIZED) {
     // Show toast for auth endpoints (login/register fail)
@@ -127,6 +127,19 @@ export function shouldShowError(errorType: ErrorType, url?: string): boolean {
     }
     // Don't show for other endpoints (will redirect to login)
     return false;
+  }
+
+  // Don't show FORBIDDEN errors for blocked/deleted accounts — redirect handles it
+  // Exception: on the login page we DO want to show the message
+  if (errorType === ErrorType.FORBIDDEN) {
+    if (message?.includes('заблокирован') || message?.includes('blocked')) {
+      return url?.includes('/auth/login') ?? false;
+    }
+    // Don't show FORBIDDEN errors for public user profile endpoints — the UI
+    // already shows an EyeOff block explaining the content is hidden.
+    if (url?.match(/\/users\/[^/]+\/(plants|shelves)/)) {
+      return false;
+    }
   }
 
   // Show all other errors

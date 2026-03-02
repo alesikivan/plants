@@ -7,9 +7,10 @@ import Link from 'next/link';
 interface ShelfCardProps {
   shelf: Shelf;
   index?: number;
+  href?: string;
 }
 
-export function ShelfCard({ shelf, index = 0 }: ShelfCardProps) {
+export function ShelfCard({ shelf, index = 0, href }: ShelfCardProps) {
   const shelfPhotoUrl = getShelfPhotoUrl(shelf.photo);
   const plants = shelf.plants || [];
   const plantPhotos = plants
@@ -18,7 +19,7 @@ export function ShelfCard({ shelf, index = 0 }: ShelfCardProps) {
     .slice(0, 3);
 
   return (
-    <Link href={`/shelves/${shelf._id}`}>
+    <Link href={href ?? `/shelves/${shelf._id}`}>
       <div className="group">
         <div className="aspect-square relative bg-background rounded-lg overflow-hidden mb-3 shadow-sm">
           {shelfPhotoUrl ? (

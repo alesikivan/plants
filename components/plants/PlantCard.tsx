@@ -10,9 +10,10 @@ import Link from 'next/link';
 interface PlantCardProps {
   plant: Plant;
   index?: number;
+  href?: string;
 }
 
-export function PlantCard({ plant, index = 0 }: PlantCardProps) {
+export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
 
@@ -25,7 +26,7 @@ export function PlantCard({ plant, index = 0 }: PlantCardProps) {
   const photoUrl = getPlantPhotoUrl(plant.photo);
 
   return (
-    <Link href={`/plants/${plant._id}`}>
+    <Link href={href ?? `/plants/${plant._id}`}>
       <div className="group">
         <div className="aspect-square relative bg-background rounded-lg overflow-hidden mb-3 shadow-sm">
           {photoUrl ? (

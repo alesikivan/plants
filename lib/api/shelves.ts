@@ -94,4 +94,13 @@ export const shelvesApi = {
   updatePlants: async (shelfId: string, plantIds: string[]): Promise<void> => {
     await apiClient.put(`/shelves/${shelfId}/plants`, { plantIds });
   },
+
+  adminGetAll: async (): Promise<Shelf[]> => {
+    const response = await apiClient.get<Shelf[]>('/shelves/admin/all');
+    return response.data;
+  },
+
+  adminDelete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/shelves/admin/${id}`);
+  },
 };

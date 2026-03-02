@@ -23,6 +23,8 @@ export interface CreateWishlistDto {
 export interface UpdateWishlistDto {
   genusId?: string;
   varietyId?: string;
+  removeVariety?: boolean;
+  removePhoto?: boolean;
   photo?: File;
 }
 
@@ -70,6 +72,12 @@ export const wishlistApi = {
     }
     if (data.varietyId) {
       formData.append('varietyId', data.varietyId);
+    }
+    if (data.removeVariety) {
+      formData.append('removeVariety', 'true');
+    }
+    if (data.removePhoto) {
+      formData.append('removePhoto', 'true');
     }
     if (data.photo) {
       formData.append('photo', data.photo);

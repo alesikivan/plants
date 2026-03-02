@@ -18,8 +18,8 @@ export function handleApiError(error: AxiosError): ApiError {
     });
   }
 
-  // Show toast notification (pass URL to determine if we should show)
-  if (shouldShowError(apiError.type, error.config?.url)) {
+  // Show toast notification (pass URL and message to determine if we should show)
+  if (shouldShowError(apiError.type, error.config?.url, apiError.message)) {
     showErrorToast(apiError);
   }
 

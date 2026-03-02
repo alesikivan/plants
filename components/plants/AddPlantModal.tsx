@@ -14,15 +14,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ComboBox } from '@/components/ui/combobox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileInput } from '@/components/ui/file-input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { genusApi, varietyApi, plantsApi, shelvesApi, Genus, Variety, Shelf } from '@/lib/api';
-import { useDebounce } from '@/lib/hooks/useDebounce';
+import { plantsApi, shelvesApi, Shelf } from '@/lib/api';
 import { toast } from 'sonner';
-import { CreateGenusModal } from './CreateGenusModal';
-import { CreateVarietyModal } from './CreateVarietyModal';
+import { PlantSelector } from './PlantSelector';
 
 interface AddPlantModalProps {
   open: boolean;
@@ -40,28 +37,15 @@ interface PlantFormData {
 }
 
 export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalProps) {
-  const [genuses, setGenuses] = useState<Genus[]>([]);
-  const [varieties, setVarieties] = useState<Variety[]>([]);
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
   const [selectedShelfIds, setSelectedShelfIds] = useState<string[]>([]);
-  const [genusSearch, setGenusSearch] = useState<string>('');
-  const [varietySearch, setVarietySearch] = useState<string>('');
   const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(new Date());
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingGenuses, setIsLoadingGenuses] = useState(false);
-  const [isLoadingVarieties, setIsLoadingVarieties] = useState(false);
   const [isLoadingShelves, setIsLoadingShelves] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [createGenusOpen, setCreateGenusOpen] = useState(false);
-  const [createVarietyOpen, setCreateVarietyOpen] = useState(false);
-  const [createGenusQuery, setCreateGenusQuery] = useState('');
-  const [createVarietyQuery, setCreateVarietyQuery] = useState('');
-
-  const debouncedGenusSearch = useDebounce(genusSearch, 300);
-  const debouncedVarietySearch = useDebounce(varietySearch, 300);
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<PlantFormData>();
 
@@ -72,56 +56,18 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       setSelectedGenusId('');
       setSelectedVarietyId('');
       setSelectedShelfIds([]);
-      setGenusSearch('');
-      setVarietySearch('');
       setPurchaseDate(new Date());
       setPhotoPreview(null);
       setSelectedFile(null);
     }
   }, [open]);
 
-  // Загрузка родов при открытии модального окна или изменении поиска
+  // Загрузка полок при открытии модального окна
   useEffect(() => {
     if (open) {
-      loadGenuses(debouncedGenusSearch);
       loadShelves();
     }
-  }, [open, debouncedGenusSearch]);
-
-  // Загрузка сортов при выборе рода или изменении поиска
-  useEffect(() => {
-    if (selectedGenusId) {
-      loadVarieties(selectedGenusId, debouncedVarietySearch);
-    } else {
-      setVarieties([]);
-    }
-  }, [selectedGenusId, debouncedVarietySearch]);
-
-  const loadGenuses = async (search?: string) => {
-    setIsLoadingGenuses(true);
-    try {
-      const data = await genusApi.getAll(search);
-      setGenuses(data);
-    } catch (error) {
-      toast.error('Ошибка загрузки родов растений');
-      console.error('Failed to load genuses:', error);
-    } finally {
-      setIsLoadingGenuses(false);
-    }
-  };
-
-  const loadVarieties = async (genusId: string, search?: string) => {
-    setIsLoadingVarieties(true);
-    try {
-      const data = await varietyApi.getAll(genusId, search);
-      setVarieties(data);
-    } catch (error) {
-      toast.error('Ошибка загрузки сортов растений');
-      console.error('Failed to load varieties:', error);
-    } finally {
-      setIsLoadingVarieties(false);
-    }
-  };
+  }, [open]);
 
   const loadShelves = async () => {
     setIsLoadingShelves(true);
@@ -152,8 +98,6 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       setSelectedGenusId('');
       setSelectedVarietyId('');
       setSelectedShelfIds([]);
-      setGenusSearch('');
-      setVarietySearch('');
       setPurchaseDate(new Date());
       setPhotoPreview(null);
       setSelectedFile(null);
@@ -201,37 +145,16 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     setPhotoPreview(null);
   };
 
-  const handleGenusChange = (value: string) => {
-    setSelectedGenusId(value);
-    setValue('genusId', value);
-    setSelectedVarietyId(''); // Сбрасываем выбранный сорт
-    setValue('varietyId', ''); // Сбрасываем выбранный сорт
-    setVarietySearch(''); // Сбрасываем поиск сортов
+  const handleGenusChange = (genusId: string) => {
+    setSelectedGenusId(genusId);
+    setValue('genusId', genusId);
+    setSelectedVarietyId('');
+    setValue('varietyId', '');
   };
 
-  const handleVarietyChange = (value: string) => {
-    setSelectedVarietyId(value);
-    setValue('varietyId', value);
-  };
-
-  const handleCreateNewGenus = (searchValue: string) => {
-    setCreateGenusQuery(searchValue);
-    setCreateGenusOpen(true);
-  };
-
-  const handleGenusCreated = (genus: Genus) => {
-    setGenuses((prev) => [...prev, genus]);
-    handleGenusChange(genus._id);
-  };
-
-  const handleCreateNewVariety = (searchValue: string) => {
-    setCreateVarietyQuery(searchValue);
-    setCreateVarietyOpen(true);
-  };
-
-  const handleVarietyCreated = (variety: Variety) => {
-    setVarieties((prev) => [...prev, variety]);
-    handleVarietyChange(variety._id);
+  const handleVarietyChange = (varietyId: string) => {
+    setSelectedVarietyId(varietyId);
+    setValue('varietyId', varietyId);
   };
 
   const handleShelfToggle = (shelfId: string) => {
@@ -244,40 +167,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     });
   };
 
-  const getDisplayName = (nameRu: string, nameEn: string) => {
-    return `${nameRu} / ${nameEn}`;
-  };
-
-  const genusOptions = genuses.map((genus) => ({
-    value: genus._id,
-    label: getDisplayName(genus.nameRu, genus.nameEn),
-  }));
-
-  const varietyOptions = varieties.map((variety) => ({
-    value: variety._id,
-    label: getDisplayName(variety.nameRu, variety.nameEn),
-  }));
-
-  const shelfOptions = shelves.map((shelf) => ({
-    value: shelf._id,
-    label: shelf.name,
-  }));
-
   return (
     <>
-    <CreateGenusModal
-      open={createGenusOpen}
-      onOpenChange={setCreateGenusOpen}
-      initialQuery={createGenusQuery}
-      onCreated={handleGenusCreated}
-    />
-    <CreateVarietyModal
-      open={createVarietyOpen}
-      onOpenChange={setCreateVarietyOpen}
-      initialQuery={createVarietyQuery}
-      genusId={selectedGenusId}
-      onCreated={handleVarietyCreated}
-    />
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -288,49 +179,16 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
-            {/* Род растения */}
-            <div className="grid gap-2">
-              <Label htmlFor="genusId">
-                Род растения <span className="text-destructive">*</span>
-              </Label>
-              <ComboBox
-                options={genusOptions}
-                value={selectedGenusId}
-                onValueChange={handleGenusChange}
-                placeholder="Выберите род растения"
-                searchPlaceholder="Поиск рода..."
-                emptyText="Ничего не найдено"
-                isLoading={isLoadingGenuses}
-                onSearchChange={setGenusSearch}
-                onCreateNew={handleCreateNewGenus}
-                createNewLabel="Создать род"
-              />
-              {errors.genusId && (
-                <p className="text-sm text-destructive">Это поле обязательно</p>
-              )}
-            </div>
-
-            {/* Сорт растения */}
-            <div className="grid gap-2">
-              <Label htmlFor="varietyId">Сорт растения</Label>
-              <ComboBox
-                options={varietyOptions}
-                value={selectedVarietyId}
-                onValueChange={handleVarietyChange}
-                placeholder={
-                  !selectedGenusId
-                    ? 'Сначала выберите род'
-                    : 'Выберите сорт'
-                }
-                searchPlaceholder="Поиск сорта..."
-                emptyText={varietySearch ? 'Ничего не найдено' : 'Нет доступных сортов'}
-                isLoading={isLoadingVarieties}
-                disabled={!selectedGenusId}
-                onSearchChange={setVarietySearch}
-                onCreateNew={selectedGenusId ? handleCreateNewVariety : undefined}
-                createNewLabel="Создать сорт"
-              />
-            </div>
+            {/* Род и сорт растения */}
+            <PlantSelector
+              selectedGenusId={selectedGenusId}
+              selectedVarietyId={selectedVarietyId}
+              onGenusChange={handleGenusChange}
+              onVarietyChange={handleVarietyChange}
+              allowCreate
+              required
+              genusError={!!errors.genusId}
+            />
 
             {/* Полки */}
             <div className="grid gap-2">

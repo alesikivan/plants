@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Button } from '@/components/ui/button';
-import { Leaf } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function HomePage() {
   const user = useAuthStore((state) => state.user);
@@ -13,15 +13,15 @@ export default function HomePage() {
       <div className="w-full max-w-2xl text-center space-y-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center backdrop-blur-xl border border-primary/20">
-            <Leaf className="w-10 h-10 text-primary" />
+          <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center backdrop-blur-xl border border-primary/20 text-primary">
+            <Logo size="lg" />
           </div>
         </div>
 
         {/* Hero Text */}
         <div className="space-y-4">
           <h1 className="text-6xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Растения
+            Plantsheep
           </h1>
           <p className="text-xl text-muted-foreground max-w-md mx-auto leading-relaxed">
             Отслеживайте и управляйте своей коллекцией растений с элегантной простотой

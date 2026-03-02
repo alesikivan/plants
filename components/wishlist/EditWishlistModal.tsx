@@ -12,11 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ComboBox } from '@/components/ui/combobox';
 import { FileInput } from '@/components/ui/file-input';
-import { genusApi, varietyApi, wishlistApi, Genus, Variety, Wishlist, getWishlistPhotoUrl } from '@/lib/api';
-import { useDebounce } from '@/lib/hooks/useDebounce';
+import { wishlistApi, Wishlist, getWishlistPhotoUrl } from '@/lib/api';
 import { toast } from 'sonner';
+import { PlantSelector } from '@/components/plants/PlantSelector';
 
 interface EditWishlistModalProps {
   open: boolean;
@@ -32,22 +31,14 @@ interface WishlistFormData {
 }
 
 export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem }: EditWishlistModalProps) {
-  const [genuses, setGenuses] = useState<Genus[]>([]);
-  const [varieties, setVarieties] = useState<Variety[]>([]);
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
-  const [genusSearch, setGenusSearch] = useState<string>('');
-  const [varietySearch, setVarietySearch] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingGenuses, setIsLoadingGenuses] = useState(false);
-  const [isLoadingVarieties, setIsLoadingVarieties] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [removeCurrentPhoto, setRemoveCurrentPhoto] = useState(false);
 
-  const debouncedGenusSearch = useDebounce(genusSearch, 300);
-  const debouncedVarietySearch = useDebounce(varietySearch, 300);
-
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<WishlistFormData>();
+  const { handleSubmit, reset, setValue, formState: { errors } } = useForm<WishlistFormData>();
 
   // Initialize form with wishlist item data
   useEffect(() => {
@@ -63,67 +54,27 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
       if (wishlistItem.photo) {
         setPhotoPreview(getWishlistPhotoUrl(wishlistItem.photo) || null);
       }
+      setRemoveCurrentPhoto(false);
     }
   }, [open, wishlistItem, setValue]);
-
-  // Загрузка родов при открытии модального окна или изменении поиска
-  useEffect(() => {
-    if (open) {
-      loadGenuses(debouncedGenusSearch);
-    }
-  }, [open, debouncedGenusSearch]);
-
-  // Загрузка сортов при выборе рода или изменении поиска
-  useEffect(() => {
-    if (selectedGenusId) {
-      loadVarieties(selectedGenusId, debouncedVarietySearch);
-    } else {
-      setVarieties([]);
-    }
-  }, [selectedGenusId, debouncedVarietySearch]);
-
-  const loadGenuses = async (search?: string) => {
-    setIsLoadingGenuses(true);
-    try {
-      const data = await genusApi.getAll(search);
-      setGenuses(data);
-    } catch (error) {
-      toast.error('Ошибка загрузки родов растений');
-      console.error('Failed to load genuses:', error);
-    } finally {
-      setIsLoadingGenuses(false);
-    }
-  };
-
-  const loadVarieties = async (genusId: string, search?: string) => {
-    setIsLoadingVarieties(true);
-    try {
-      const data = await varietyApi.getAll(genusId, search);
-      setVarieties(data);
-    } catch (error) {
-      toast.error('Ошибка загрузки сортов растений');
-      console.error('Failed to load varieties:', error);
-    } finally {
-      setIsLoadingVarieties(false);
-    }
-  };
 
   const onSubmit = async (data: WishlistFormData) => {
     setIsLoading(true);
     try {
       await wishlistApi.update(wishlistItem._id, {
-        genusId: data.genusId,
-        varietyId: data.varietyId || undefined,
+        genusId: selectedGenusId,
+        varietyId: selectedVarietyId || undefined,
+        removeVariety: !selectedVarietyId,
+        removePhoto: removeCurrentPhoto,
         photo: selectedFile || undefined,
       });
       toast.success('Список желаний обновлен!');
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
-      setGenusSearch('');
-      setVarietySearch('');
       setPhotoPreview(null);
       setSelectedFile(null);
+      setRemoveCurrentPhoto(false);
       onOpenChange(false);
       onSuccess();
     } catch (error) {
@@ -166,34 +117,20 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
   const handleRemovePhoto = () => {
     setSelectedFile(null);
     setPhotoPreview(null);
+    setRemoveCurrentPhoto(true);
   };
 
-  const handleGenusChange = (value: string) => {
-    setSelectedGenusId(value);
-    setValue('genusId', value);
-    setSelectedVarietyId(''); // Сбрасываем выбранный сорт
-    setValue('varietyId', ''); // Сбрасываем выбранный сорт
-    setVarietySearch(''); // Сбрасываем поиск сортов
+  const handleGenusChange = (genusId: string) => {
+    setSelectedGenusId(genusId);
+    setValue('genusId', genusId);
+    setSelectedVarietyId('');
+    setValue('varietyId', '');
   };
 
-  const handleVarietyChange = (value: string) => {
-    setSelectedVarietyId(value);
-    setValue('varietyId', value);
+  const handleVarietyChange = (varietyId: string) => {
+    setSelectedVarietyId(varietyId);
+    setValue('varietyId', varietyId);
   };
-
-  const getDisplayName = (nameRu: string, nameEn: string) => {
-    return `${nameRu} / ${nameEn}`;
-  };
-
-  const genusOptions = genuses.map((genus) => ({
-    value: genus._id,
-    label: getDisplayName(genus.nameRu, genus.nameEn),
-  }));
-
-  const varietyOptions = varieties.map((variety) => ({
-    value: variety._id,
-    label: getDisplayName(variety.nameRu, variety.nameEn),
-  }));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -206,45 +143,16 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
-            {/* Род растения */}
-            <div className="grid gap-2">
-              <Label htmlFor="genusId">
-                Род растения <span className="text-destructive">*</span>
-              </Label>
-              <ComboBox
-                options={genusOptions}
-                value={selectedGenusId}
-                onValueChange={handleGenusChange}
-                placeholder="Выберите род растения"
-                searchPlaceholder="Поиск рода..."
-                emptyText="Ничего не найдено"
-                isLoading={isLoadingGenuses}
-                onSearchChange={setGenusSearch}
-              />
-              {errors.genusId && (
-                <p className="text-sm text-destructive">Это поле обязательно</p>
-              )}
-            </div>
-
-            {/* Сорт растения */}
-            <div className="grid gap-2">
-              <Label htmlFor="varietyId">Сорт растения</Label>
-              <ComboBox
-                options={varietyOptions}
-                value={selectedVarietyId}
-                onValueChange={handleVarietyChange}
-                placeholder={
-                  !selectedGenusId
-                    ? 'Сначала выберите род'
-                    : 'Выберите сорт'
-                }
-                searchPlaceholder="Поиск сорта..."
-                emptyText={varietySearch ? 'Ничего не найдено' : 'Нет доступных сортов'}
-                isLoading={isLoadingVarieties}
-                disabled={!selectedGenusId}
-                onSearchChange={setVarietySearch}
-              />
-            </div>
+            {/* Род и сорт растения */}
+            <PlantSelector
+              selectedGenusId={selectedGenusId}
+              selectedVarietyId={selectedVarietyId}
+              onGenusChange={handleGenusChange}
+              onVarietyChange={handleVarietyChange}
+              allowCreate
+              required
+              genusError={!!errors.genusId}
+            />
 
             {/* Фото растения */}
             <div className="grid gap-2">

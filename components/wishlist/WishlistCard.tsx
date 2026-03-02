@@ -80,7 +80,6 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
               onClick={() => setIsEditModalOpen(true)}
             >
               <Edit className="w-4 h-4 mr-1" />
-              Изменить
             </Button>
             <Button
               size="sm"
@@ -88,7 +87,6 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
               onClick={() => setIsDeleteDialogOpen(true)}
             >
               <Trash2 className="w-4 h-4 mr-1" />
-              Удалить
             </Button>
           </div>
         </div>

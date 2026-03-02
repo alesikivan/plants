@@ -10,12 +10,33 @@ export interface UserResponse {
   name: string;
   role: Role;
   preferredLanguage: string;
+  showPlants: boolean;
+  showShelves: boolean;
+  showPlantHistory: boolean;
+  isBlocked: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UpdateUserDto {
   preferredLanguage?: string;
+  showPlants?: boolean;
+  showShelves?: boolean;
+  showPlantHistory?: boolean;
+}
+
+export interface AdminCreateUserDto {
+  email: string;
+  password: string;
+  name: string;
+  role?: Role;
+}
+
+export interface AdminUpdateUserDto {
+  email?: string;
+  name?: string;
+  role?: Role;
+  isBlocked?: boolean;
 }
 
 export interface UserProfileWithStats {
@@ -23,6 +44,9 @@ export interface UserProfileWithStats {
   name: string;
   role: Role;
   preferredLanguage?: string;
+  showPlants: boolean;
+  showShelves: boolean;
+  showPlantHistory: boolean;
   createdAt: string;
   updatedAt: string;
   stats: {

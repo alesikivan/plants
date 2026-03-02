@@ -154,6 +154,7 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
       await plantsApi.update(plant._id, {
         genusId: selectedGenusId,
         varietyId: selectedVarietyId || undefined,
+        removeVariety: !selectedVarietyId,
         shelfIds: selectedShelfIds,
         purchaseDate: purchaseDate ? purchaseDate.toISOString() : undefined,
         photo: selectedFile || undefined,
