@@ -20,15 +20,7 @@ module.exports = {
       repo: 'https://github.com/alesikivan/plants',
       path: '/root/apps/plants-frontend',
 
-      'post-deploy': `
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
-        npm install
-        npm run build
-        pm2 restart plants-frontend || pm2 start npm --name plants-frontend -- start
-        pm2 save --force
-      `
+      'post-deploy': `source ~/.nvm/nvm.sh && npm install && npm run build && pm2 delete plants-frontend && pm2 start ecosystem.config.js --name plants-frontend && pm2 save --force`
     }
   }
 };
