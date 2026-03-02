@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { compressImage } from '@/lib/utils/image-compression';
 
 interface MultiFileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
   onFilesChange?: (files: File[]) => void;
@@ -22,9 +23,10 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
       inputRef.current?.click();
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files ? Array.from(e.target.files) : [];
-      onFilesChange?.(files);
+      const compressed = await Promise.all(files.map((f) => compressImage(f)));
+      onFilesChange?.(compressed);
     };
 
     const formatFileSize = (bytes: number) => {

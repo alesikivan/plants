@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { compressImage } from '@/lib/utils/image-compression';
 
 interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
   onFileChange?: (file: File | null) => void;
@@ -21,9 +22,14 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
       inputRef.current?.click();
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] || null;
-      onFileChange?.(file);
+      if (file) {
+        const compressed = await compressImage(file);
+        onFileChange?.(compressed);
+      } else {
+        onFileChange?.(null);
+      }
     };
 
     const formatFileSize = (bytes: number) => {
