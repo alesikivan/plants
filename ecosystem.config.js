@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'plants-frontend',
-      script: 'node_modules/.bin/next',
-      args: 'start',
+      script: 'bash',                                                                                                                                      
+      args: '-c "npm start"',
       instances: 1,
       env: {
         PORT: 3007,
