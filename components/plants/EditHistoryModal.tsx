@@ -46,12 +46,8 @@ export function EditHistoryModal({
   }, [open, historyItem]);
 
   const handleNewPhotosChange = (files: File[]) => {
-    // Check file size for each file
+    // Check file type for each file
     const validFiles = files.filter(file => {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`Файл ${file.name} превышает 5MB`);
-        return false;
-      }
       if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
         toast.error(`Файл ${file.name} не является изображением`);
         return false;

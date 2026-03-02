@@ -169,11 +169,6 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Размер файла не должен превышать 5MB');
-      return;
-    }
-
     if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
       toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
       return;

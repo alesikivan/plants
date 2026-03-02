@@ -69,12 +69,6 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
       return;
     }
 
-    // Check file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Размер файла не должен превышать 5MB');
-      return;
-    }
-
     // Check file type
     if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
       toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
