@@ -59,9 +59,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true });
     try {
       await authApi.logout();
-      set({ user: null });
     } finally {
-      set({ loading: false });
+      // Clear user regardless of API call success/failure
+      set({ user: null, loading: false });
     }
   },
 
