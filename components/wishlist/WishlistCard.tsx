@@ -75,29 +75,29 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
           )}
 
           {/* Action buttons overlay */}
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 px-1">
             {photoUrl && (
               <Button
-                size="sm"
-                variant="secondary"
+                size="icon"
                 onClick={() => setIsPhotoDialogOpen(true)}
+                className="w-12 h-12 rounded-full bg-white text-black hover:bg-white/90 transition-all hover:scale-110 active:scale-95"
               >
-                <Eye className="w-4 h-4 mr-1" />
+                <Eye className="w-6 h-6" />
               </Button>
             )}
             <Button
-              size="sm"
-              variant="secondary"
+              size="icon"
               onClick={() => setIsEditModalOpen(true)}
+              className="w-12 h-12 rounded-full bg-white text-black hover:bg-white/90 transition-all hover:scale-110 active:scale-95"
             >
-              <Edit className="w-4 h-4 mr-1" />
+              <Edit className="w-6 h-6" />
             </Button>
             <Button
-              size="sm"
-              variant="destructive"
+              size="icon"
               onClick={() => setIsDeleteDialogOpen(true)}
+              className="w-12 h-12 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all hover:scale-110 active:scale-95"
             >
-              <Trash2 className="w-4 h-4 mr-1" />
+              <Trash2 className="w-6 h-6" />
             </Button>
           </div>
         </div>
