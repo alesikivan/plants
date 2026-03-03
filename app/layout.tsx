@@ -5,6 +5,14 @@ import { Providers } from './providers';
 export const metadata: Metadata = {
   title: 'PlantSheep',
   description: 'Приложение для отслеживания истории растений',
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/apple-touch-icon.png',
+    icon: [
+      { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
