@@ -260,6 +260,12 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
     });
   };
 
+  const disableFutureDates = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
+
   const getDisplayName = (nameRu: string, nameEn: string) => {
     return `${nameRu} / ${nameEn}`;
   };
@@ -388,6 +394,7 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
                 date={purchaseDate}
                 onDateChange={setPurchaseDate}
                 placeholder="Выберите дату покупки"
+                disabledMatcher={disableFutureDates}
               />
             </div>
 

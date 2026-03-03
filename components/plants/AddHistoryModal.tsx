@@ -53,6 +53,12 @@ export function AddHistoryModal({
     setPhotoPreviews(newPreviews);
   };
 
+  const disableFutureDates = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -111,6 +117,7 @@ export function AddHistoryModal({
               date={date}
               onDateChange={setDate}
               placeholder="Выберите дату события"
+              disabledMatcher={disableFutureDates}
             />
           </div>
 

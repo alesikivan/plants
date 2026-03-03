@@ -18,6 +18,7 @@ interface DatePickerProps {
   onDateChange?: (date: Date | undefined) => void;
   placeholder?: string;
   disabled?: boolean;
+  disabledMatcher?: (date: Date) => boolean;
 }
 
 export function DatePicker({
@@ -25,6 +26,7 @@ export function DatePicker({
   onDateChange,
   placeholder = 'Выберите дату',
   disabled = false,
+  disabledMatcher,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -53,6 +55,7 @@ export function DatePicker({
           captionLayout="dropdown"
           locale={ru}
           weekStartsOn={1}
+          disabled={disabledMatcher}
           formatters={{
             formatWeekdayName: (date) => {
               const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];

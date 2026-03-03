@@ -162,6 +162,12 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     });
   };
 
+  const disableFutureDates = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
+
   return (
     <>
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -225,6 +231,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
                 date={purchaseDate}
                 onDateChange={setPurchaseDate}
                 placeholder="Выберите дату покупки"
+                disabledMatcher={disableFutureDates}
               />
             </div>
 
