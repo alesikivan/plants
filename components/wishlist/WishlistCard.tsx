@@ -16,8 +16,9 @@ import {
 import { Wishlist, Genus, Variety, getWishlistPhotoUrl, wishlistApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
-import { Leaf, Edit, Trash2 } from 'lucide-react';
+import { Leaf, Edit, Trash2, Eye } from 'lucide-react';
 import { EditWishlistModal } from './EditWishlistModal';
+import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import { toast } from 'sonner';
 
 interface WishlistCardProps {
@@ -31,6 +32,7 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const genus = typeof wishlistItem.genusId === 'object' ? wishlistItem.genusId : null;
@@ -74,6 +76,15 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
 
           {/* Action buttons overlay */}
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            {photoUrl && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setIsPhotoDialogOpen(true)}
+              >
+                <Eye className="w-4 h-4 mr-1" />
+              </Button>
+            )}
             <Button
               size="sm"
               variant="secondary"
@@ -109,6 +120,15 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
         onSuccess={onUpdate}
         wishlistItem={wishlistItem}
       />
+
+      {/* Photo Gallery */}
+      {isPhotoDialogOpen && photoUrl && (
+        <PhotoGallery
+          photos={[photoUrl]}
+          initialIndex={0}
+          onClose={() => setIsPhotoDialogOpen(false)}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
