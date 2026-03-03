@@ -188,8 +188,8 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
     }
 
     // Check file type
-    if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
-      toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
+    if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp|heic|heif)/)) {
+      toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP, HEIC)');
       return;
     }
 
@@ -403,13 +403,13 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
               <Label htmlFor="photo">Фото растения</Label>
               <FileInput
                 id="photo"
-                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
                 onFileChange={handleFileChange}
                 onDateFound={handleDateFound}
                 preview={photoPreview}
                 onRemove={handleRemovePhoto}
                 maxSize={5 * 1024 * 1024}
-                acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP']}
+                acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
               />
             </div>
 

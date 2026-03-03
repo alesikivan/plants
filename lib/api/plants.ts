@@ -75,9 +75,21 @@ export const getPlantHistoryPhotoUrl = (photoFilename: string | undefined): stri
   return `${API_BASE_URL}/plants/history/photo/${photoFilename}`;
 };
 
+export interface PlantFilters {
+  search?: string;
+  genusId?: string;
+  varietyId?: string;
+  shelfId?: string;
+}
+
 export const plantsApi = {
-  getAll: async (): Promise<Plant[]> => {
-    const response = await apiClient.get<Plant[]>('/plants');
+  getAll: async (filters?: PlantFilters): Promise<Plant[]> => {
+    const params: Record<string, string> = {};
+    if (filters?.search) params.search = filters.search;
+    if (filters?.genusId) params.genusId = filters.genusId;
+    if (filters?.varietyId) params.varietyId = filters.varietyId;
+    if (filters?.shelfId) params.shelfId = filters.shelfId;
+    const response = await apiClient.get<Plant[]>('/plants', { params });
     return response.data;
   },
 

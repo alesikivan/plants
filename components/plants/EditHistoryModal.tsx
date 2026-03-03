@@ -48,7 +48,7 @@ export function EditHistoryModal({
   const handleNewPhotosChange = (files: File[]) => {
     // Check file type for each file
     const validFiles = files.filter(file => {
-      if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
+      if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp|heic|heif)/)) {
         toast.error(`Файл ${file.name} не является изображением`);
         return false;
       }
@@ -185,13 +185,13 @@ export function EditHistoryModal({
             <Label htmlFor="photos">Добавить новые фотографии</Label>
             <MultiFileInput
               id="photos"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
               onFilesChange={handleNewPhotosChange}
               onDateFound={handleDateFound}
               previews={newPhotoPreviews}
               onRemove={handleRemoveNewPhoto}
               maxSize={5 * 1024 * 1024}
-              acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP']}
+              acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
               maxFiles={10}
             />
           </div>

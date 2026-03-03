@@ -35,6 +35,7 @@ interface ComboBoxProps {
   onSearchChange?: (search: string) => void;
   onCreateNew?: (searchValue: string) => void;
   createNewLabel?: string;
+  className?: string;
 }
 
 export function ComboBox({
@@ -49,6 +50,7 @@ export function ComboBox({
   onSearchChange,
   onCreateNew,
   createNewLabel = 'Создать новый',
+  className,
 }: ComboBoxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState('');
@@ -76,7 +78,7 @@ export function ComboBox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn('w-full justify-between', className)}
           disabled={disabled}
         >
           {selectedOption ? (
