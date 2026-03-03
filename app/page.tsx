@@ -21,7 +21,7 @@ export default function HomePage() {
         {/* Hero Text */}
         <div className="space-y-4">
           <h1 className="text-6xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Plantsheep
+            PlantSheep
           </h1>
           <p className="text-xl text-muted-foreground max-w-md mx-auto leading-relaxed">
             Отслеживайте и управляйте своей коллекцией растений с элегантной простотой

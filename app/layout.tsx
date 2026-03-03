@@ -3,7 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Приложение Plantsheep',
+  title: 'PlantSheep',
   description: 'Приложение для отслеживания истории растений',
 };
 
