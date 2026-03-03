@@ -13,6 +13,7 @@ import { PlantCard } from '@/components/plants/PlantCard';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
+import { AvatarViewer } from '@/components/profile/AvatarViewer';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -30,6 +31,7 @@ export default function UserProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [loadingShelves, setLoadingShelves] = useState(false);
+  const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -90,20 +92,25 @@ export default function UserProfilePage() {
         <CardHeader className="p-5">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
-                {profile.avatar ? (
-                  <Image
-                    src={getAvatarUrl(profile.avatar)!}
-                    alt={profile.name}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <User className="w-8 h-8 text-primary" />
-                )}
-              </div>
+              <button
+              onClick={() => profile.avatar && setIsAvatarViewerOpen(true)}
+              className={`w-16 h-16 rounded-2xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0 transition-all hover:scale-105 ${
+                profile.avatar ? 'cursor-pointer' : ''
+              }`}
+            >
+              {profile.avatar ? (
+                <Image
+                  src={getAvatarUrl(profile.avatar)!}
+                  alt={profile.name}
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                  unoptimized
+                />
+              ) : (
+                <User className="w-8 h-8 text-primary" />
+              )}
+            </button>
               <div>
                 <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -243,6 +250,15 @@ export default function UserProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Avatar Viewer */}
+      {isAvatarViewerOpen && profile.avatar && (
+        <AvatarViewer
+          avatarUrl={getAvatarUrl(profile.avatar)!}
+          userName={profile.name}
+          onClose={() => setIsAvatarViewerOpen(false)}
+        />
+      )}
     </div>
   );
 }

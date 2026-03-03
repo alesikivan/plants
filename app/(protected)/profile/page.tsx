@@ -17,6 +17,7 @@ import { PlantCard } from '@/components/plants/PlantCard';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
 import Image from 'next/image';
+import { AvatarViewer } from '@/components/profile/AvatarViewer';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -36,6 +37,7 @@ export default function ProfilePage() {
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [loadingPlants, setLoadingPlants] = useState(true);
   const [loadingShelves, setLoadingShelves] = useState(true);
+  const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
 
   useEffect(() => {
     plantsApi.getAll().then(setPlants).catch(() => {}).finally(() => setLoadingPlants(false));
@@ -129,7 +131,14 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className="relative group shrink-0">
-              <div className="w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={() => user.avatar && setIsAvatarViewerOpen(true)}
+                className={`w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center ${
+                  user.avatar ? 'cursor-pointer' : ''
+                } transition-all hover:scale-105`}
+                title={user.avatar ? 'Посмотреть аватар' : undefined}
+              >
                 {user.avatar ? (
                   <Image
                     src={getAvatarUrl(user.avatar)!}
@@ -147,7 +156,7 @@ export default function ProfilePage() {
                     <Loader2 className="w-6 h-6 text-white animate-spin" />
                   </div>
                 )}
-              </div>
+              </button>
               {/* Upload overlay */}
               {!isAvatarLoading && (
                 <button
@@ -460,6 +469,15 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Avatar Viewer */}
+      {isAvatarViewerOpen && user.avatar && (
+        <AvatarViewer
+          avatarUrl={getAvatarUrl(user.avatar)!}
+          userName={user.name}
+          onClose={() => setIsAvatarViewerOpen(false)}
+        />
+      )}
     </div>
   );
 }
