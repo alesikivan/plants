@@ -210,6 +210,13 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
     setRemoveCurrentPhoto(true);
   };
 
+  const handleDateFound = (date: Date | null) => {
+    setPurchaseDate(date ?? new Date());
+    if (date) {
+      toast.info(`Дата покупки обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+    }
+  };
+
   const handleGenusChange = (value: string) => {
     setSelectedGenusId(value);
     setValue('genusId', value);
@@ -391,6 +398,7 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
                 id="photo"
                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                 onFileChange={handleFileChange}
+                onDateFound={handleDateFound}
                 preview={photoPreview}
                 onRemove={handleRemovePhoto}
                 maxSize={5 * 1024 * 1024}

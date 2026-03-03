@@ -67,6 +67,13 @@ export function EditHistoryModal({
     setRemovePhotos([...removePhotos, photo]);
   };
 
+  const handleDateFound = (date: Date | null) => {
+    setDate(date ?? new Date());
+    if (date) {
+      toast.info(`Дата обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+    }
+  };
+
   const handleRemoveNewPhoto = (index: number) => {
     const newPhotosList = newPhotos.filter((_, i) => i !== index);
     setNewPhotos(newPhotosList);
@@ -173,6 +180,7 @@ export function EditHistoryModal({
               id="photos"
               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
               onFilesChange={handleNewPhotosChange}
+              onDateFound={handleDateFound}
               previews={newPhotoPreviews}
               onRemove={handleRemoveNewPhoto}
               maxSize={5 * 1024 * 1024}
