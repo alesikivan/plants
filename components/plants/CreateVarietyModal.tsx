@@ -142,7 +142,7 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
               <Label htmlFor="variety-query">Название сорта</Label>
               <Input
                 id="variety-query"
-                placeholder="Например: Алоказия Амазонская или Alocasia Amazonica"
+                placeholder="Например: Амазонская или Amazonica"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleValidate()}

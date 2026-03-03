@@ -87,67 +87,48 @@ export default function UserProfilePage() {
 
       {/* Profile Card */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
-              {profile.avatar ? (
-                <Image
-                  src={getAvatarUrl(profile.avatar)!}
-                  alt={profile.name}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              ) : (
-                <User className="w-10 h-10 text-primary" />
-              )}
+        <CardHeader className="p-5">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                {profile.avatar ? (
+                  <Image
+                    src={getAvatarUrl(profile.avatar)!}
+                    alt={profile.name}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <User className="w-8 h-8 text-primary" />
+                )}
+              </div>
+              <div>
+                <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Участник с{' '}
+                  {new Date(profile.createdAt).toLocaleDateString('ru-RU', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                  })}
+                </p>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-3xl">{profile.name}</CardTitle>
-              <p className="text-muted-foreground">
-                Участник с{' '}
-                {new Date(profile.createdAt).toLocaleDateString('ru-RU', {
-                  year: 'numeric', month: 'long', day: 'numeric',
-                })}
-              </p>
+            <div className="flex gap-3 shrink-0">
+              <div className="px-3 min-w-[76px] h-[80px] flex flex-col items-center justify-center bg-green-50 dark:bg-green-950/20 rounded-lg">
+                <Leaf className="w-5 h-5 text-green-600 mb-0.5" />
+                <p className="text-lg font-bold text-green-700 dark:text-green-400 leading-tight">{profile.stats.totalPlants}</p>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">Растения</p>
+              </div>
+              <div className="px-3 min-w-[76px] h-[80px] flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                <Layers className="w-5 h-5 text-blue-600 mb-0.5" />
+                <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">{profile.stats.totalShelves}</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Полки</p>
+              </div>
             </div>
           </div>
         </CardHeader>
       </Card>
-
-      {/* Statistics */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="transition-all hover:shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Растения</CardTitle>
-              <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center">
-                <Leaf className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">{profile.stats.totalPlants}</div>
-            <p className="text-sm text-muted-foreground mt-2">Всего растений в коллекции</p>
-          </CardContent>
-        </Card>
-
-        <Card className="transition-all hover:shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Полки</CardTitle>
-              <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center">
-                <Layers className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">{profile.stats.totalShelves}</div>
-            <p className="text-sm text-muted-foreground mt-2">Всего полок для растений</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Plants Preview */}
       <Card>
