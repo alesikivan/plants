@@ -35,8 +35,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Pencil, Trash2, Ban, CheckCircle, Search } from 'lucide-react';
+import { Shield, UserPlus, Pencil, Trash2, Ban, CheckCircle, Search, User } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
+import { getAvatarUrl } from '@/lib/api/users';
+import Image from 'next/image';
 
 const PAGE_SIZE = 20;
 
@@ -206,10 +208,21 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-semibold text-primary">
-                      {u.name.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                    {u.avatar ? (
+                      <Image
+                        src={getAvatarUrl(u.avatar)!}
+                        alt={u.name}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-primary">
+                        {u.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
 
                   {/* Info */}

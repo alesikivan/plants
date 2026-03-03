@@ -1,18 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { plantsApi, shelvesApi, Plant, Shelf } from '@/lib/api';
+import { getAvatarUrl } from '@/lib/api/users';
+import { compressImage } from '@/lib/utils/image-compression';
+import { isHeic, convertHeicToJpeg } from '@/lib/utils/heic';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -21,8 +25,12 @@ export default function ProfilePage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);
+  const uploadAvatar = useAuthStore((state) => state.uploadAvatar);
+  const removeAvatar = useAuthStore((state) => state.removeAvatar);
   const logout = useAuthStore((state) => state.logout);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [plants, setPlants] = useState<Plant[]>([]);
   const [shelves, setShelves] = useState<Shelf[]>([]);
@@ -52,6 +60,35 @@ export default function ProfilePage() {
       toast.success('Настройки приватности обновлены');
     } catch (error) {
       toast.error('Ошибка при обновлении настроек');
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsAvatarLoading(true);
+    try {
+      const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
+      const compressed = await compressImage(converted);
+      await uploadAvatar(compressed);
+      toast.success('Аватар успешно обновлён');
+    } catch {
+      toast.error('Ошибка при загрузке аватара');
+    } finally {
+      setIsAvatarLoading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setIsAvatarLoading(true);
+    try {
+      await removeAvatar();
+      toast.success('Аватар удалён');
+    } catch {
+      toast.error('Ошибка при удалении аватара');
+    } finally {
+      setIsAvatarLoading(false);
     }
   };
 
@@ -90,8 +127,56 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20">
-              <User className="w-10 h-10 text-primary" />
+            {/* Avatar */}
+            <div className="relative group shrink-0">
+              <div className="w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center">
+                {user.avatar ? (
+                  <Image
+                    src={getAvatarUrl(user.avatar)!}
+                    alt={user.name}
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <User className="w-10 h-10 text-primary" />
+                )}
+                {isAvatarLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-3xl">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+              {/* Upload overlay */}
+              {!isAvatarLoading && (
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  title="Изменить аватар"
+                >
+                  <Camera className="w-6 h-6 text-white" />
+                </button>
+              )}
+              {/* Remove button */}
+              {user.avatar && !isAvatarLoading && (
+                <button
+                  type="button"
+                  onClick={handleAvatarRemove}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  title="Удалить аватар"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
             </div>
             <div>
               <CardTitle className="text-3xl">{user.name}</CardTitle>

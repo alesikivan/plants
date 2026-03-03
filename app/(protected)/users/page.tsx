@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { User, Shield, Calendar, Leaf, Layers, Search, Users as UsersIcon, X } from 'lucide-react';
 import { usersApi, UserProfileWithStats } from '@/lib/api';
+import { getAvatarUrl } from '@/lib/api/users';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
@@ -121,8 +123,19 @@ export default function UsersPage() {
               <div className="space-y-3">
                 {/* User Info */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-muted-foreground" />
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-border bg-muted flex items-center justify-center flex-shrink-0">
+                    {user.avatar ? (
+                      <Image
+                        src={getAvatarUrl(user.avatar)!}
+                        alt={user.name}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-muted-foreground" />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">{user.name}</p>

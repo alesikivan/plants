@@ -5,6 +5,13 @@ import { Shelf } from './shelves';
 
 export type { UserResponse, UpdateUserDto, AdminCreateUserDto, AdminUpdateUserDto, UserProfileWithStats };
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
+
+export const getAvatarUrl = (avatarFilename: string | undefined): string | undefined => {
+  if (!avatarFilename) return undefined;
+  return `${API_BASE_URL}/users/avatar/${avatarFilename}`;
+};
+
 export const usersApi = {
   // Get current user profile
   getProfile: async (): Promise<UserResponse> => {
@@ -82,5 +89,21 @@ export const usersApi = {
   // Admin: delete user
   adminDeleteUser: async (userId: string): Promise<void> => {
     await apiClient.delete(`/users/${userId}`);
+  },
+
+  // Upload avatar for current user
+  uploadAvatar: async (file: File): Promise<UserResponse> => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const response = await apiClient.patch<UserResponse>('/users/profile/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  // Remove avatar for current user
+  removeAvatar: async (): Promise<UserResponse> => {
+    const response = await apiClient.delete<UserResponse>('/users/profile/avatar');
+    return response.data;
   },
 };

@@ -14,6 +14,7 @@ export interface UserResponse {
   showShelves: boolean;
   showPlantHistory: boolean;
   isBlocked: boolean;
+  avatar?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,6 +48,7 @@ export interface UserProfileWithStats {
   showPlants: boolean;
   showShelves: boolean;
   showPlantHistory: boolean;
+  avatar?: string;
   createdAt: string;
   updatedAt: string;
   stats: {

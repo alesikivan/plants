@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Leaf, Layers, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
+import { getAvatarUrl } from '@/lib/api/users';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { PlantCard } from '@/components/plants/PlantCard';
@@ -87,8 +89,19 @@ export default function UserProfilePage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20">
-              <User className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+              {profile.avatar ? (
+                <Image
+                  src={getAvatarUrl(profile.avatar)!}
+                  alt={profile.name}
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                  unoptimized
+                />
+              ) : (
+                <User className="w-10 h-10 text-primary" />
+              )}
             </div>
             <div>
               <CardTitle className="text-3xl">{profile.name}</CardTitle>

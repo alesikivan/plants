@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Logo } from '@/components/logo';
 import { LayoutDashboard, Settings, Layers, Users, User, Leaf } from 'lucide-react';
+import { getAvatarUrl } from '@/lib/api/users';
 
 export default function ProtectedLayout({
   children,
@@ -86,18 +88,45 @@ export default function ProtectedLayout({
                 {/* Desktop User Info */}
                 <Link
                   href="/profile"
-                  className="hidden lg:flex flex-col items-end hover:opacity-80 transition-opacity cursor-pointer"
+                  className="hidden lg:flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
                 >
-                  <p className="text-sm font-semibold text-foreground">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <div className="flex flex-col items-end">
+                    <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                  <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                    {user.avatar ? (
+                      <Image
+                        src={getAvatarUrl(user.avatar)!}
+                        alt={user.name}
+                        width={36}
+                        height={36}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <User className="w-4 h-4 text-primary" />
+                    )}
+                  </div>
                 </Link>
 
                 {/* Mobile User Icon */}
                 <Link
                   href="/profile"
-                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
+                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 hover:opacity-80 transition-opacity shrink-0"
                 >
-                  <User className="w-5 h-5 text-primary" />
+                  {user.avatar ? (
+                    <Image
+                      src={getAvatarUrl(user.avatar)!}
+                      alt={user.name}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <User className="w-5 h-5 text-primary" />
+                  )}
                 </Link>
               </>
             )}
