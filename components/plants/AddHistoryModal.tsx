@@ -30,20 +30,16 @@ export function AddHistoryModal({
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
+  const handleDateFound = (date: Date | null) => {
+    setDate(date ?? new Date());
+    if (date) {
+      toast.info(`Дата обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+    }
+  };
+
   const handlePhotosChange = (files: File[]) => {
-    // Check file type for each file
-    const validFiles = files.filter(file => {
-      if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
-        toast.error(`Файл ${file.name} не является изображением`);
-        return false;
-      }
-      return true;
-    });
-
-    setPhotos(validFiles);
-
-    // Create previews
-    const previews = validFiles.map(file => URL.createObjectURL(file));
+    setPhotos(files);
+    const previews = files.map(file => URL.createObjectURL(file));
     setPhotoPreviews(previews);
   };
 
@@ -133,12 +129,13 @@ export function AddHistoryModal({
             <Label htmlFor="photos">Фотографии</Label>
             <MultiFileInput
               id="photos"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
               onFilesChange={handlePhotosChange}
+              onDateFound={handleDateFound}
               previews={photoPreviews}
               onRemove={handleRemovePhoto}
               maxSize={5 * 1024 * 1024}
-              acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP']}
+              acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
               maxFiles={10}
             />
           </div>

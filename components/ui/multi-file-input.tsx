@@ -5,9 +5,12 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { compressImage } from '@/lib/utils/image-compression';
+import { getPhotoDate } from '@/lib/utils/exif';
+import { isHeic, convertHeicToJpeg } from '@/lib/utils/heic';
 
 interface MultiFileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
   onFilesChange?: (files: File[]) => void;
+  onDateFound?: (date: Date | null) => void;
   previews?: string[];
   onRemove?: (index: number) => void;
   maxSize?: number;
@@ -16,7 +19,7 @@ interface MultiFileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEl
 }
 
 export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputProps>(
-  ({ className, onFilesChange, previews = [], onRemove, maxSize, acceptedFormats, maxFiles = 10, accept, ...props }, ref) => {
+  ({ className, onFilesChange, onDateFound, previews = [], onRemove, maxSize, acceptedFormats, maxFiles = 10, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const handleClick = () => {
@@ -25,7 +28,17 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files ? Array.from(e.target.files) : [];
-      const compressed = await Promise.all(files.map((f) => compressImage(f)));
+
+      // Extract EXIF date from the first file before any conversion
+      if (files.length > 0) {
+        const date = await getPhotoDate(files[0]);
+        onDateFound?.(date);
+      }
+
+      const converted = await Promise.all(
+        files.map((f) => isHeic(f) ? convertHeicToJpeg(f) : f)
+      );
+      const compressed = await Promise.all(converted.map((f) => compressImage(f)));
       onFilesChange?.(compressed);
     };
 

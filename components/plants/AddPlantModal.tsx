@@ -111,16 +111,17 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     }
   };
 
+  const handleDateFound = (date: Date | null) => {
+    setPurchaseDate(date ?? new Date());
+    if (date) {
+      toast.info(`Дата покупки обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+    }
+  };
+
   const handleFileChange = (file: File | null) => {
     if (!file) {
       setSelectedFile(null);
       setPhotoPreview(null);
-      return;
-    }
-
-    // Check file type
-    if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
-      toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
       return;
     }
 
@@ -232,12 +233,13 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
               <Label htmlFor="photo">Фото растения</Label>
               <FileInput
                 id="photo"
-                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
                 onFileChange={handleFileChange}
+                onDateFound={handleDateFound}
                 preview={photoPreview}
                 onRemove={handleRemovePhoto}
                 maxSize={5 * 1024 * 1024}
-                acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP']}
+                acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
               />
             </div>
 

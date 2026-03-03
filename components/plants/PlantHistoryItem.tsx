@@ -39,12 +39,11 @@ export function PlantHistoryItem({
 
   const photoUrls = historyItem.photos.map(photo => getPlantHistoryPhotoUrl(photo)!);
 
-  const formattedDate = new Date(historyItem.date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const date = new Date(historyItem.date);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const formattedDate = `${day}.${month}.${year}`;
 
   return (
     <>

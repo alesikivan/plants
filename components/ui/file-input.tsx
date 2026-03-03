@@ -5,9 +5,12 @@ import { Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { compressImage } from '@/lib/utils/image-compression';
+import { getPhotoDate } from '@/lib/utils/exif';
+import { isHeic, convertHeicToJpeg } from '@/lib/utils/heic';
 
 interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
   onFileChange?: (file: File | null) => void;
+  onDateFound?: (date: Date | null) => void;
   preview?: string | null;
   onRemove?: () => void;
   maxSize?: number;
@@ -15,7 +18,7 @@ interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
 }
 
 export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
-  ({ className, onFileChange, preview, onRemove, maxSize, acceptedFormats, accept, ...props }, ref) => {
+  ({ className, onFileChange, onDateFound, preview, onRemove, maxSize, acceptedFormats, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const handleClick = () => {
@@ -25,7 +28,12 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] || null;
       if (file) {
-        const compressed = await compressImage(file);
+        // Extract EXIF date from original file before any conversion
+        const date = await getPhotoDate(file);
+        onDateFound?.(date);
+
+        const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
+        const compressed = await compressImage(converted);
         onFileChange?.(compressed);
       } else {
         onFileChange?.(null);
