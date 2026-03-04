@@ -9,7 +9,7 @@ interface AuthState {
   loading: boolean;
   initialized: boolean;
   login: (data: LoginDto) => Promise<void>;
-  register: (data: RegisterDto) => Promise<void>;
+  register: (data: RegisterDto) => Promise<{ requiresVerification?: boolean }>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
   setUser: (user: UserResponse | null) => void;
@@ -51,7 +51,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true });
     try {
       const response = await authApi.register(data);
+      if (response.requiresVerification) {
+        return { requiresVerification: true };
+      }
       set({ user: response.user, initialized: true });
+      return {};
     } finally {
       set({ loading: false });
     }

@@ -43,11 +43,14 @@ if (process.env.NODE_ENV === 'development') {
   );
 }
 
+// Paths where forceLogout should not redirect (already public/auth pages)
+const AUTH_PATHS = ['/', '/login', '/register', '/verify-email', '/forgot-password', '/reset-password'];
+
 // Clear session cookies and redirect to login page
 async function forceLogout(reason?: string) {
   if (typeof window === 'undefined') return;
   const currentPath = window.location.pathname;
-  if (currentPath.startsWith('/login') || currentPath.startsWith('/register') || currentPath === '/') return;
+  if (AUTH_PATHS.some((p) => p === '/' ? currentPath === p : currentPath.startsWith(p))) return;
 
   try {
     // Clear httpOnly cookies server-side so middleware doesn't loop
@@ -141,8 +144,10 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Handle all errors through centralized error handler
-    handleApiError(error);
+    // Suppress toast for /auth/refresh 401 — handled silently by forceLogout
+    if (!(error.response?.status === 401 && originalRequest?.url?.includes('/auth/refresh'))) {
+      handleApiError(error);
+    }
 
     return Promise.reject(error);
   }

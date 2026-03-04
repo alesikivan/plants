@@ -17,6 +17,7 @@ export interface ApiError {
   type: ErrorType;
   message: string;
   statusCode?: number;
+  code?: string;
   details?: Record<string, unknown>;
   originalError?: unknown;
 }
@@ -81,6 +82,9 @@ export function parseAxiosError(error: AxiosError): ApiError {
       message = responseData.message;
     } else if (Array.isArray(responseData.message)) {
       message = responseData.message.join(', ');
+    } else if (typeof responseData.message === 'object' && responseData.message?.message) {
+      // NestJS wraps object in message field: { message: { message: '...', code: '...' } }
+      message = responseData.message.message;
     }
 
     // Include validation errors if present
@@ -89,11 +93,20 @@ export function parseAxiosError(error: AxiosError): ApiError {
     }
   }
 
+  // Extract custom error code if present
+  let code: string | undefined;
+  if (responseData?.code) {
+    code = responseData.code;
+  } else if (typeof responseData?.message === 'object' && responseData.message?.code) {
+    code = responseData.message.code;
+  }
+
   return {
     type: errorType,
     message,
     statusCode,
     details,
+    code,
     originalError: error,
   };
 }
@@ -114,7 +127,17 @@ export function formatErrorMessage(error: ApiError): string {
 }
 
 // Check if error should be shown to user
-export function shouldShowError(errorType: ErrorType, url?: string, message?: string): boolean {
+export function shouldShowError(errorType: ErrorType, url?: string, message?: string, code?: string): boolean {
+  // EMAIL_NOT_VERIFIED is handled by the login page UI — suppress global toast
+  if (code === 'EMAIL_NOT_VERIFIED') {
+    return false;
+  }
+
+  // verify-email errors are shown inline on the page
+  if (url?.includes('/auth/verify-email')) {
+    return false;
+  }
+
   // Show UNAUTHORIZED errors for login/register pages (invalid credentials)
   if (errorType === ErrorType.UNAUTHORIZED) {
     // Show toast for auth endpoints (login/register fail)

@@ -4,9 +4,13 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Public paths
-  const publicPaths = ['/login', '/register'];
+  // Public paths (accessible without auth)
+  const publicPaths = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password'];
   const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
+
+  // Paths that should ALWAYS be accessible regardless of auth state
+  const alwaysPublicPaths = ['/verify-email', '/forgot-password', '/reset-password'];
+  const isAlwaysPublic = alwaysPublicPaths.some(path => pathname.startsWith(path));
 
   // Check for accessToken OR refreshToken cookie.
   // accessToken expires in 15 min, but refreshToken lives 7 days.
@@ -22,7 +26,8 @@ export function middleware(request: NextRequest) {
   }
 
   // If user IS authenticated and trying to access login/register
-  if (isAuthenticated && isPublicPath) {
+  // (but NOT /verify-email — that should be accessible to everyone)
+  if (isAuthenticated && isPublicPath && !isAlwaysPublic) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

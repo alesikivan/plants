@@ -12,5 +12,6 @@ export interface LoginDto {
 }
 
 export interface AuthResponse {
-  user: UserResponse;
+  user?: UserResponse;
+  requiresVerification?: boolean;
 }
