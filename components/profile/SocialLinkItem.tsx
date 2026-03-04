@@ -13,13 +13,20 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Trash2, Edit2 } from 'lucide-react';
+import { Trash2, Edit2, Mail, Phone, Send, Instagram, Check } from 'lucide-react';
 
 const SOCIAL_LABELS: Record<string, string> = {
   telegram: 'Telegram',
   instagram: 'Instagram',
   phone: 'Телефон',
   email: 'Почта',
+};
+
+const SOCIAL_ICONS: Record<string, React.ReactNode> = {
+  telegram: <Send className="w-4 h-4" />,
+  instagram: <Instagram className="w-4 h-4" />,
+  phone: <Phone className="w-4 h-4" />,
+  email: <Mail className="w-4 h-4" />,
 };
 
 interface SocialLinkItemProps {
@@ -38,6 +45,7 @@ export function SocialLinkItem({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editValue, setEditValue] = useState(link.value);
   const [editIsPublic, setEditIsPublic] = useState(link.isPublic);
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleSave = () => {
     onUpdate({
@@ -64,34 +72,55 @@ export function SocialLinkItem({
     return '#';
   };
 
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await navigator.clipboard.writeText(link.value);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   return (
     <>
-      <div className="flex items-center justify-between gap-4 py-3 px-0">
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {SOCIAL_LABELS[link.type] || link.type}
-          </p>
-          <a
-            href={getLinkUrl()}
-            target={link.type === 'email' || link.type === 'phone' ? undefined : '_blank'}
-            rel={link.type !== 'email' && link.type !== 'phone' ? 'noopener noreferrer' : undefined}
-            className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-all"
-          >
-            {link.value}
-          </a>
+      <div className="flex items-center justify-between gap-4 py-2 px-3 rounded-lg">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Icon */}
+          <div className="text-gray-600 dark:text-gray-400 flex-shrink-0">
+            {SOCIAL_ICONS[link.type]}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {SOCIAL_LABELS[link.type] || link.type}
+            </p>
+            <button
+              onClick={handleCopy}
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-all text-left cursor-pointer"
+            >
+              {isCopied ? (
+                <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <Check className="w-3.5 h-3.5" />
+                  Скопировано
+                </span>
+              ) : (
+                link.value
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Status indicator circle */}
-          <div className="flex items-center gap-1">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                link.isPublic
-                  ? 'bg-green-500'
-                  : 'bg-yellow-500'
-              }`}
-            />
-          </div>
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${
+              link.isPublic
+                ? 'bg-green-500'
+                : 'bg-yellow-500'
+            }`}
+          />
 
           {!isReadOnly && (
             <div className="flex gap-1">
