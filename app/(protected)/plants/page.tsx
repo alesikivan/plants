@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
-import { Plus, Leaf, Search, X, SlidersHorizontal } from 'lucide-react';
+import { Plus, Leaf, Search, X, SlidersHorizontal, Archive } from 'lucide-react';
 import { plantsApi, Plant, shelvesApi, Shelf, Genus, Variety } from '@/lib/api';
 import { AddPlantModal } from '@/components/plants/AddPlantModal';
 import { PlantCard } from '@/components/plants/PlantCard';
@@ -21,6 +21,7 @@ export default function MyPlantsPage() {
   const [isFiltering, setIsFiltering] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [showArchived, setShowArchived] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
@@ -116,6 +117,7 @@ export default function MyPlantsPage() {
     genusId: string,
     varietyId: string,
     shelfId: string,
+    archived = showArchived,
   ) => {
     setIsFiltering(true);
     try {
@@ -124,6 +126,7 @@ export default function MyPlantsPage() {
         genusId: genusId || undefined,
         varietyId: varietyId || undefined,
         shelfId: shelfId || undefined,
+        showArchived: archived,
       });
       setPlants(data);
     } catch (error) {
@@ -181,6 +184,20 @@ export default function MyPlantsPage() {
     );
   };
 
+  const handleTabChange = (archived: boolean) => {
+    setShowArchived(archived);
+    setSearchQuery('');
+    setGenusFilter('');
+    setGenusSearch('');
+    setVarietyFilter('');
+    setVarietySearch('');
+    setShelfFilter('');
+    setShelfSearch('');
+    filtersRef.current = { search: '', genusId: '', varietyId: '', shelfId: '' };
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    applyFilters('', '', '', '', archived);
+  };
+
   const clearFilters = () => {
     setSearchQuery('');
     setGenusFilter('');
@@ -224,8 +241,28 @@ export default function MyPlantsPage() {
         </Button>
       </div>
 
+      {/* Tabs: active / archived */}
+      {!isLoading && (
+        <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300">
+          <button
+            onClick={() => !showArchived || handleTabChange(false)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${!showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <Leaf className="w-4 h-4" />
+            Активные
+          </button>
+          <button
+            onClick={() => showArchived || handleTabChange(true)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <Archive className="w-4 h-4" />
+            Архив
+          </button>
+        </div>
+      )}
+
       {/* Filters */}
-      {!isLoading && (genera.length > 0 || shelves.length > 0) && (
+      {!isLoading && !showArchived && (genera.length > 0 || shelves.length > 0) && (
         <div className="flex flex-col gap-2 animate-in fade-in duration-500">
           {/* Row 1: search + filter toggle */}
           <div className="flex items-center gap-2">
@@ -336,18 +373,28 @@ export default function MyPlantsPage() {
         </div>
       ) : plants.length === 0 && !hasFilters ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
-          <Leaf className="w-16 h-16 text-muted-foreground/50 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">У вас пока нет растений</h3>
-          <p className="text-muted-foreground mb-6">
-            Начните отслеживать свою коллекцию, добавив первое растение
-          </p>
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="gap-2 transition-all hover:scale-105 active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            Добавить первое растение
-          </Button>
+          {showArchived ? (
+            <>
+              <Archive className="w-16 h-16 text-muted-foreground/50 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Архив пуст</h3>
+              <p className="text-muted-foreground">Здесь будут архивированные растения</p>
+            </>
+          ) : (
+            <>
+              <Leaf className="w-16 h-16 text-muted-foreground/50 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">У вас пока нет растений</h3>
+              <p className="text-muted-foreground mb-6">
+                Начните отслеживать свою коллекцию, добавив первое растение
+              </p>
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="gap-2 transition-all hover:scale-105 active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                Добавить первое растение
+              </Button>
+            </>
+          )}
         </div>
       ) : plants.length === 0 && hasFilters ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">

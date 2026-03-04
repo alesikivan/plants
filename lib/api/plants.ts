@@ -14,6 +14,7 @@ export interface Plant {
   purchaseDate?: string;
   photo?: string;
   description?: string;
+  isArchived?: boolean;
   createdAt: string;
   updatedAt: string;
   shelves?: Shelf[];
@@ -80,6 +81,7 @@ export interface PlantFilters {
   genusId?: string;
   varietyId?: string;
   shelfId?: string;
+  showArchived?: boolean;
 }
 
 export const plantsApi = {
@@ -89,6 +91,7 @@ export const plantsApi = {
     if (filters?.genusId) params.genusId = filters.genusId;
     if (filters?.varietyId) params.varietyId = filters.varietyId;
     if (filters?.shelfId) params.shelfId = filters.shelfId;
+    if (filters?.showArchived) params.showArchived = 'true';
     const response = await apiClient.get<Plant[]>('/plants', { params });
     return response.data;
   },
@@ -163,6 +166,16 @@ export const plantsApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return response.data;
+  },
+
+  archive: async (id: string): Promise<Plant> => {
+    const response = await apiClient.patch<Plant>(`/plants/${id}/archive`);
+    return response.data;
+  },
+
+  unarchive: async (id: string): Promise<Plant> => {
+    const response = await apiClient.patch<Plant>(`/plants/${id}/unarchive`);
     return response.data;
   },
 

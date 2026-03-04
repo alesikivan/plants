@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Calendar, FileText, Leaf, Trash2, Pencil, Layers } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, Leaf, Trash2, Pencil, Layers, Archive, ArchiveRestore } from 'lucide-react';
 import { plantsApi, Plant, Genus, Variety, Shelf, getPlantPhotoUrl } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
@@ -32,6 +32,7 @@ export default function PlantDetailPage() {
   const [plant, setPlant] = useState<Plant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
 
@@ -68,6 +69,34 @@ export default function PlantDetailPage() {
       console.error('Failed to delete plant:', error);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleArchive = async () => {
+    if (!plant) return;
+    setIsArchiving(true);
+    try {
+      const updated = await plantsApi.archive(plant._id);
+      setPlant(updated);
+      toast.success('Растение перемещено в архив');
+    } catch (error) {
+      toast.error('Ошибка при архивировании растения');
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
+  const handleUnarchive = async () => {
+    if (!plant) return;
+    setIsArchiving(true);
+    try {
+      const updated = await plantsApi.unarchive(plant._id);
+      setPlant(updated);
+      toast.success('Растение восстановлено из архива');
+    } catch (error) {
+      toast.error('Ошибка при восстановлении растения');
+    } finally {
+      setIsArchiving(false);
     }
   };
 
@@ -115,14 +144,58 @@ export default function PlantDetailPage() {
           Назад к списку
         </Button>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsEditModalOpen(true)}
-            className="gap-2 transition-all hover:scale-105 active:scale-95"
-          >
-            <Pencil className="w-4 h-4" />
-            <span className="hidden sm:inline">Редактировать</span>
-          </Button>
+          {plant.isArchived ? (
+            <Button
+              variant="outline"
+              onClick={handleUnarchive}
+              disabled={isArchiving}
+              className="gap-2 transition-all hover:scale-105 active:scale-95"
+            >
+              <ArchiveRestore className="w-4 h-4" />
+              <span className="hidden sm:inline">{isArchiving ? 'Восстановление...' : 'Восстановить'}</span>
+            </Button>
+          ) : (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  disabled={isArchiving}
+                  className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all hover:scale-105 active:scale-95"
+                >
+                  <Archive className="w-4 h-4" />
+                  <span className="hidden sm:inline">{isArchiving ? 'Архивирование...' : 'Архив'}</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Архивировать растение?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Растение будет удалено из всех полок и перемещено в архив.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">Отмена</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleArchive}
+                    disabled={isArchiving}
+                    className="transition-all hover:scale-105 active:scale-95"
+                  >
+                    {isArchiving ? 'Архивирование...' : 'Архивировать'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {!plant.isArchived && (
+            <Button
+              variant="outline"
+              onClick={() => setIsEditModalOpen(true)}
+              className="gap-2 transition-all hover:scale-105 active:scale-95"
+            >
+              <Pencil className="w-4 h-4" />
+              <span className="hidden sm:inline">Редактировать</span>
+            </Button>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all hover:scale-105 active:scale-95">
@@ -191,7 +264,15 @@ export default function PlantDetailPage() {
             {/* Details - объединенные */}
             <div className="flex-1 space-y-4 min-w-0">
               <div>
-                <h1 className="text-xl sm:text-2xl font-semibold mb-1">{plantName || 'Без названия'}</h1>
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <h1 className="text-xl sm:text-2xl font-semibold">{plantName || 'Без названия'}</h1>
+                  {plant.isArchived && (
+                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground border">
+                      <Archive className="w-3 h-3" />
+                      В архиве
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground">Информация о растении</p>
               </div>
 
