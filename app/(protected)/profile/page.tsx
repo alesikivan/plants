@@ -195,8 +195,8 @@ export default function ProfilePage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-3">
+          <div className="grid mt-3 gap-3 md:grid-cols-2">
+            <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <User className="w-4 h-4" />
                 <span className="text-sm font-semibold">Полное имя</span>
@@ -204,7 +204,7 @@ export default function ProfilePage() {
               <p className="text-lg font-medium">{user.name}</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
                 <span className="text-sm font-semibold">Email адрес</span>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
               <p className="text-lg font-medium">{user.email}</p>
             </div>
 
-            <div className="space-y-3">
+            {/* <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Shield className="w-4 h-4" />
                 <span className="text-sm font-semibold">Роль аккаунта</span>
@@ -220,9 +220,9 @@ export default function ProfilePage() {
               <div className="inline-flex items-center px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
                 <span className="text-sm font-semibold text-primary capitalize">{user.role}</span>
               </div>
-            </div>
+            </div> */}
 
-            <div className="space-y-3">
+            <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm font-semibold">Участник с</span>
@@ -248,7 +248,7 @@ export default function ProfilePage() {
             <CardDescription>Настройте ваш опыт использования приложения</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3">
+            <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Languages className="w-4 h-4" />
                 <span className="text-sm font-semibold">Язык названий растений</span>

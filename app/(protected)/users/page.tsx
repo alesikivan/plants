@@ -113,14 +113,14 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
           {users.map((user) => (
             <Card
               key={user.id}
-              className="transition-all hover:border-primary/50 cursor-pointer p-4"
+              className="transition-all hover:border-primary/50 cursor-pointer p-3"
               onClick={() => router.push(`/profile/${user.id}`)}
             >
-              <div className="space-y-3">
+              <div className="flex items-center justify-between space-x-3">
                 {/* User Info */}
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden border border-border bg-muted flex items-center justify-center flex-shrink-0">
@@ -139,12 +139,12 @@ export default function UsersPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">{user.name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+                    {/* <p className="text-xs text-muted-foreground capitalize">{user.role}</p> */}
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Leaf className="w-4 h-4" />
                     <span>{user.stats.totalPlants}</span>
