@@ -18,6 +18,8 @@ import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
+import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
+import { SocialLink } from '@/lib/types/user';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -359,6 +361,25 @@ export default function ProfilePage() {
               onCheckedChange={(v) => handlePrivacyChange('showPlantHistory', v)}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Social Links */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Способы связи</CardTitle>
+          <CardDescription>
+            Добавьте контакты, чтобы другие пользователи могли связаться с вами
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SocialLinksSection
+            socialLinks={user.socialLinks || []}
+            onUpdate={async (socialLinks: SocialLink[]) => {
+              await updateProfile({ socialLinks });
+              toast.success('Сохранено');
+            }}
+          />
         </CardContent>
       </Card>
 

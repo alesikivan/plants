@@ -187,9 +187,11 @@ export default function UserPlantDetailPage() {
               {history.map((item, index) => {
                 const isLast = index === history.length - 1;
                 const photoUrls = item.photos.map(p => getPlantHistoryPhotoUrl(p)!);
-                const formattedDate = new Date(item.date).toLocaleDateString('ru-RU', {
-                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-                });
+                const date = new Date(item.date);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                const formattedDate = `${day}.${month}.${year}`;
                 return (
                   <div key={item._id} className="relative flex gap-3">
                     <div className="relative flex flex-col items-center pt-1">

@@ -15,10 +15,11 @@ interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
   onRemove?: () => void;
   maxSize?: number;
   acceptedFormats?: string[];
+  disableDateDetection?: boolean;
 }
 
 export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
-  ({ className, onFileChange, onDateFound, preview, onRemove, maxSize, acceptedFormats, accept, ...props }, ref) => {
+  ({ className, onFileChange, onDateFound, preview, onRemove, maxSize, acceptedFormats, disableDateDetection, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const handleClick = () => {
@@ -28,9 +29,11 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] || null;
       if (file) {
-        // Extract EXIF date from original file before any conversion
-        const date = await getPhotoDate(file);
-        onDateFound?.(date);
+        // Extract EXIF date from original file before any conversion (only if not disabled)
+        if (!disableDateDetection) {
+          const date = await getPhotoDate(file);
+          onDateFound?.(date);
+        }
 
         const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
         const compressed = await compressImage(converted);

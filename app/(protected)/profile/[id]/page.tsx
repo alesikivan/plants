@@ -14,6 +14,7 @@ import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
+import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -136,6 +137,18 @@ export default function UserProfilePage() {
           </div>
         </CardHeader>
       </Card>
+
+      {/* Social Links */}
+      {profile.socialLinks && profile.socialLinks.length > 0 && (
+        <Card>
+          <CardContent className="pt-5">
+            <SocialLinksSection
+              socialLinks={profile.socialLinks}
+              isReadOnly={true}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Plants Preview */}
       <Card>

@@ -143,7 +143,7 @@ export function AddHistoryModal({
               onRemove={handleRemovePhoto}
               maxSize={5 * 1024 * 1024}
               acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
-              maxFiles={10}
+              maxFiles={5}
             />
           </div>
 

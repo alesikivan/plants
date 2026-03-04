@@ -16,10 +16,11 @@ interface MultiFileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEl
   maxSize?: number;
   acceptedFormats?: string[];
   maxFiles?: number;
+  disableDateDetection?: boolean;
 }
 
 export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputProps>(
-  ({ className, onFilesChange, onDateFound, previews = [], onRemove, maxSize, acceptedFormats, maxFiles = 10, accept, ...props }, ref) => {
+  ({ className, onFilesChange, onDateFound, previews = [], onRemove, maxSize, acceptedFormats, maxFiles = 10, disableDateDetection, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const handleClick = () => {
@@ -29,8 +30,8 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files ? Array.from(e.target.files) : [];
 
-      // Extract EXIF date from the first file before any conversion
-      if (files.length > 0) {
+      // Extract EXIF date from the first file before any conversion (only if not disabled)
+      if (!disableDateDetection && files.length > 0) {
         const date = await getPhotoDate(files[0]);
         onDateFound?.(date);
       }

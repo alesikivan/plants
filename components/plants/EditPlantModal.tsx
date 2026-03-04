@@ -410,6 +410,7 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
                 onRemove={handleRemovePhoto}
                 maxSize={5 * 1024 * 1024}
                 acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
+                disableDateDetection={true}
               />
             </div>
 

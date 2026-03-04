@@ -4,6 +4,12 @@ export enum Role {
   MANAGER = 'manager',
 }
 
+export interface SocialLink {
+  type: string;
+  value: string;
+  isPublic: boolean;
+}
+
 export interface UserResponse {
   id: string;
   email: string;
@@ -15,6 +21,7 @@ export interface UserResponse {
   showPlantHistory: boolean;
   isBlocked: boolean;
   avatar?: string;
+  socialLinks?: SocialLink[];
   createdAt: string;
   updatedAt: string;
 }
@@ -24,6 +31,7 @@ export interface UpdateUserDto {
   showPlants?: boolean;
   showShelves?: boolean;
   showPlantHistory?: boolean;
+  socialLinks?: SocialLink[];
 }
 
 export interface AdminCreateUserDto {
@@ -49,6 +57,7 @@ export interface UserProfileWithStats {
   showShelves: boolean;
   showPlantHistory: boolean;
   avatar?: string;
+  socialLinks?: SocialLink[];
   createdAt: string;
   updatedAt: string;
   stats: {

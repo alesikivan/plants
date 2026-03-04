@@ -163,31 +163,31 @@ export default function ProtectedLayout({
           <div className="flex items-center justify-around px-4 py-2">
             <Link
               href="/dashboard"
-              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <LayoutDashboard className="w-5 h-5" />
-              <span className="text-xs font-medium">Панель</span>
+              <span className="text-xs font-medium select-none">Панель</span>
             </Link>
             <Link
               href="/plants"
-              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Leaf className="w-5 h-5" />
-              <span className="text-xs font-medium">Растения</span>
+              <span className="text-xs font-medium select-none">Растения</span>
             </Link>
             <Link
               href="/shelves"
-              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Layers className="w-5 h-5" />
-              <span className="text-xs font-medium">Полки</span>
+              <span className="text-xs font-medium select-none">Полки</span>
             </Link>
             <Link
               href="/users"
-              className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Users className="w-5 h-5" />
-              <span className="text-xs font-medium">Польз.</span>
+              <span className="text-xs font-medium select-none">Польз.</span>
             </Link>
           </div>
         </nav>
