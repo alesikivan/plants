@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 
 interface SocialLinksSectionProps {
   socialLinks: SocialLink[];
-  onUpdate: (socialLinks: SocialLink[]) => Promise<void>;
+  onUpdate?: (socialLinks: SocialLink[]) => Promise<void>;
   isReadOnly?: boolean;
 }
 
@@ -40,6 +40,7 @@ export function SocialLinksSection({
   };
 
   const saveLinks = async (updatedLinks: SocialLink[]) => {
+    if (!onUpdate) return;
     setIsSaving(true);
     try {
       await onUpdate(updatedLinks);
