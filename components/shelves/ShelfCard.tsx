@@ -74,10 +74,10 @@ export function ShelfCard({ shelf, index = 0, href }: ShelfCardProps) {
             </div>
           )}
 
-          {plants.length > 0 && (
+          {(shelf.plantsCount || plants.length) > 0 && (
             <div style={{zIndex: 10}} className="absolute bottom-2 right-2 bg-background/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium flex items-center gap-1 shadow-sm">
               <Leaf className="w-3 h-3" />
-              {plants.length}
+              {shelf.plantsCount || plants.length}
             </div>
           )}
         </div>

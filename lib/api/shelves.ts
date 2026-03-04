@@ -12,6 +12,7 @@ export interface Shelf {
   createdAt: string;
   updatedAt: string;
   plants?: Plant[];
+  plantsCount?: number;
 }
 
 export interface CreateShelfDto {
