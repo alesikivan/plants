@@ -141,7 +141,7 @@ export default function UserProfilePage() {
       {/* Social Links */}
       {profile.socialLinks && profile.socialLinks.length > 0 && (
         <Card>
-          <CardContent className="pt-5">
+          <CardContent className="p-3">
             <SocialLinksSection
               socialLinks={profile.socialLinks}
               isReadOnly={true}
