@@ -277,14 +277,16 @@ interface StatCardProps {
 }
 
 function StatCard({ label, icon: Icon, total, period, archived }: StatCardProps) {
+  const hasAddedItems = period !== undefined && period > 0;
+
   return (
     <div className="border rounded-lg p-4 hover:bg-muted/30 transition-colors">
       <div className="flex items-start justify-between">
         <div className="space-y-2 flex-1">
           <div className="text-sm font-medium text-muted-foreground">{label}</div>
           <div className="text-3xl font-bold">{total.toLocaleString('ru-RU')}</div>
-          {period !== undefined && (
-            <div className="text-sm text-muted-foreground">
+          {hasAddedItems && (
+            <div className="text-sm text-primary">
               +{period.toLocaleString('ru-RU')} добавлено
             </div>
           )}
