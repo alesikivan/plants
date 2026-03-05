@@ -4,11 +4,24 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
-import { Plus, Leaf, Search, X, SlidersHorizontal, Archive } from 'lucide-react';
+import { Plus, Leaf, Search, X, SlidersHorizontal, Archive, GripVertical, Check } from 'lucide-react';
 import { plantsApi, Plant, shelvesApi, Shelf, Genus, Variety } from '@/lib/api';
 import { AddPlantModal } from '@/components/plants/AddPlantModal';
 import { PlantCard } from '@/components/plants/PlantCard';
+import { SortablePlantCard } from '@/components/plants/SortablePlantCard';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 
 const COMBOBOX_CLASS = 'h-11 rounded-xl border-2 text-base font-normal';
 
@@ -29,6 +42,15 @@ export default function MyPlantsPage() {
   const [varietySearch, setVarietySearch] = useState('');
   const [shelfFilter, setShelfFilter] = useState('');
   const [shelfSearch, setShelfSearch] = useState('');
+
+  const [isReorderMode, setIsReorderMode] = useState(false);
+  const [isReorderSaving, setIsReorderSaving] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  );
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const filtersRef = useRef({ search: '', genusId: '', varietyId: '', shelfId: '' });
@@ -211,6 +233,42 @@ export default function MyPlantsPage() {
     applyFilters('', '', '', '');
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveDragId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = plants.findIndex((p) => p._id === active.id);
+    const newIndex = plants.findIndex((p) => p._id === over.id);
+    setPlants(arrayMove(plants, oldIndex, newIndex));
+  };
+
+  const handleSaveOrder = async () => {
+    setIsReorderSaving(true);
+    try {
+      await plantsApi.reorder(plants.map((p) => p._id));
+      setIsReorderMode(false);
+      toast.success('Порядок сохранён');
+    } catch {
+      toast.error('Ошибка сохранения порядка');
+    } finally {
+      setIsReorderSaving(false);
+    }
+  };
+
+  const handleCancelReorder = () => {
+    setIsReorderMode(false);
+    applyFilters(
+      filtersRef.current.search,
+      filtersRef.current.genusId,
+      filtersRef.current.varietyId,
+      filtersRef.current.shelfId,
+    );
+  };
+
   const handleSuccess = () => {
     clearFilters();
     initialLoad();
@@ -232,13 +290,50 @@ export default function MyPlantsPage() {
             Управляйте своей<br className="sm:hidden" /> коллекцией растений
           </p>
         </div>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          className="gap-2 transition-all active:scale-95 w-full sm:w-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Добавить растение
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          {isReorderMode ? (
+            <>
+              <Button
+                onClick={handleCancelReorder}
+                variant="outline"
+                className="flex-1 sm:flex-none gap-2 transition-all active:scale-95"
+                disabled={isReorderSaving}
+              >
+                <X className="w-4 h-4" />
+                Отмена
+              </Button>
+              <Button
+                onClick={handleSaveOrder}
+                className="flex-1 sm:flex-none gap-2 transition-all active:scale-95"
+                disabled={isReorderSaving}
+              >
+                <Check className="w-4 h-4" />
+                {isReorderSaving ? 'Сохранение...' : 'Сохранить'}
+              </Button>
+            </>
+          ) : (
+            <>
+              {!showArchived && !hasFilters && plants.length > 1 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsReorderMode(true)}
+                  className="transition-all active:scale-95 shrink-0 h-11 w-11 p-0 sm:w-auto sm:px-4 sm:gap-2 rounded-xl"
+                  title="Изменить порядок"
+                >
+                  <GripVertical className="w-4 h-4" />
+                  <span className="hidden sm:inline">Изменить порядок</span>
+                </Button>
+              )}
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="gap-2 transition-all active:scale-95 flex-1 sm:flex-none"
+              >
+                <Plus className="w-4 h-4" />
+                Добавить растение
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Tabs: active / archived */}
@@ -413,13 +508,42 @@ export default function MyPlantsPage() {
           {hasFilters && !isBusy && (
             <p className="text-sm text-muted-foreground">Найдено: {plants.length}</p>
           )}
-          <div
-            className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 transition-opacity duration-200 ${isBusy ? 'opacity-50' : 'opacity-100'}`}
-          >
-            {plants.map((plant, index) => (
-              <PlantCard key={plant._id} plant={plant} index={index} />
-            ))}
-          </div>
+          {isReorderMode && (
+            <p className="text-sm text-muted-foreground animate-in fade-in duration-200">
+              Перетащите карточки для изменения порядка
+            </p>
+          )}
+          {isReorderMode ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={plants.map((p) => p._id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                  {plants.map((plant) => (
+                    <SortablePlantCard key={plant._id} plant={plant} />
+                  ))}
+                </div>
+              </SortableContext>
+              <DragOverlay>
+                {activeDragId ? (
+                  <div className="opacity-90 scale-105 shadow-xl rounded-lg">
+                    <PlantCard plant={plants.find((p) => p._id === activeDragId)!} />
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          ) : (
+            <div
+              className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 transition-opacity duration-200 ${isBusy ? 'opacity-50' : 'opacity-100'}`}
+            >
+              {plants.map((plant, index) => (
+                <PlantCard key={plant._id} plant={plant} index={index} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

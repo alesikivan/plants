@@ -15,6 +15,7 @@ export interface Plant {
   photo?: string;
   description?: string;
   isArchived?: boolean;
+  sortOrder?: number;
   createdAt: string;
   updatedAt: string;
   shelves?: Shelf[];
@@ -99,6 +100,10 @@ export const plantsApi = {
   getOne: async (id: string): Promise<Plant> => {
     const response = await apiClient.get<Plant>(`/plants/${id}`);
     return response.data;
+  },
+
+  reorder: async (ids: string[]): Promise<void> => {
+    await apiClient.patch('/plants/reorder', { ids });
   },
 
   create: async (data: CreatePlantDto): Promise<Plant> => {
