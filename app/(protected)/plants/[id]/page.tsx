@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Calendar, FileText, Leaf, Trash2, Pencil, Layers, Archive, ArchiveRestore } from 'lucide-react';
@@ -27,6 +27,8 @@ import {
 export default function PlantDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const backUrl = searchParams.get('from') === 'archive' ? '/plants?tab=archive' : '/plants';
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
   const [plant, setPlant] = useState<Plant | null>(null);
@@ -50,7 +52,7 @@ export default function PlantDetailPage() {
     } catch (error) {
       toast.error('Ошибка загрузки растения');
       console.error('Failed to load plant:', error);
-      router.push('/plants');
+      router.push(backUrl);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +65,7 @@ export default function PlantDetailPage() {
     try {
       await plantsApi.delete(plant._id);
       toast.success('Растение успешно удалено');
-      router.push('/plants');
+      router.push(backUrl);
     } catch (error) {
       toast.error('Ошибка при удалении растения');
       console.error('Failed to delete plant:', error);
@@ -137,7 +139,7 @@ export default function PlantDetailPage() {
       <div className="flex items-center justify-between gap-2 fade-in slide-in-from-top-2 duration-500 overflow-x-auto">
         <Button
           variant="ghost"
-          onClick={() => router.push('/plants')}
+          onClick={() => router.push(backUrl)}
           className="gap-2 transition-all active:scale-95 flex-shrink-0"
         >
           <ArrowLeft className="w-4 h-4" />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
@@ -26,6 +27,7 @@ import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortab
 const COMBOBOX_CLASS = 'h-11 rounded-xl border-2 text-base font-normal';
 
 export default function MyPlantsPage() {
+  const searchParams = useSearchParams();
   const [plants, setPlants] = useState<Plant[]>([]);
   const [allVarieties, setAllVarieties] = useState<Variety[]>([]);
   const [genera, setGenera] = useState<Genus[]>([]);
@@ -34,7 +36,7 @@ export default function MyPlantsPage() {
   const [isFiltering, setIsFiltering] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [showArchived, setShowArchived] = useState(false);
+  const [showArchived, setShowArchived] = useState(searchParams.get('tab') === 'archive');
   const [searchQuery, setSearchQuery] = useState('');
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
@@ -56,14 +58,14 @@ export default function MyPlantsPage() {
   const filtersRef = useRef({ search: '', genusId: '', varietyId: '', shelfId: '' });
 
   useEffect(() => {
-    initialLoad();
+    initialLoad(showArchived);
   }, []);
 
-  const initialLoad = async () => {
+  const initialLoad = async (archived = false) => {
     setIsLoading(true);
     try {
       const [plantsData, shelvesData] = await Promise.all([
-        plantsApi.getAll(),
+        plantsApi.getAll({ showArchived: archived }),
         shelvesApi.getAll(),
       ]);
       setPlants(plantsData);
@@ -540,7 +542,12 @@ export default function MyPlantsPage() {
               className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 transition-opacity duration-200 ${isBusy ? 'opacity-50' : 'opacity-100'}`}
             >
               {plants.map((plant, index) => (
-                <PlantCard key={plant._id} plant={plant} index={index} />
+                <PlantCard
+                  key={plant._id}
+                  plant={plant}
+                  index={index}
+                  href={showArchived ? `/plants/${plant._id}?from=archive` : undefined}
+                />
               ))}
             </div>
           )}
