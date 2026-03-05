@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropModal } from '@/components/ui/image-crop-modal';
 import { compressImage } from '@/lib/utils/image-compression';
@@ -32,6 +32,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
     const [cropQueue, setCropQueue] = React.useState<CropQueueItem[]>([]);
     // Files that have been processed (cropped or skipped) but not yet compressed+submitted
     const pendingRef = React.useRef<File[]>([]);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const handleClick = () => {
       inputRef.current?.click();
@@ -43,26 +44,31 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
 
       if (files.length === 0) return;
 
-      if (!disableDateDetection) {
-        const date = await getPhotoDate(files[0]);
-        onDateFound?.(date);
+      setIsLoading(true);
+      try {
+        if (!disableDateDetection) {
+          const date = await getPhotoDate(files[0]);
+          onDateFound?.(date);
+        }
+
+        const converted = await Promise.all(
+          files.map((f) => isHeic(f) ? convertHeicToJpeg(f) : f)
+        );
+
+        // Build queue with data URLs for the crop modal
+        const queue: CropQueueItem[] = await Promise.all(
+          converted.map((file) => new Promise<CropQueueItem>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve({ file, dataUrl: reader.result as string });
+            reader.readAsDataURL(file);
+          }))
+        );
+
+        pendingRef.current = [];
+        setCropQueue(queue);
+      } finally {
+        setIsLoading(false);
       }
-
-      const converted = await Promise.all(
-        files.map((f) => isHeic(f) ? convertHeicToJpeg(f) : f)
-      );
-
-      // Build queue with data URLs for the crop modal
-      const queue: CropQueueItem[] = await Promise.all(
-        converted.map((file) => new Promise<CropQueueItem>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve({ file, dataUrl: reader.result as string });
-          reader.readAsDataURL(file);
-        }))
-      );
-
-      pendingRef.current = [];
-      setCropQueue(queue);
     };
 
     const finishQueue = async (accumulated: File[]) => {
@@ -148,19 +154,26 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={handleClick}
-          className={cn(
-            "flex h-11 w-full items-center rounded-xl border-2 border-input bg-background px-4 py-3 text-base transition-all duration-200 hover:border-ring hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50",
-            className
-          )}
-        >
-          <Upload className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">
-            {previews.length > 0 ? `Добавить ещё фото` : 'Выберите фотографии'}
-          </span>
-        </button>
+        {isLoading ? (
+          <div className="flex h-11 w-full items-center rounded-xl border-2 border-input bg-background px-4 py-3 text-base justify-center">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Обработка фото...</span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleClick}
+            className={cn(
+              "flex h-11 w-full items-center rounded-xl border-2 border-input bg-background px-4 py-3 text-base transition-all duration-200 hover:border-ring hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50",
+              className
+            )}
+          >
+            <Upload className="mr-2 h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">
+              {previews.length > 0 ? `Добавить ещё фото` : 'Выберите фотографии'}
+            </span>
+          </button>
+        )}
 
         {maxSize && acceptedFormats && (
           <p className="text-xs text-muted-foreground">

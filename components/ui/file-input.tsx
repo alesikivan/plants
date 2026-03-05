@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ImageCropModal } from '@/components/ui/image-crop-modal';
@@ -23,6 +23,7 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
   ({ className, onFileChange, onDateFound, preview, onRemove, maxSize, acceptedFormats, disableDateDetection, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [cropSrc, setCropSrc] = React.useState<string | null>(null);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const handleClick = () => {
       inputRef.current?.click();
@@ -38,19 +39,24 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
         return;
       }
 
-      if (!disableDateDetection) {
-        const date = await getPhotoDate(file);
-        onDateFound?.(date);
+      setIsLoading(true);
+      try {
+        if (!disableDateDetection) {
+          const date = await getPhotoDate(file);
+          onDateFound?.(date);
+        }
+
+        const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
+
+        // Show crop modal with the raw converted image
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setCropSrc(reader.result as string);
+        };
+        reader.readAsDataURL(converted);
+      } finally {
+        setIsLoading(false);
       }
-
-      const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
-
-      // Show crop modal with the raw converted image
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCropSrc(reader.result as string);
-      };
-      reader.readAsDataURL(converted);
     };
 
     const handleCropComplete = async (croppedFile: File) => {
@@ -87,7 +93,12 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           />
         )}
 
-        {preview ? (
+        {isLoading ? (
+          <div className="flex h-11 w-full items-center rounded-xl border-2 border-input bg-background px-4 py-3 text-base justify-center">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Обработка фото...</span>
+          </div>
+        ) : preview ? (
           <div className="relative rounded-xl border-2 border-input overflow-hidden">
             <img
               src={preview}
