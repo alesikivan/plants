@@ -317,7 +317,7 @@ export default function AdminUsersPage() {
                 id="create-name"
                 value={createForm.name}
                 onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Иван Иванов"
+                placeholder="nicknameнов"
               />
             </div>
             <div className="space-y-2">
