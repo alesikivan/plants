@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
 import { Plus, Leaf, Search, X, SlidersHorizontal, Archive, GripVertical, Check } from 'lucide-react';
-import { plantsApi, Plant, shelvesApi, Shelf, Genus, Variety } from '@/lib/api';
+import { plantsApi, Plant, shelvesApi, Shelf, Genus } from '@/lib/api';
 import { AddPlantModal } from '@/components/plants/AddPlantModal';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { SortablePlantCard } from '@/components/plants/SortablePlantCard';
@@ -29,7 +29,6 @@ const COMBOBOX_CLASS = 'h-11 rounded-xl border-2 text-base font-normal';
 export function PlantsPageContent() {
   const searchParams = useSearchParams();
   const [plants, setPlants] = useState<Plant[]>([]);
-  const [allVarieties, setAllVarieties] = useState<Variety[]>([]);
   const [genera, setGenera] = useState<Genus[]>([]);
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,8 +39,6 @@ export function PlantsPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
-  const [varietyFilter, setVarietyFilter] = useState('');
-  const [varietySearch, setVarietySearch] = useState('');
   const [shelfFilter, setShelfFilter] = useState('');
   const [shelfSearch, setShelfSearch] = useState('');
 
@@ -55,7 +52,7 @@ export function PlantsPageContent() {
   );
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const filtersRef = useRef({ search: '', genusId: '', varietyId: '', shelfId: '' });
+  const filtersRef = useRef({ search: '', genusId: '', shelfId: '' });
 
   useEffect(() => {
     initialLoad(showArchived);
@@ -72,20 +69,13 @@ export function PlantsPageContent() {
       setShelves(shelvesData);
 
       const genusMap = new Map<string, Genus>();
-      const varietyMap = new Map<string, Variety>();
       plantsData.forEach((p) => {
         if (typeof p.genusId === 'object' && p.genusId) {
           genusMap.set(p.genusId._id, p.genusId as Genus);
         }
-        if (typeof p.varietyId === 'object' && p.varietyId) {
-          varietyMap.set(p.varietyId._id, p.varietyId as Variety);
-        }
       });
       setGenera(
         Array.from(genusMap.values()).sort((a, b) => a.nameRu.localeCompare(b.nameRu))
-      );
-      setAllVarieties(
-        Array.from(varietyMap.values()).sort((a, b) => a.nameRu.localeCompare(b.nameRu))
       );
     } catch (error) {
       toast.error('Ошибка загрузки растений');
@@ -94,15 +84,6 @@ export function PlantsPageContent() {
       setIsLoading(false);
     }
   };
-
-  // Varieties for the dropdown: filtered by selected genus
-  const visibleVarieties = useMemo(() => {
-    if (!genusFilter) return allVarieties;
-    return allVarieties.filter((v) => {
-      const gId = typeof v.genusId === 'object' ? v.genusId._id : v.genusId;
-      return gId === genusFilter;
-    });
-  }, [allVarieties, genusFilter]);
 
   // Client-side filtering of dropdown options by search text
   const genusOptions = useMemo(() => {
@@ -117,18 +98,6 @@ export function PlantsPageContent() {
       .map((g) => ({ value: g._id, label: `${g.nameRu} / ${g.nameEn}` }));
   }, [genera, genusSearch]);
 
-  const varietyOptions = useMemo(() => {
-    const q = varietySearch.toLowerCase();
-    return visibleVarieties
-      .filter(
-        (v) =>
-          !q ||
-          v.nameRu.toLowerCase().includes(q) ||
-          v.nameEn.toLowerCase().includes(q)
-      )
-      .map((v) => ({ value: v._id, label: `${v.nameRu} / ${v.nameEn}` }));
-  }, [visibleVarieties, varietySearch]);
-
   const shelfOptions = useMemo(() => {
     const q = shelfSearch.toLowerCase();
     return shelves
@@ -139,7 +108,6 @@ export function PlantsPageContent() {
   const applyFilters = async (
     search: string,
     genusId: string,
-    varietyId: string,
     shelfId: string,
     archived = showArchived,
   ) => {
@@ -148,7 +116,6 @@ export function PlantsPageContent() {
       const data = await plantsApi.getAll({
         search: search || undefined,
         genusId: genusId || undefined,
-        varietyId: varietyId || undefined,
         shelfId: shelfId || undefined,
         showArchived: archived,
       });
@@ -168,32 +135,16 @@ export function PlantsPageContent() {
 
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     searchDebounceRef.current = setTimeout(() => {
-      const { search, genusId, varietyId, shelfId } = filtersRef.current;
-      applyFilters(search, genusId, varietyId, shelfId);
+      const { search, genusId, shelfId } = filtersRef.current;
+      applyFilters(search, genusId, shelfId);
     }, 400);
   };
 
   const handleGenusChange = (value: string) => {
     setGenusFilter(value);
     setGenusSearch('');
-    // Reset variety when genus changes
-    setVarietyFilter('');
-    setVarietySearch('');
     filtersRef.current.genusId = value;
-    filtersRef.current.varietyId = '';
-    applyFilters(filtersRef.current.search, value, '', filtersRef.current.shelfId);
-  };
-
-  const handleVarietyChange = (value: string) => {
-    setVarietyFilter(value);
-    setVarietySearch('');
-    filtersRef.current.varietyId = value;
-    applyFilters(
-      filtersRef.current.search,
-      filtersRef.current.genusId,
-      value,
-      filtersRef.current.shelfId,
-    );
+    applyFilters(filtersRef.current.search, value, filtersRef.current.shelfId);
   };
 
   const handleShelfChange = (value: string) => {
@@ -203,7 +154,6 @@ export function PlantsPageContent() {
     applyFilters(
       filtersRef.current.search,
       filtersRef.current.genusId,
-      filtersRef.current.varietyId,
       value,
     );
   };
@@ -213,26 +163,22 @@ export function PlantsPageContent() {
     setSearchQuery('');
     setGenusFilter('');
     setGenusSearch('');
-    setVarietyFilter('');
-    setVarietySearch('');
     setShelfFilter('');
     setShelfSearch('');
-    filtersRef.current = { search: '', genusId: '', varietyId: '', shelfId: '' };
+    filtersRef.current = { search: '', genusId: '', shelfId: '' };
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    applyFilters('', '', '', '', archived);
+    applyFilters('', '', '', archived);
   };
 
   const clearFilters = () => {
     setSearchQuery('');
     setGenusFilter('');
     setGenusSearch('');
-    setVarietyFilter('');
-    setVarietySearch('');
     setShelfFilter('');
     setShelfSearch('');
-    filtersRef.current = { search: '', genusId: '', varietyId: '', shelfId: '' };
+    filtersRef.current = { search: '', genusId: '', shelfId: '' };
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    applyFilters('', '', '', '');
+    applyFilters('', '', '');
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -266,7 +212,6 @@ export function PlantsPageContent() {
     applyFilters(
       filtersRef.current.search,
       filtersRef.current.genusId,
-      filtersRef.current.varietyId,
       filtersRef.current.shelfId,
     );
   };
@@ -279,7 +224,7 @@ export function PlantsPageContent() {
   const [showFilters, setShowFilters] = useState(false);
 
   const hasFilters =
-    searchQuery !== '' || genusFilter !== '' || varietyFilter !== '' || shelfFilter !== '';
+    searchQuery !== '' || genusFilter !== '' || shelfFilter !== '';
   const isBusy = isLoading || isFiltering;
 
   return (
@@ -398,21 +343,6 @@ export function PlantsPageContent() {
                     searchPlaceholder="Поиск рода..."
                     emptyText="Ничего не найдено"
                     onSearchChange={setGenusSearch}
-                    className={COMBOBOX_CLASS}
-                  />
-                </div>
-              )}
-
-              {visibleVarieties.length > 0 && (
-                <div className="w-full sm:flex-1">
-                  <ComboBox
-                    options={varietyOptions}
-                    value={varietyFilter}
-                    onValueChange={handleVarietyChange}
-                    placeholder="Все сорта"
-                    searchPlaceholder="Поиск сорта..."
-                    emptyText="Ничего не найдено"
-                    onSearchChange={setVarietySearch}
                     className={COMBOBOX_CLASS}
                   />
                 </div>

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
 import { Leaf, Heart, Plus, Search, X, SlidersHorizontal } from 'lucide-react';
-import { wishlistApi, Wishlist, Genus, Variety } from '@/lib/api';
+import { wishlistApi, Wishlist, Genus } from '@/lib/api';
 import { WishlistCard, AddWishlistModal } from '@/components/wishlist';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
@@ -21,7 +21,6 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const [wishlist, setWishlist] = useState<Wishlist[]>([]);
-  const [allVarieties, setAllVarieties] = useState<Variety[]>([]);
   const [genera, setGenera] = useState<Genus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
@@ -30,12 +29,10 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
-  const [varietyFilter, setVarietyFilter] = useState('');
-  const [varietySearch, setVarietySearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const filtersRef = useRef({ search: '', genusId: '', varietyId: '' });
+  const filtersRef = useRef({ search: '', genusId: '' });
 
   useEffect(() => {
     initialLoad();
@@ -48,22 +45,13 @@ export default function DashboardPage() {
       setWishlist(data);
 
       const genusMap = new Map<string, Genus>();
-      const varietyMap = new Map<string, Variety>();
       data.forEach((item) => {
         if (typeof item.genusId === 'object' && item.genusId) {
           genusMap.set((item.genusId as Genus)._id, item.genusId as Genus);
         }
-        if (typeof item.varietyId === 'object' && item.varietyId) {
-          varietyMap.set((item.varietyId as Variety)._id, item.varietyId as Variety);
-        }
       });
       setGenera(
         Array.from(genusMap.values()).sort((a, b) =>
-          getDisplayName(a, language).localeCompare(getDisplayName(b, language))
-        )
-      );
-      setAllVarieties(
-        Array.from(varietyMap.values()).sort((a, b) =>
           getDisplayName(a, language).localeCompare(getDisplayName(b, language))
         )
       );
@@ -75,14 +63,6 @@ export default function DashboardPage() {
     }
   };
 
-  const visibleVarieties = useMemo(() => {
-    if (!genusFilter) return allVarieties;
-    return allVarieties.filter((v) => {
-      const gId = typeof v.genusId === 'object' ? (v.genusId as Genus)._id : v.genusId;
-      return gId === genusFilter;
-    });
-  }, [allVarieties, genusFilter]);
-
   const genusOptions = useMemo(() => {
     const q = genusSearch.toLowerCase();
     return genera
@@ -90,20 +70,12 @@ export default function DashboardPage() {
       .map((g) => ({ value: g._id, label: `${g.nameRu} / ${g.nameEn}` }));
   }, [genera, genusSearch, language]);
 
-  const varietyOptions = useMemo(() => {
-    const q = varietySearch.toLowerCase();
-    return visibleVarieties
-      .filter((v) => !q || getDisplayName(v, language).toLowerCase().includes(q))
-      .map((v) => ({ value: v._id, label: `${v.nameRu} / ${v.nameEn}` }));
-  }, [visibleVarieties, varietySearch, language]);
-
-  const applyFilters = async (search: string, genusId: string, varietyId: string) => {
+  const applyFilters = async (search: string, genusId: string) => {
     setIsFiltering(true);
     try {
       const data = await wishlistApi.getAll({
         search: search || undefined,
         genusId: genusId || undefined,
-        varietyId: varietyId || undefined,
       });
       setWishlist(data);
     } catch (error) {
@@ -120,37 +92,25 @@ export default function DashboardPage() {
     filtersRef.current.search = value;
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     searchDebounceRef.current = setTimeout(() => {
-      const { search, genusId, varietyId } = filtersRef.current;
-      applyFilters(search, genusId, varietyId);
+      const { search, genusId } = filtersRef.current;
+      applyFilters(search, genusId);
     }, 400);
   };
 
   const handleGenusChange = (value: string) => {
     setGenusFilter(value);
     setGenusSearch('');
-    setVarietyFilter('');
-    setVarietySearch('');
     filtersRef.current.genusId = value;
-    filtersRef.current.varietyId = '';
-    applyFilters(filtersRef.current.search, value, '');
-  };
-
-  const handleVarietyChange = (value: string) => {
-    setVarietyFilter(value);
-    setVarietySearch('');
-    filtersRef.current.varietyId = value;
-    applyFilters(filtersRef.current.search, filtersRef.current.genusId, value);
+    applyFilters(filtersRef.current.search, value);
   };
 
   const clearFilters = () => {
     setSearchQuery('');
     setGenusFilter('');
     setGenusSearch('');
-    setVarietyFilter('');
-    setVarietySearch('');
-    filtersRef.current = { search: '', genusId: '', varietyId: '' };
+    filtersRef.current = { search: '', genusId: '' };
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    applyFilters('', '', '');
+    applyFilters('', '');
   };
 
   const handleSuccess = () => {
@@ -158,7 +118,7 @@ export default function DashboardPage() {
     initialLoad();
   };
 
-  const hasFilters = searchQuery !== '' || genusFilter !== '' || varietyFilter !== '';
+  const hasFilters = searchQuery !== '' || genusFilter !== '';
   const isBusy = isLoading || isFiltering;
 
   return (
@@ -235,20 +195,6 @@ export default function DashboardPage() {
                       searchPlaceholder="Поиск рода..."
                       emptyText="Ничего не найдено"
                       onSearchChange={setGenusSearch}
-                      className={COMBOBOX_CLASS}
-                    />
-                  </div>
-                )}
-                {visibleVarieties.length > 0 && (
-                  <div className="w-full sm:flex-1">
-                    <ComboBox
-                      options={varietyOptions}
-                      value={varietyFilter}
-                      onValueChange={handleVarietyChange}
-                      placeholder="Все сорта"
-                      searchPlaceholder="Поиск сорта..."
-                      emptyText="Ничего не найдено"
-                      onSearchChange={setVarietySearch}
                       className={COMBOBOX_CLASS}
                     />
                   </div>
