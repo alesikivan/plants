@@ -97,27 +97,27 @@ export default function ShelfDetailPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
       {/* Header */}
-      <div className="flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-500">
+      <div className="flex items-center justify-between gap-2 animate-in fade-in slide-in-from-top-2 duration-500 overflow-x-auto">
         <Button
           variant="ghost"
           onClick={() => router.push('/shelves')}
-          className="gap-2 transition-all hover:scale-105 active:scale-95"
+          className="gap-2 transition-all active:scale-95 flex-shrink-0"
         >
           <ArrowLeft className="w-4 h-4" />
-          Назад к списку
+          <span className="hidden sm:inline">Назад к списку</span>
         </Button>
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2 flex-shrink-0">
           <Button
             variant="outline"
             onClick={() => setIsEditModalOpen(true)}
-            className="gap-2 transition-all hover:scale-105 active:scale-95"
+            className="gap-2 transition-all active:scale-95"
           >
             <Pencil className="w-4 h-4" />
             <span className="hidden sm:inline">Редактировать</span>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all hover:scale-105 active:scale-95">
+              <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all active:scale-95">
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Удалить</span>
               </Button>
@@ -130,11 +130,11 @@ export default function ShelfDetailPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">Отмена</AlertDialogCancel>
+                <AlertDialogCancel className="transition-all active:scale-95">Отмена</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="transition-all hover:scale-105 active:scale-95"
+                  className="transition-all active:scale-95"
                 >
                   {isDeleting ? 'Удаление...' : 'Удалить'}
                 </AlertDialogAction>

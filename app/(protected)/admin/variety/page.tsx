@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { varietyApi, Variety, CreateVarietyDto } from '@/lib/api/variety';
 import { genusApi, Genus } from '@/lib/api/genus';
@@ -21,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ComboBox } from '@/components/ui/combobox';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,16 +48,20 @@ export default function AdminVarietyPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editVariety, setEditVariety] = useState<Variety | null>(null);
   const [deleteVariety, setDeleteVariety] = useState<Variety | null>(null);
+  const [genusSearch, setGenusSearch] = useState('');
   const [form, setForm] = useState<CreateVarietyDto>({ nameRu: '', nameEn: '', genusId: '', description: '' });
+
+  const debouncedGenusSearch = useDebounce(genusSearch, 300);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['admin-variety', genusFilter],
     queryFn: () => varietyApi.getAll(genusFilter === 'all' ? undefined : genusFilter || undefined),
   });
 
-  const { data: genera = [] } = useQuery({
-    queryKey: ['admin-genus'],
-    queryFn: () => genusApi.getAll(),
+  const { data: genera = [], isLoading: isGenusLoading } = useQuery({
+    queryKey: ['admin-genus', debouncedGenusSearch],
+    queryFn: () => genusApi.getAll(debouncedGenusSearch),
+    enabled: true,
   });
 
   const filtered = items.filter(
@@ -113,7 +119,13 @@ export default function AdminVarietyPage() {
     setEditVariety(v);
     const genusId = typeof v.genusId === 'object' ? v.genusId._id : v.genusId;
     setForm({ nameRu: v.nameRu, nameEn: v.nameEn, genusId, description: v.description ?? '' });
+    setGenusSearch('');
   };
+
+  const genusOptions = genera.map((g) => ({
+    value: g._id,
+    label: `${g.nameRu} / ${g.nameEn}`,
+  }));
 
   return (
     <div className="space-y-6">
@@ -127,7 +139,7 @@ export default function AdminVarietyPage() {
             <p className="text-sm text-muted-foreground">Всего: {items.length}</p>
           </div>
         </div>
-        <Button onClick={() => { setForm({ nameRu: '', nameEn: '', genusId: '', description: '' }); setCreateOpen(true); }} className="gap-2">
+        <Button onClick={() => { setForm({ nameRu: '', nameEn: '', genusId: '', description: '' }); setGenusSearch(''); setCreateOpen(true); }} className="gap-2">
           <Plus className="w-4 h-4" />
           Создать сорт
         </Button>
@@ -210,7 +222,7 @@ export default function AdminVarietyPage() {
       <Dialog
         open={createOpen || !!editVariety}
         onOpenChange={(open) => {
-          if (!open) { setCreateOpen(false); setEditVariety(null); }
+          if (!open) { setCreateOpen(false); setEditVariety(null); setGenusSearch(''); }
         }}
       >
         <DialogContent>
@@ -236,21 +248,16 @@ export default function AdminVarietyPage() {
             </div>
             <div className="space-y-2">
               <Label>Род</Label>
-              <Select
+              <ComboBox
+                options={genusOptions}
                 value={form.genusId}
                 onValueChange={(v) => setForm((f) => ({ ...f, genusId: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите род" />
-                </SelectTrigger>
-                <SelectContent>
-                  {genera.map((g) => (
-                    <SelectItem key={g._id} value={g._id}>
-                      {g.nameRu} / {g.nameEn}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Выберите род"
+                searchPlaceholder="Поиск рода..."
+                emptyText="Роды не найдены"
+                isLoading={isGenusLoading}
+                onSearchChange={setGenusSearch}
+              />
             </div>
             <div className="space-y-2">
               <Label>Описание</Label>

@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileInput } from '@/components/ui/file-input';
-import { Checkbox } from '@/components/ui/checkbox';
+import { MultiComboBox } from '@/components/ui/multi-combobox';
 import { plantsApi, shelvesApi, Shelf } from '@/lib/api';
 import { toast } from 'sonner';
 import { PlantSelector } from './PlantSelector';
@@ -152,16 +152,6 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     setValue('varietyId', varietyId);
   };
 
-  const handleShelfToggle = (shelfId: string) => {
-    setSelectedShelfIds(prev => {
-      if (prev.includes(shelfId)) {
-        return prev.filter(id => id !== shelfId);
-      } else {
-        return [...prev, shelfId];
-      }
-    });
-  };
-
   const disableFutureDates = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -194,34 +184,15 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
             {/* Полки */}
             <div className="grid gap-2">
               <Label>Полки</Label>
-              {isLoadingShelves ? (
-                <div className="text-sm text-muted-foreground">Загрузка полок...</div>
-              ) : shelves.length === 0 ? (
-                <div className="text-sm text-muted-foreground">Нет доступных полок</div>
-              ) : (
-                <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-3">
-                  {shelves.map((shelf) => (
-                    <div key={shelf._id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`shelf-${shelf._id}`}
-                        checked={selectedShelfIds.includes(shelf._id)}
-                        onCheckedChange={() => handleShelfToggle(shelf._id)}
-                      />
-                      <label
-                        htmlFor={`shelf-${shelf._id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {shelf.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {selectedShelfIds.length > 0 && (
-                <div className="text-sm text-muted-foreground">
-                  Выбрано полок: {selectedShelfIds.length}
-                </div>
-              )}
+              <MultiComboBox
+                options={shelves.map((s) => ({ value: s._id, label: s.name }))}
+                values={selectedShelfIds}
+                onValuesChange={setSelectedShelfIds}
+                placeholder="Выберите полки..."
+                searchPlaceholder="Поиск полки..."
+                emptyText="Нет доступных полок"
+                isLoading={isLoadingShelves}
+              />
             </div>
 
             {/* Дата покупки */}

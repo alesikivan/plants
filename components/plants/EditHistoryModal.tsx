@@ -37,7 +37,7 @@ export function EditHistoryModal({
   useEffect(() => {
     if (open && historyItem) {
       setDate(new Date(historyItem.date));
-      setComment(historyItem.comment);
+      setComment(historyItem.comment ?? '');
       setExistingPhotos(historyItem.photos);
       setNewPhotos([]);
       setNewPhotoPreviews([]);

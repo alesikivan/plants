@@ -134,22 +134,22 @@ export default function PlantDetailPage() {
   return (
     <div className="space-y-6 fade-in slide-in-from-bottom-2 duration-700">
       {/* Header */}
-      <div className="flex items-center justify-between  fade-in slide-in-from-top-2 duration-500">
+      <div className="flex items-center justify-between gap-2 fade-in slide-in-from-top-2 duration-500 overflow-x-auto">
         <Button
           variant="ghost"
           onClick={() => router.push('/plants')}
-          className="gap-2 transition-all hover:scale-105 active:scale-95"
+          className="gap-2 transition-all active:scale-95 flex-shrink-0"
         >
           <ArrowLeft className="w-4 h-4" />
-          Назад к списку
+          <span className="hidden sm:inline">Назад к списку</span>
         </Button>
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2 flex-shrink-0">
           {plant.isArchived ? (
             <Button
               variant="outline"
               onClick={handleUnarchive}
               disabled={isArchiving}
-              className="gap-2 transition-all hover:scale-105 active:scale-95"
+              className="gap-2 transition-all active:scale-95"
             >
               <ArchiveRestore className="w-4 h-4" />
               <span className="hidden sm:inline">{isArchiving ? 'Восстановление...' : 'Восстановить'}</span>
@@ -160,7 +160,7 @@ export default function PlantDetailPage() {
                 <Button
                   variant="outline"
                   disabled={isArchiving}
-                  className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all hover:scale-105 active:scale-95"
+                  className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all active:scale-95"
                 >
                   <Archive className="w-4 h-4" />
                   <span className="hidden sm:inline">{isArchiving ? 'Архивирование...' : 'Архив'}</span>
@@ -174,11 +174,11 @@ export default function PlantDetailPage() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">Отмена</AlertDialogCancel>
+                  <AlertDialogCancel className="transition-all active:scale-95">Отмена</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleArchive}
                     disabled={isArchiving}
-                    className="transition-all hover:scale-105 active:scale-95"
+                    className="transition-all active:scale-95"
                   >
                     {isArchiving ? 'Архивирование...' : 'Архивировать'}
                   </AlertDialogAction>
@@ -190,7 +190,7 @@ export default function PlantDetailPage() {
             <Button
               variant="outline"
               onClick={() => setIsEditModalOpen(true)}
-              className="gap-2 transition-all hover:scale-105 active:scale-95"
+              className="gap-2 transition-all active:scale-95"
             >
               <Pencil className="w-4 h-4" />
               <span className="hidden sm:inline">Редактировать</span>
@@ -198,7 +198,7 @@ export default function PlantDetailPage() {
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all hover:scale-105 active:scale-95">
+              <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all active:scale-95">
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Удалить</span>
               </Button>
@@ -211,11 +211,11 @@ export default function PlantDetailPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">Отмена</AlertDialogCancel>
+                <AlertDialogCancel className="transition-all active:scale-95">Отмена</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="transition-all hover:scale-105 active:scale-95"
+                  className="transition-all active:scale-95"
                 >
                   {isDeleting ? 'Удаление...' : 'Удалить'}
                 </AlertDialogAction>
@@ -338,7 +338,7 @@ export default function PlantDetailPage() {
                               key={shelfData._id}
                               variant="outline"
                               size="sm"
-                              className="transition-all hover:scale-105 active:scale-95"
+                              className="transition-all active:scale-95"
                               onClick={() => router.push(`/shelves/${shelfData._id}`)}
                             >
                               <Layers className="w-3 h-3 mr-1.5" />

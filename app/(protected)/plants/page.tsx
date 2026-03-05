@@ -234,7 +234,7 @@ export default function MyPlantsPage() {
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="gap-2 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
+          className="gap-2 transition-all active:scale-95 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           Добавить растение
@@ -388,7 +388,7 @@ export default function MyPlantsPage() {
               </p>
               <Button
                 onClick={() => setIsModalOpen(true)}
-                className="gap-2 transition-all hover:scale-105 active:scale-95"
+                className="gap-2 transition-all active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 Добавить первое растение

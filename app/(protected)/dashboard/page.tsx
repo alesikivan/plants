@@ -42,7 +42,7 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <button
             onClick={() => router.push('/plants')}
-            className="p-6 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-accent/50 transition-all duration-200 text-left group hover:scale-105 active:scale-95"
+            className="p-6 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-accent/50 transition-all duration-200 text-left group active:scale-95"
           >
             <div className="space-y-2">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">

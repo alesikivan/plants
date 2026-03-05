@@ -79,7 +79,7 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
             </div>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="gap-2 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
+              className="gap-2 transition-all active:scale-95 w-full sm:w-auto"
               size="sm"
             >
               <Plus className="w-4 h-4" />

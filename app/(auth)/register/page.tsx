@@ -8,6 +8,7 @@ import { showErrorToast } from '@/lib/api/error-handler';
 import { ErrorType } from '@/lib/api/errors';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Mail } from 'lucide-react';
@@ -157,9 +158,8 @@ export default function RegisterPage() {
 
               <div className="space-y-1">
                 <Label htmlFor="password">Пароль</Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -170,9 +170,8 @@ export default function RegisterPage() {
 
               <div className="space-y-1">
                 <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}

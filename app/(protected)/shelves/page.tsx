@@ -44,7 +44,7 @@ export default function ShelvesPage() {
             Организуйте свои<br className="sm:hidden" /> растения по полкам
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto">
+        <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all active:scale-95 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           Создать полку
         </Button>
@@ -65,7 +65,7 @@ export default function ShelvesPage() {
           <p className="text-muted-foreground mb-6">
             Создайте свою первую полку, чтобы организовать растения
           </p>
-          <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all hover:scale-105 active:scale-95">
+          <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all active:scale-95">
             <Plus className="w-4 h-4" />
             Создать первую полку
           </Button>

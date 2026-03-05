@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { ComboBox } from '@/components/ui/combobox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileInput } from '@/components/ui/file-input';
-import { Checkbox } from '@/components/ui/checkbox';
+import { MultiComboBox } from '@/components/ui/multi-combobox';
 import { genusApi, varietyApi, plantsApi, shelvesApi, Genus, Variety, Plant, Shelf, getPlantPhotoUrl } from '@/lib/api';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { toast } from 'sonner';
@@ -250,16 +250,6 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
     handleVarietyChange(variety._id);
   };
 
-  const handleShelfToggle = (shelfId: string) => {
-    setSelectedShelfIds(prev => {
-      if (prev.includes(shelfId)) {
-        return prev.filter(id => id !== shelfId);
-      } else {
-        return [...prev, shelfId];
-      }
-    });
-  };
-
   const disableFutureDates = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -278,11 +268,6 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
   const varietyOptions = varieties.map((variety) => ({
     value: variety._id,
     label: getDisplayName(variety.nameRu, variety.nameEn),
-  }));
-
-  const shelfOptions = shelves.map((shelf) => ({
-    value: shelf._id,
-    label: shelf.name,
   }));
 
   return (
@@ -357,34 +342,15 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
             {/* Полки */}
             <div className="grid gap-2">
               <Label>Полки</Label>
-              {isLoadingShelves ? (
-                <div className="text-sm text-muted-foreground">Загрузка полок...</div>
-              ) : shelves.length === 0 ? (
-                <div className="text-sm text-muted-foreground">Нет доступных полок</div>
-              ) : (
-                <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-3">
-                  {shelves.map((shelf) => (
-                    <div key={shelf._id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`shelf-${shelf._id}`}
-                        checked={selectedShelfIds.includes(shelf._id)}
-                        onCheckedChange={() => handleShelfToggle(shelf._id)}
-                      />
-                      <label
-                        htmlFor={`shelf-${shelf._id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {shelf.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {selectedShelfIds.length > 0 && (
-                <div className="text-sm text-muted-foreground">
-                  Выбрано полок: {selectedShelfIds.length}
-                </div>
-              )}
+              <MultiComboBox
+                options={shelves.map((s) => ({ value: s._id, label: s.name }))}
+                values={selectedShelfIds}
+                onValuesChange={setSelectedShelfIds}
+                placeholder="Выберите полки..."
+                searchPlaceholder="Поиск полки..."
+                emptyText="Нет доступных полок"
+                isLoading={isLoadingShelves}
+              />
             </div>
 
             {/* Дата покупки */}

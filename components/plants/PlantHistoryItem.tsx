@@ -94,12 +94,12 @@ export function PlantHistoryItem({
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="transition-all hover:scale-105 active:scale-95">
+                    <AlertDialogCancel className="transition-all active:scale-95">
                       Отмена
                     </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={onDelete}
-                      className="transition-all hover:scale-105 active:scale-95"
+                      className="transition-all active:scale-95"
                     >
                       Удалить
                     </AlertDialogAction>

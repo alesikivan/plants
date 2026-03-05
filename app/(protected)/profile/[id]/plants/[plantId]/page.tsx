@@ -73,7 +73,7 @@ export default function UserPlantDetailPage() {
       <Button
         variant="ghost"
         onClick={() => router.back()}
-        className="gap-2 transition-all hover:scale-105 active:scale-95"
+        className="gap-2 transition-all active:scale-95"
       >
         <ArrowLeft className="w-4 h-4" />
         Назад
