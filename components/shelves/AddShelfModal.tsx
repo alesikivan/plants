@@ -82,9 +82,8 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
         );
         setPlants(availablePlants);
       } else {
-        // При создании только растения без полки
-        const availablePlants = data.filter(plant => plant.shelfIds.length === 0);
-        setPlants(availablePlants);
+        // При создании показываем все растения (они могут быть на других полках)
+        setPlants(data);
       }
     } catch (error) {
       toast.error('Ошибка загрузки растений');
