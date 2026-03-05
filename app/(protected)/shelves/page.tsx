@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Layers } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Layers, Search, X } from 'lucide-react';
 import { shelvesApi, Shelf } from '@/lib/api';
 import { AddShelfModal } from '@/components/shelves/AddShelfModal';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
@@ -11,7 +12,11 @@ import { toast } from 'sonner';
 export default function ShelvesPage() {
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFiltering, setIsFiltering] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const searchRef = useRef('');
 
   useEffect(() => {
     loadShelves();
@@ -30,7 +35,38 @@ export default function ShelvesPage() {
     }
   };
 
+  const applySearch = async (search: string) => {
+    setIsFiltering(true);
+    try {
+      const data = await shelvesApi.getAll({ search: search || undefined });
+      setShelves(data);
+    } catch (error) {
+      toast.error('Ошибка загрузки полок');
+      console.error('Failed to search shelves:', error);
+    } finally {
+      setIsFiltering(false);
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    searchRef.current = value;
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      applySearch(searchRef.current);
+    }, 400);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    searchRef.current = '';
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    applySearch('');
+  };
+
   const handleSuccess = () => {
+    handleClearSearch();
     loadShelves();
   };
 
@@ -50,6 +86,27 @@ export default function ShelvesPage() {
         </Button>
       </div>
 
+      {/* Search */}
+      {!isLoading && (
+        <div className="relative animate-in fade-in duration-500">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Поиск по названию полки..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="pl-9 pr-9"
+          />
+          {searchQuery && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Shelves Grid */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64 animate-in fade-in duration-500">
@@ -58,7 +115,7 @@ export default function ShelvesPage() {
             <p className="text-muted-foreground">Загрузка полок...</p>
           </div>
         </div>
-      ) : shelves.length === 0 ? (
+      ) : shelves.length === 0 && !searchQuery ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
           <Layers className="w-16 h-16 text-muted-foreground/50 mb-4" />
           <h3 className="text-xl font-semibold mb-2">У вас пока нет полок</h3>
@@ -70,8 +127,20 @@ export default function ShelvesPage() {
             Создать первую полку
           </Button>
         </div>
+      ) : shelves.length === 0 && searchQuery ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
+          <Search className="w-16 h-16 text-muted-foreground/50 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Ничего не найдено</h3>
+          <p className="text-muted-foreground mb-4">
+            Попробуйте изменить поисковый запрос
+          </p>
+          <Button variant="outline" onClick={handleClearSearch} className="gap-2">
+            <X className="w-4 h-4" />
+            Сбросить поиск
+          </Button>
+        </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+        <div className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 transition-opacity duration-200 ${isFiltering ? 'opacity-50' : 'opacity-100'}`}>
           {shelves.map((shelf, index) => (
             <ShelfCard key={shelf._id} shelf={shelf} index={index} />
           ))}

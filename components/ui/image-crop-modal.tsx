@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import type { Area } from 'react-easy-crop';
-import { ZoomIn, ZoomOut } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, Minimize2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +37,7 @@ export function ImageCropModal({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [aspect, setAspect] = useState<number>(1);
 
   const handleCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels);
@@ -64,13 +65,13 @@ export function ImageCropModal({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
-        {/* Crop area — edge-to-edge, square */}
-        <div className="relative w-full bg-black" style={{ aspectRatio: '1 / 1', maxHeight: '60svh' }}>
+        {/* Crop area — edge-to-edge */}
+        <div className="relative w-full bg-black" style={{ aspectRatio: aspect === 1 ? '1' : '5/8', maxHeight: '60svh' }}>
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={1}
+            aspect={aspect}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={handleCropComplete}
@@ -83,6 +84,15 @@ export function ImageCropModal({
         {/* Zoom control */}
         <div className="px-5 pt-4 pb-2">
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setAspect(aspect === 1 ? 5 / 8 : 1)}
+              className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              aria-label="Переключить формат"
+            >
+              {aspect === 1 ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+            </button>
+
             <button
               type="button"
               onClick={() => setZoom((z) => Math.max(1, z - 0.2))}

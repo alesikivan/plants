@@ -35,8 +35,12 @@ export const getWishlistPhotoUrl = (photoFilename: string | undefined): string |
 };
 
 export const wishlistApi = {
-  getAll: async (): Promise<Wishlist[]> => {
-    const response = await apiClient.get<Wishlist[]>('/wishlist');
+  getAll: async (filters?: { search?: string; genusId?: string; varietyId?: string }): Promise<Wishlist[]> => {
+    const params: Record<string, string> = {};
+    if (filters?.search) params.search = filters.search;
+    if (filters?.genusId) params.genusId = filters.genusId;
+    if (filters?.varietyId) params.varietyId = filters.varietyId;
+    const response = await apiClient.get<Wishlist[]>('/wishlist', { params });
     return response.data;
   },
 

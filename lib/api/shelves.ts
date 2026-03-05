@@ -33,8 +33,8 @@ export const getShelfPhotoUrl = (photoFilename: string | undefined): string | un
 };
 
 export const shelvesApi = {
-  getAll: async (): Promise<Shelf[]> => {
-    const response = await apiClient.get<Shelf[]>('/shelves');
+  getAll: async (params?: { search?: string }): Promise<Shelf[]> => {
+    const response = await apiClient.get<Shelf[]>('/shelves', { params });
     return response.data;
   },
 
