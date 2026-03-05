@@ -75,7 +75,7 @@ export default function ProtectedLayout({
                   </Link>
                   {user.role === 'admin' && (
                     <Link
-                      href="/admin"
+                      href="/admin/info"
                       className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                     >
                       <Settings className="w-4 h-4" />
