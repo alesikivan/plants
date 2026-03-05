@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { ImageCropModal } from '@/components/ui/image-crop-modal';
 import { compressImage } from '@/lib/utils/image-compression';
 import { getPhotoDate } from '@/lib/utils/exif';
 import { isHeic, convertHeicToJpeg } from '@/lib/utils/heic';
@@ -21,6 +22,7 @@ interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
 export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
   ({ className, onFileChange, onDateFound, preview, onRemove, maxSize, acceptedFormats, disableDateDetection, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const [cropSrc, setCropSrc] = React.useState<string | null>(null);
 
     const handleClick = () => {
       inputRef.current?.click();
@@ -28,19 +30,37 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] || null;
-      if (file) {
-        // Extract EXIF date from original file before any conversion (only if not disabled)
-        if (!disableDateDetection) {
-          const date = await getPhotoDate(file);
-          onDateFound?.(date);
-        }
+      // Reset input so same file can be re-selected after cancel
+      e.target.value = '';
 
-        const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
-        const compressed = await compressImage(converted);
-        onFileChange?.(compressed);
-      } else {
+      if (!file) {
         onFileChange?.(null);
+        return;
       }
+
+      if (!disableDateDetection) {
+        const date = await getPhotoDate(file);
+        onDateFound?.(date);
+      }
+
+      const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
+
+      // Show crop modal with the raw converted image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCropSrc(reader.result as string);
+      };
+      reader.readAsDataURL(converted);
+    };
+
+    const handleCropComplete = async (croppedFile: File) => {
+      setCropSrc(null);
+      const compressed = await compressImage(croppedFile);
+      onFileChange?.(compressed);
+    };
+
+    const handleCropCancel = () => {
+      setCropSrc(null);
     };
 
     const formatFileSize = (bytes: number) => {
@@ -57,6 +77,15 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
           onChange={handleChange}
           {...props}
         />
+
+        {cropSrc && (
+          <ImageCropModal
+            open={!!cropSrc}
+            imageSrc={cropSrc}
+            onCropComplete={handleCropComplete}
+            onCancel={handleCropCancel}
+          />
+        )}
 
         {preview ? (
           <div className="relative rounded-xl border-2 border-input overflow-hidden">

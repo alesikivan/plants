@@ -1,9 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { ImageCropModal } from '@/components/ui/image-crop-modal';
 import { compressImage } from '@/lib/utils/image-compression';
 import { getPhotoDate } from '@/lib/utils/exif';
 import { isHeic, convertHeicToJpeg } from '@/lib/utils/heic';
@@ -19,9 +19,19 @@ interface MultiFileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEl
   disableDateDetection?: boolean;
 }
 
+interface CropQueueItem {
+  /** HEIC-converted but not yet cropped */
+  file: File;
+  dataUrl: string;
+}
+
 export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputProps>(
   ({ className, onFilesChange, onDateFound, previews = [], onRemove, maxSize, acceptedFormats, maxFiles = 10, disableDateDetection, accept, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
+
+    const [cropQueue, setCropQueue] = React.useState<CropQueueItem[]>([]);
+    // Files that have been processed (cropped or skipped) but not yet compressed+submitted
+    const pendingRef = React.useRef<File[]>([]);
 
     const handleClick = () => {
       inputRef.current?.click();
@@ -29,9 +39,11 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files ? Array.from(e.target.files) : [];
+      e.target.value = '';
 
-      // Extract EXIF date from the first file before any conversion (only if not disabled)
-      if (!disableDateDetection && files.length > 0) {
+      if (files.length === 0) return;
+
+      if (!disableDateDetection) {
         const date = await getPhotoDate(files[0]);
         onDateFound?.(date);
       }
@@ -39,13 +51,57 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
       const converted = await Promise.all(
         files.map((f) => isHeic(f) ? convertHeicToJpeg(f) : f)
       );
-      const compressed = await Promise.all(converted.map((f) => compressImage(f)));
+
+      // Build queue with data URLs for the crop modal
+      const queue: CropQueueItem[] = await Promise.all(
+        converted.map((file) => new Promise<CropQueueItem>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve({ file, dataUrl: reader.result as string });
+          reader.readAsDataURL(file);
+        }))
+      );
+
+      pendingRef.current = [];
+      setCropQueue(queue);
+    };
+
+    const finishQueue = async (accumulated: File[]) => {
+      pendingRef.current = [];
+      setCropQueue([]);
+      const compressed = await Promise.all(accumulated.map((f) => compressImage(f)));
       onFilesChange?.(compressed);
+    };
+
+    const handleCropComplete = async (croppedFile: File) => {
+      const accumulated = [...pendingRef.current, croppedFile];
+      const remaining = cropQueue.slice(1);
+
+      if (remaining.length === 0) {
+        await finishQueue(accumulated);
+      } else {
+        pendingRef.current = accumulated;
+        setCropQueue(remaining);
+      }
+    };
+
+    const handleSkip = async () => {
+      const accumulated = [...pendingRef.current, cropQueue[0].file];
+      const remaining = cropQueue.slice(1);
+
+      if (remaining.length === 0) {
+        await finishQueue(accumulated);
+      } else {
+        pendingRef.current = accumulated;
+        setCropQueue(remaining);
+      }
     };
 
     const formatFileSize = (bytes: number) => {
       return `${(bytes / (1024 * 1024)).toFixed(0)}MB`;
     };
+
+    const totalInQueue = pendingRef.current.length + cropQueue.length;
+    const currentInQueue = pendingRef.current.length + 1;
 
     return (
       <div className="w-full space-y-3">
@@ -58,6 +114,18 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
           onChange={handleChange}
           {...props}
         />
+
+        {cropQueue.length > 0 && (
+          <ImageCropModal
+            key={cropQueue[0].dataUrl}
+            open={true}
+            imageSrc={cropQueue[0].dataUrl}
+            onCropComplete={handleCropComplete}
+            onCancel={handleSkip}
+            cancelLabel="Пропустить"
+            queueInfo={totalInQueue > 1 ? { current: currentInQueue, total: totalInQueue } : undefined}
+          />
+        )}
 
         {previews.length > 0 && (
           <div className="grid grid-cols-3 gap-3">
@@ -90,7 +158,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
         >
           <Upload className="mr-2 h-4 w-4 text-muted-foreground" />
           <span className="text-muted-foreground">
-            {previews.length > 0 ? `Выбрано фото: ${previews.length}` : 'Выберите фотографии'}
+            {previews.length > 0 ? `Добавить ещё фото` : 'Выберите фотографии'}
           </span>
         </button>
 
