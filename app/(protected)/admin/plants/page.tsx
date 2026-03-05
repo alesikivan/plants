@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { plantsApi, Plant, getPlantPhotoUrl } from '@/lib/api/plants';
 import { Genus } from '@/lib/api/genus';
@@ -19,7 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Leaf, Trash2, Search } from 'lucide-react';
+import { Leaf, Trash2, Search, Eye } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 
 const PAGE_SIZE = 20;
@@ -137,13 +138,24 @@ export default function AdminPlantsPage() {
                     </div>
 
                     {/* Actions */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeletePlant(p)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link
+                          href={`/profile/${p.userId}/plants/${p._id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeletePlant(p)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}

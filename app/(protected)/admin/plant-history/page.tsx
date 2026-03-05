@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { plantHistoryApi, PlantHistory, getPlantHistoryPhotoUrl } from '@/lib/api/plants';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { History, Trash2, Search, Image } from 'lucide-react';
+import { History, Trash2, Search, Image, Eye } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 
 const PAGE_SIZE = 20;
@@ -130,14 +131,24 @@ export default function AdminPlantHistoryPage() {
                     </div>
 
                     {/* Actions */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() => setDeleteEntry(h)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center shrink-0 gap-2">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link
+                          href={`/profile/${h.userId}/plants/${h.plantId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeleteEntry(h)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}

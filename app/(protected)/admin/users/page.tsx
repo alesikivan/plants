@@ -155,7 +155,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
             <Shield className="w-5 h-5 text-primary" />
@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
             </p>
           </div>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2">
+        <Button onClick={() => setCreateOpen(true)} className="gap-2 w-full sm:w-auto">
           <UserPlus className="w-4 h-4" />
           Создать пользователя
         </Button>
@@ -203,57 +203,67 @@ export default function AdminUsersPage() {
               {pagedUsers.map((u) => (
                 <div
                   key={u.id}
-                  className={`flex items-center gap-4 px-6 py-4 ${
-                    u.isBlocked ? 'bg-destructive/5' : ''
-                  }`}
+                  className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-6"
                 >
-                  {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
-                    {u.avatar ? (
-                      <Image
-                        src={getAvatarUrl(u.avatar)!}
-                        alt={u.name}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <span className="text-sm font-semibold text-primary">
-                        {u.name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium truncate">{u.name}</span>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
-                          ROLE_BADGE_COLORS[u.role]
-                        }`}
-                      >
-                        {ROLE_LABELS[u.role]}
-                      </span>
-                      {u.isBlocked && (
-                        <span className="text-xs px-2 py-0.5 rounded-full border bg-destructive/10 text-destructive border-destructive/20 font-medium">
-                          Заблокирован
+                  <div className="flex items-center gap-3 w-full min-w-0 sm:flex-1">
+                    {/* Avatar */}
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                      {u.avatar ? (
+                        <Image
+                          src={getAvatarUrl(u.avatar)!}
+                          alt={u.name}
+                          width={40}
+                          height={40}
+                          className="w-full h-full object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <span className="text-sm font-semibold text-primary">
+                          {u.name.charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">{u.email}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Зарегистрирован:{' '}
-                      {new Date(u.createdAt).toLocaleDateString('ru-RU')}
-                    </p>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium truncate">{u.name}</span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                            ROLE_BADGE_COLORS[u.role]
+                          }`}
+                        >
+                          {ROLE_LABELS[u.role]}
+                        </span>
+                        {u.isBlocked && (
+                          <span className="text-xs px-2 py-0.5 rounded-full border bg-destructive/10 text-destructive border-destructive/20 font-medium">
+                            Заблокирован
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">{u.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Зарегистрирован:{' '}
+                        {new Date(u.createdAt).toLocaleDateString('ru-RU')}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="grid grid-cols-4 gap-1 w-full sm:flex sm:w-auto sm:justify-end sm:gap-2 shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="w-full sm:w-9"
+                      title="Открыть профиль"
+                      onClick={() => router.push(`/profile/${u.id}`)}
+                    >
+                      <User className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-full sm:w-9"
                       title={u.isBlocked ? 'Разблокировать' : 'Заблокировать'}
                       disabled={u.id === user.id || blockMutation.isPending}
                       onClick={() =>
@@ -269,6 +279,7 @@ export default function AdminUsersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="w-full sm:w-9"
                       title="Редактировать"
                       onClick={() => openEdit(u)}
                     >
@@ -277,6 +288,7 @@ export default function AdminUsersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="w-full sm:w-9"
                       title="Удалить"
                       disabled={u.id === user.id}
                       onClick={() => setDeleteUser(u)}

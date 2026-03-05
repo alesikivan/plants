@@ -226,6 +226,7 @@ export function PlantsPageContent() {
   const hasFilters =
     searchQuery !== '' || genusFilter !== '' || shelfFilter !== '';
   const isBusy = isLoading || isFiltering;
+  const canShowAdvancedFilters = !showArchived && (genera.length > 1 || shelves.length > 0);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
@@ -304,7 +305,7 @@ export function PlantsPageContent() {
       )}
 
       {/* Filters */}
-      {!isLoading && !showArchived && (genera.length > 0 || shelves.length > 0) && (
+      {!isLoading && (
         <div className="flex flex-col gap-2 animate-in fade-in duration-500">
           {/* Row 1: search + filter toggle */}
           <div className="flex items-center gap-2">
@@ -317,21 +318,34 @@ export function PlantsPageContent() {
                 className="pl-9"
               />
             </div>
-            <Button
-              variant={hasFilters ? 'default' : 'outline'}
-              onClick={() => setShowFilters((v) => !v)}
-              className="relative shrink-0 h-11 w-11 p-0 rounded-xl"
-              title="Фильтры"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              {hasFilters && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
-              )}
-            </Button>
+            {canShowAdvancedFilters ? (
+              <Button
+                variant={hasFilters ? 'default' : 'outline'}
+                onClick={() => setShowFilters((v) => !v)}
+                className="relative shrink-0 h-11 w-11 p-0 rounded-xl"
+                title="Фильтры"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                {hasFilters && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
+                )}
+              </Button>
+            ) : (
+              searchQuery && (
+                <Button
+                  variant="outline"
+                  onClick={clearFilters}
+                  className="shrink-0 h-11 w-11 p-0 rounded-xl"
+                  title="Очистить поиск"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )
+            )}
           </div>
 
           {/* Row 2: filter comboboxes (collapsible) */}
-          {showFilters && (
+          {showFilters && canShowAdvancedFilters && (
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
               {genera.length > 1 && (
                 <div className="w-full sm:flex-1">
@@ -348,7 +362,7 @@ export function PlantsPageContent() {
                 </div>
               )}
 
-              {shelves.length > 0 && (
+              {!showArchived && shelves.length > 0 && (
                 <div className="w-full sm:flex-1">
                   <ComboBox
                     options={shelfOptions}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { shelvesApi, Shelf, getShelfPhotoUrl } from '@/lib/api/shelves';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Layers, Trash2, Search } from 'lucide-react';
+import { Layers, Trash2, Search, Eye } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 
 const PAGE_SIZE = 20;
@@ -117,13 +118,24 @@ export default function AdminShelvesPage() {
                     </div>
 
                     {/* Actions */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteShelf(s)}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link
+                          href={`/profile/${s.userId}/shelves/${s._id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeleteShelf(s)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
