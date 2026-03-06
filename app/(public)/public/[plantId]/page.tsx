@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { PlantHistoryTimeline } from '@/components/plants/PlantHistoryTimeline';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DiscoverBanner } from '@/components/public/DiscoverBanner';
 
 export default function PublicPlantDetailPage() {
   const params = useParams();
@@ -182,6 +183,9 @@ export default function PublicPlantDetailPage() {
           onClose={() => setIsPhotoGalleryOpen(false)}
         />
       )}
+
+      {/* Discover Banner */}
+      <DiscoverBanner />
 
       {/* Plant History */}
       {plant.showPlantHistory ? (

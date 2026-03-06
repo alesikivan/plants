@@ -23,7 +23,7 @@ export function PublicHeader() {
 
           {/* Sign Up Button */}
           <Link href="/register" className='cursor-pointer'>
-            <Button size="sm">
+            <Button size="sm" className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
               Начать бесплатно!
             </Button>
           </Link>

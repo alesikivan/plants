@@ -106,8 +106,8 @@ export default function HomePage() {
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/login">Войти</Link>
                 </Button>
-                <Button asChild size="sm">
-                  <Link href="/register">Начать бесплатно</Link>
+                <Button asChild size="sm" className="bg-gradient-to-r from-primary to-primary/80 font-semibold">
+                  <Link href="/register">✨ Начать бесплатно</Link>
                 </Button>
               </>
             )}
@@ -151,9 +151,9 @@ export default function HomePage() {
               </Button>
             ) : (
               <>
-                <Button asChild size="lg" className="px-10 gap-2">
+                <Button asChild size="lg" className="px-12 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
                   <Link href="/register">
-                    Начать бесплатно <ArrowRight className="w-4 h-4" />
+                    ✨ Начать бесплатно <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="px-10">
@@ -301,9 +301,9 @@ export default function HomePage() {
             </Button>
           ) : (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="px-12 gap-2">
+              <Button asChild size="lg" className="px-12 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
                 <Link href="/register">
-                  Создать аккаунт <ArrowRight className="w-4 h-4" />
+                  ✨ Создать аккаунт <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="px-12">
