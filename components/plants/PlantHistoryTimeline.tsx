@@ -11,9 +11,10 @@ import { PlantHistoryItem } from './PlantHistoryItem';
 
 interface PlantHistoryTimelineProps {
   plantId: string;
+  isPublic?: boolean;
 }
 
-export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
+export function PlantHistoryTimeline({ plantId, isPublic = false }: PlantHistoryTimelineProps) {
   const [history, setHistory] = useState<PlantHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -25,7 +26,9 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
   const loadHistory = async () => {
     setIsLoading(true);
     try {
-      const data = await plantHistoryApi.getAll(plantId);
+      const data = isPublic
+        ? await plantHistoryApi.getPublic(plantId)
+        : await plantHistoryApi.getAll(plantId);
       setHistory(data);
     } catch (error) {
       toast.error('Ошибка загрузки истории');
@@ -77,14 +80,16 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
                   : 'История пока пуста'}
               </CardDescription>
             </div>
-            <Button
-              onClick={() => setIsAddModalOpen(true)}
-              className="gap-2 transition-all active:scale-95 w-full sm:w-auto"
-              size="sm"
-            >
-              <Plus className="w-4 h-4" />
-              Добавить запись
-            </Button>
+            {!isPublic && (
+              <Button
+                onClick={() => setIsAddModalOpen(true)}
+                className="gap-2 transition-all active:scale-95 w-full sm:w-auto"
+                size="sm"
+              >
+                <Plus className="w-4 h-4" />
+                Добавить запись
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent className="pt-2">
@@ -105,6 +110,7 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
                   onEditSuccess={handleEditSuccess}
                   onDelete={() => handleDelete(item._id)}
                   isLast={index === history.length - 1}
+                  isPublic={isPublic}
                 />
               ))}
             </div>
@@ -112,12 +118,14 @@ export function PlantHistoryTimeline({ plantId }: PlantHistoryTimelineProps) {
         </CardContent>
       </Card>
 
-      <AddHistoryModal
-        open={isAddModalOpen}
-        onOpenChange={setIsAddModalOpen}
-        onSuccess={handleAddSuccess}
-        plantId={plantId}
-      />
+      {!isPublic && (
+        <AddHistoryModal
+          open={isAddModalOpen}
+          onOpenChange={setIsAddModalOpen}
+          onSuccess={handleAddSuccess}
+          plantId={plantId}
+        />
+      )}
     </div>
   );
 }

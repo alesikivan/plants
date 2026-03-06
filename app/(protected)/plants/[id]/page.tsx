@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Calendar, FileText, Leaf, Trash2, Pencil, Layers, Archive, ArchiveRestore } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, Leaf, Trash2, Pencil, Layers, Archive, ArchiveRestore, Copy, Check } from 'lucide-react';
 import { plantsApi, Plant, Genus, Variety, Shelf, getPlantPhotoUrl } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
@@ -37,6 +37,7 @@ export default function PlantDetailPage() {
   const [isArchiving, setIsArchiving] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -108,6 +109,21 @@ export default function PlantDetailPage() {
     }
   };
 
+  const handleCopyPublicLink = async () => {
+    if (!plant) return;
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const publicUrl = `${baseUrl}/public/${plant._id}`;
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      setIsLinkCopied(true);
+      toast.success('Ссылка скопирована в буфер обмена');
+      setTimeout(() => setIsLinkCopied(false), 2000);
+    } catch (error) {
+      toast.error('Не удалось скопировать ссылку');
+      console.error('Failed to copy link:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64  fade-in duration-300">
@@ -146,6 +162,36 @@ export default function PlantDetailPage() {
           <span className="hidden sm:inline">Назад к списку</span>
         </Button>
         <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+          <Button
+            variant="outline"
+            onClick={handleCopyPublicLink}
+            className="gap-2 transition-all active:scale-95"
+            title="Скопировать публичную ссылку на растение"
+          >
+            {isLinkCopied ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span className="hidden sm:inline">Скопировано!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4" />
+                <span className="hidden sm:inline">Поделиться</span>
+              </>
+            )}
+          </Button>
+          
+          {!plant.isArchived && (
+            <Button
+              variant="outline"
+              onClick={() => setIsEditModalOpen(true)}
+              className="gap-2 transition-all active:scale-95"
+            >
+              <Pencil className="w-4 h-4" />
+              <span className="hidden sm:inline">Редактировать</span>
+            </Button>
+          )}
+
           {plant.isArchived ? (
             <Button
               variant="outline"
@@ -188,16 +234,7 @@ export default function PlantDetailPage() {
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {!plant.isArchived && (
-            <Button
-              variant="outline"
-              onClick={() => setIsEditModalOpen(true)}
-              className="gap-2 transition-all active:scale-95"
-            >
-              <Pencil className="w-4 h-4" />
-              <span className="hidden sm:inline">Редактировать</span>
-            </Button>
-          )}
+          
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all active:scale-95">

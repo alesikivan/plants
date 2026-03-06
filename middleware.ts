@@ -5,11 +5,11 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public paths (accessible without auth)
-  const publicPaths = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password'];
+  const publicPaths = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password', '/public'];
   const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
 
   // Paths that should ALWAYS be accessible regardless of auth state
-  const alwaysPublicPaths = ['/verify-email', '/forgot-password', '/reset-password'];
+  const alwaysPublicPaths = ['/verify-email', '/forgot-password', '/reset-password', '/public'];
   const isAlwaysPublic = alwaysPublicPaths.some(path => pathname.startsWith(path));
 
   // Check for accessToken OR refreshToken cookie.

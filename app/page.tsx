@@ -91,7 +91,10 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Logo size="sm" />
-            <span className="font-semibold text-sm">PlantSheep</span>
+            <div className="font-semibold">
+              <span className="text-primary">Plant</span>
+              <span className="text-foreground">Sheep</span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {user ? (

@@ -25,6 +25,7 @@ interface PlantHistoryItemProps {
   onEditSuccess: () => void;
   onDelete: () => void;
   isLast?: boolean;
+  isPublic?: boolean;
 }
 
 export function PlantHistoryItem({
@@ -33,6 +34,7 @@ export function PlantHistoryItem({
   onEditSuccess,
   onDelete,
   isLast = false,
+  isPublic = false,
 }: PlantHistoryItemProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
@@ -61,52 +63,54 @@ export function PlantHistoryItem({
         </div>
 
         {/* Content */}
-        <div className="flex-1 pb-8 pt-1">
+        <div className="flex-1 pb-8 pt-3">
           {/* Date at top */}
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground">
               {formattedDate}
             </span>
-            <div className="flex gap-0.5">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsEditModalOpen(true)}
-                className="h-7 w-7 p-0 text-muted-foreground hover:bg-muted"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Удалить запись?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Это действие нельзя отменить. Запись и все её фотографии будут удалены.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="transition-all active:scale-95">
-                      Отмена
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={onDelete}
-                      className="transition-all active:scale-95"
+            {!isPublic && (
+              <div className="flex gap-0.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="h-7 w-7 p-0 text-muted-foreground hover:bg-muted"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                     >
-                      Удалить
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Удалить запись?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Это действие нельзя отменить. Запись и все её фотографии будут удалены.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="transition-all active:scale-95">
+                        Отмена
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={onDelete}
+                        className="transition-all active:scale-95"
+                      >
+                        Удалить
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            )}
           </div>
 
           {/* Comment */}
@@ -135,13 +139,15 @@ export function PlantHistoryItem({
         </div>
       </div>
 
-      <EditHistoryModal
-        open={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        onSuccess={onEditSuccess}
-        plantId={plantId}
-        historyItem={historyItem}
-      />
+      {!isPublic && (
+        <EditHistoryModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSuccess={onEditSuccess}
+          plantId={plantId}
+          historyItem={historyItem}
+        />
+      )}
 
       {selectedPhotoIndex !== null && (
         <PhotoGallery

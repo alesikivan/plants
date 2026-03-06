@@ -23,15 +23,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const initialized = useAuthStore((state) => state.initialized);
 
-  // Проверяем, находимся ли мы на страницах авторизации
+  // Проверяем, находимся ли мы на страницах авторизации или публичных страницах
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register');
+  const isPublicPage = pathname?.startsWith('/public');
 
   useEffect(() => {
-    // Не загружаем профиль на страницах авторизации
-    if (!initialized && !isAuthPage) {
+    // Не загружаем профиль на страницах авторизации и публичных страницах
+    if (!initialized && !isAuthPage && !isPublicPage) {
       fetchUser();
     }
-  }, [fetchUser, initialized, isAuthPage]);
+  }, [fetchUser, initialized, isAuthPage, isPublicPage]);
 
   return (
     <QueryClientProvider client={queryClient}>

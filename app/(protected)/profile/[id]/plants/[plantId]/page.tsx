@@ -203,7 +203,7 @@ export default function UserPlantDetailPage() {
                       )}
                     </div>
 
-                    <div className="flex-1 pb-8 pt-1">
+                    <div className="flex-1 pb-8 pt-2">
                       <span className="text-xs text-muted-foreground">{formattedDate}</span>
                       {item.comment && (
                         <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed mt-2 mb-3">

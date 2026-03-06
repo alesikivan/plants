@@ -102,6 +102,13 @@ export const plantsApi = {
     return response.data;
   },
 
+  getPublic: async (id: string): Promise<Plant & { showPlantHistory: boolean }> => {
+    const response = await apiClient.get<Plant & { showPlantHistory: boolean }>(
+      `/plants/public/${id}`
+    );
+    return response.data;
+  },
+
   reorder: async (ids: string[]): Promise<void> => {
     await apiClient.patch('/plants/reorder', { ids });
   },
@@ -282,5 +289,10 @@ export const plantHistoryApi = {
 
   adminDelete: async (historyId: string): Promise<void> => {
     await apiClient.delete(`/plants/admin/history/${historyId}`);
+  },
+
+  getPublic: async (plantId: string): Promise<PlantHistory[]> => {
+    const response = await apiClient.get<PlantHistory[]>(`/plants/public/${plantId}/history`);
+    return response.data;
   },
 };
