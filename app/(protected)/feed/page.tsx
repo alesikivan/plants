@@ -110,7 +110,7 @@ export default function FeedPage() {
       </div>
 
       {/* Mode tabs */}
-      <div className="flex gap-2 mb-6 p-1 bg-muted/40 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300 mb-2">
         <button
           onClick={() => setMode('global')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -134,6 +134,8 @@ export default function FeedPage() {
           Подписки
         </button>
       </div>
+
+      
 
       {/* Feed */}
       <div className="space-y-4">
