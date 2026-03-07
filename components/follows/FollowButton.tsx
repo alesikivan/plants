@@ -41,14 +41,14 @@ export function FollowButton({ userId, isFollowing, onToggle, className }: Follo
       onClick={handleToggle}
       disabled={loading}
       className={cn(
-        'inline-flex items-center gap-1.5 text-xs font-medium rounded-full px-3 py-1 transition-all disabled:opacity-50',
+        'inline-flex items-center gap-1.5 text-sm font-medium rounded-full px-3.5 py-1.5 transition-all disabled:opacity-50',
         following
           ? 'bg-muted text-muted-foreground hover:bg-muted/70'
           : 'bg-primary text-primary-foreground hover:bg-primary/90',
         className,
       )}
     >
-      {loading && <Loader2 className="w-3 h-3 animate-spin" />}
+      {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
       {following ? 'Подписан' : 'Подписаться'}
     </button>
   );

@@ -87,7 +87,7 @@ export default function UserProfilePage() {
       <Button
         variant="ghost"
         onClick={() => router.back()}
-        className="gap-2 transition-all active:scale-95 mb-2"
+        className="gap-2 transition-all active:scale-95"
       >
         <ArrowLeft className="w-4 h-4" />
         Назад

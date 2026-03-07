@@ -83,7 +83,12 @@ function PlantFeedCard({
   const { genusName, varietyName } = getNames(item.plant.genusId, item.plant.varietyId, language);
 
   return (
-    <div className="bg-card border border-border rounded-2xl overflow-hidden">
+    <div className={`relative bg-card border border-border rounded-2xl overflow-hidden`}>
+      {isNew && (
+        <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-bl-xl z-10">
+          Новое
+        </span>
+      )}
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3 pb-2">
         <Avatar user={item.user} isNew={isNew} />
@@ -100,9 +105,6 @@ function PlantFeedCard({
         <span className="text-xs text-muted-foreground flex-shrink-0">
           {formatTimeAgo(item.createdAt)}
         </span>
-        {isNew && (
-          <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
-        )}
       </div>
 
       <Link href={`/profile/${item.user._id}/plants/${item.plant._id}`} className="block">
@@ -161,7 +163,12 @@ function HistoryFeedCard({
         : 'grid-cols-3';
 
   return (
-    <div className="bg-card border border-border rounded-2xl overflow-hidden">
+    <div className={`relative bg-card border border-border rounded-2xl overflow-hidden`}>
+      {isNew && (
+        <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-bl-xl z-10">
+          Новое
+        </span>
+      )}
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-3 pb-2">
         <Avatar user={item.user} isNew={isNew} />
@@ -180,9 +187,6 @@ function HistoryFeedCard({
         <span className="text-xs text-muted-foreground flex-shrink-0">
           {formatTimeAgo(item.createdAt)}
         </span>
-        {isNew && (
-          <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
-        )}
       </div>
 
       {/* Plant badge */}
