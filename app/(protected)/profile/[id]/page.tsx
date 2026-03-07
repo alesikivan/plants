@@ -5,7 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Leaf, Layers, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
+import { followsApi, FollowStats } from '@/lib/api/follows';
 import { getAvatarUrl } from '@/lib/api/users';
+import { FollowButton } from '@/components/follows/FollowButton';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -25,10 +27,12 @@ export default function UserProfilePage() {
   const userId = params.id as string;
   const currentUser = useAuthStore((s) => s.user);
   const isAdmin = currentUser?.role === 'admin';
+  const isOwnProfile = currentUser?.id === userId;
 
   const [profile, setProfile] = useState<UserProfileWithStats | null>(null);
   const [plants, setPlants] = useState<Plant[]>([]);
   const [shelves, setShelves] = useState<Shelf[]>([]);
+  const [followStats, setFollowStats] = useState<FollowStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [loadingShelves, setLoadingShelves] = useState(false);
@@ -40,6 +44,7 @@ export default function UserProfilePage() {
     usersApi.getUserProfile(userId)
       .then((data) => {
         setProfile(data);
+        followsApi.getStats(userId).then(setFollowStats).catch(() => {});
         if (isAdmin || (data.showPlants ?? true)) {
           setLoadingPlants(true);
           usersApi.getUserPlants(userId)
@@ -114,12 +119,26 @@ export default function UserProfilePage() {
             </button>
               <div>
                 <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Участник с{' '}
-                  {new Date(profile.createdAt).toLocaleDateString('ru-RU', {
-                    year: 'numeric', month: 'long', day: 'numeric',
-                  })}
-                </p>
+                {isOwnProfile ? (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Участник с{' '}
+                    {new Date(profile.createdAt).toLocaleDateString('ru-RU', {
+                      year: 'numeric', month: 'long', day: 'numeric',
+                    })}
+                  </p>
+                ) : (
+                  <div className="mt-1.5">
+                    {followStats !== null && (
+                      <FollowButton
+                        userId={userId}
+                        isFollowing={followStats.isFollowing ?? false}
+                        onToggle={(isFollowing) =>
+                          setFollowStats(prev => prev ? { ...prev, isFollowing } : prev)
+                        }
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex gap-3 shrink-0">

@@ -7,5 +7,6 @@ export * from './variety';
 export * from './plants';
 export * from './shelves';
 export * from './wishlist';
+export * from './follows';
 export * from './errors';
 export * from './error-handler';

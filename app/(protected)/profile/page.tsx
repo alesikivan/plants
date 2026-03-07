@@ -20,6 +20,8 @@ import Image from 'next/image';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
 import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 import { SocialLink } from '@/lib/types/user';
+import { followsApi, FollowStats } from '@/lib/api/follows';
+import { FollowersDialog } from '@/components/follows/FollowersDialog';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -40,11 +42,16 @@ export default function ProfilePage() {
   const [loadingPlants, setLoadingPlants] = useState(true);
   const [loadingShelves, setLoadingShelves] = useState(true);
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
+  const [followStats, setFollowStats] = useState<FollowStats | null>(null);
+  const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
 
   useEffect(() => {
     plantsApi.getAll().then(setPlants).catch(() => {}).finally(() => setLoadingPlants(false));
     shelvesApi.getAll().then(setShelves).catch(() => {}).finally(() => setLoadingShelves(false));
-  }, []);
+    if (user?.id) {
+      followsApi.getStats(user.id).then(setFollowStats).catch(() => {});
+    }
+  }, [user?.id]);
 
   const handleLanguageChange = async (language: string) => {
     setIsUpdating(true);
@@ -130,7 +137,8 @@ export default function ProfilePage() {
       {/* Profile Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className="relative group shrink-0">
               <button
@@ -189,21 +197,62 @@ export default function ProfilePage() {
                 onChange={handleAvatarChange}
               />
             </div>
-            <div>
-              <CardTitle className="text-3xl">{user.name}</CardTitle>
-              <p className="text-muted-foreground">{user.email}</p>
+              <div>
+                <CardTitle className="text-3xl">{user.name}</CardTitle>
+                <p className="text-muted-foreground">{user.email}</p>
+              </div>
             </div>
+
+            {/* Follow stats — desktop only */}
+            {followStats && (
+              <div className="hidden md:flex gap-2 shrink-0">
+                <button
+                  onClick={() => setFollowDialog('followers')}
+                  className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
+                >
+                  <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
+                  <span className="text-xs text-muted-foreground select-none">Подписчики</span>
+                </button>
+                <button
+                  onClick={() => setFollowDialog('following')}
+                  className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
+                >
+                  <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
+                  <span className="text-xs text-muted-foreground select-none">Подписки</span>
+                </button>
+              </div>
+            )}
           </div>
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* Follow stats — mobile only */}
+          {followStats && (
+            <div className="flex md:hidden gap-2 mb-2">
+              <button
+                onClick={() => setFollowDialog('followers')}
+                className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
+              >
+                <span className="text-lg font-bold leading-tight">{followStats.followersCount}</span>
+                <span className="text-xs text-muted-foreground">подписчики</span>
+              </button>
+              <button
+                onClick={() => setFollowDialog('following')}
+                className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
+              >
+                <span className="text-lg font-bold leading-tight">{followStats.followingCount}</span>
+                <span className="text-xs text-muted-foreground">подписки</span>
+              </button>
+            </div>
+          )}
+
           <div className="grid mt-3 gap-3 md:grid-cols-2">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <User className="w-4 h-4" />
                 <span className="text-sm font-semibold">Полное имя</span>
               </div>
-              <p className="text-lg font-medium">{user.name}</p>
+              <p className="font-medium">{user.name}</p>
             </div>
 
             <div className="space-y-1">
@@ -211,7 +260,7 @@ export default function ProfilePage() {
                 <Mail className="w-4 h-4" />
                 <span className="text-sm font-semibold">Email адрес</span>
               </div>
-              <p className="text-lg font-medium">{user.email}</p>
+              <p className="font-medium">{user.email}</p>
             </div>
 
             {/* <div className="space-y-1">
@@ -229,7 +278,7 @@ export default function ProfilePage() {
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm font-semibold">Участник с</span>
               </div>
-              <p className="text-lg font-medium">
+              <p className="font-medium">
                 {new Date(user.createdAt).toLocaleDateString('ru-RU', {
                   year: 'numeric',
                   month: 'long',
@@ -497,6 +546,16 @@ export default function ProfilePage() {
           avatarUrl={getAvatarUrl(user.avatar)!}
           userName={user.name}
           onClose={() => setIsAvatarViewerOpen(false)}
+        />
+      )}
+
+      {/* Followers / Following Dialog */}
+      {followDialog && (
+        <FollowersDialog
+          userId={user.id}
+          type={followDialog}
+          isOpen={true}
+          onClose={() => setFollowDialog(null)}
         />
       )}
     </div>
