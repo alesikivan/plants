@@ -51,11 +51,7 @@ function Avatar({
     <Link
       href={`/profile/${user._id}`}
       onClick={(e) => e.stopPropagation()}
-      className={`flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-muted transition-opacity hover:opacity-80 ${
-        isNew
-          ? 'ring-2 ring-primary ring-offset-2 ring-offset-card'
-          : 'border border-border'
-      }`}
+      className="flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-muted transition-opacity hover:opacity-80 border border-border"
       style={{ width: size, height: size }}
     >
       {avatarUrl ? (
@@ -134,7 +130,7 @@ function PlantFeedCard({
             {item.plant.description}
           </p>
         ) : (
-          <div className="pb-4" />
+          ''
         )}
       </Link>
     </div>
@@ -202,15 +198,15 @@ function HistoryFeedCard({
 
       {/* Comment */}
       {item.historyEntry.comment && (
-        <p className="px-4 pb-4 text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed line-clamp-5">
+        <p className="px-4 pb-4 text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
           {item.historyEntry.comment}
         </p>
       )}
 
       {/* Photos */}
       {photos.length > 0 && (
-        <div className={`grid gap-0.5 ${gridClass} ${!item.historyEntry.comment ? '' : ''}`}>
-          {photos.slice(0, 6).map((photo, index) => (
+        <div className={`grid gap-0.5 ${gridClass}`}>
+          {photos.slice(0, 3).map((photo, index) => (
             <div
               key={photo}
               className="relative aspect-square overflow-hidden bg-muted"
@@ -220,9 +216,9 @@ function HistoryFeedCard({
                 alt={`Фото ${index + 1}`}
                 className="w-full h-full object-cover"
               />
-              {index === 5 && photos.length > 6 && (
+              {index === 2 && photos.length > 3 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="text-white font-semibold text-xl">+{photos.length - 6}</span>
+                  <span className="text-white font-semibold text-xl">+{photos.length - 3}</span>
                 </div>
               )}
             </div>
