@@ -96,6 +96,9 @@ export default function FeedPage() {
       cursorRef.current = result.nextCursor ?? undefined;
       hasMoreRef.current = result.hasMore;
       setHasMore(result.hasMore);
+      const now = new Date();
+      localStorage.setItem(STORAGE_KEY(mode), now.toISOString());
+      setLastSeenDate(now);
     } catch {
       // handled by global error handler
     } finally {
