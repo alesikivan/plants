@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Leaf, Layers, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
+import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
 import { followsApi, FollowStats } from '@/lib/api/follows';
 import { getAvatarUrl } from '@/lib/api/users';
@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
 import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
+import { FollowersDialog } from '@/components/follows/FollowersDialog';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -37,6 +38,7 @@ export default function UserProfilePage() {
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [loadingShelves, setLoadingShelves] = useState(false);
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
+  const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -119,39 +121,50 @@ export default function UserProfilePage() {
             </button>
               <div>
                 <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
-                {isOwnProfile ? (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Участник с{' '}
-                    {new Date(profile.createdAt).toLocaleDateString('ru-RU', {
-                      year: 'numeric', month: 'long', day: 'numeric',
-                    })}
-                  </p>
-                ) : (
+                {!isOwnProfile && followStats !== null && (
                   <div className="mt-1.5">
-                    {followStats !== null && (
-                      <FollowButton
-                        userId={userId}
-                        isFollowing={followStats.isFollowing ?? false}
-                        onToggle={(isFollowing) =>
-                          setFollowStats(prev => prev ? { ...prev, isFollowing } : prev)
-                        }
-                      />
-                    )}
+                    <FollowButton
+                      userId={userId}
+                      isFollowing={followStats.isFollowing ?? false}
+                      onToggle={(isFollowing) =>
+                        setFollowStats(prev => prev ? { ...prev, isFollowing } : prev)
+                      }
+                    />
                   </div>
                 )}
               </div>
             </div>
-            <div className="flex gap-3 shrink-0">
-              <div className="px-3 min-w-[76px] h-[80px] flex flex-col items-center justify-center bg-green-50 dark:bg-green-950/20 rounded-lg">
+            <div className="grid grid-cols-4 md:flex gap-2 w-full md:w-auto md:shrink-0">
+              <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-green-50 dark:bg-green-950/20 rounded-lg">
                 <Leaf className="w-5 h-5 text-green-600 mb-0.5" />
                 <p className="text-lg font-bold text-green-700 dark:text-green-400 leading-tight">{profile.stats.totalPlants}</p>
                 <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">Растения</p>
               </div>
-              <div className="px-3 min-w-[76px] h-[80px] flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+              <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                 <Layers className="w-5 h-5 text-blue-600 mb-0.5" />
                 <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">{profile.stats.totalShelves}</p>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Полки</p>
               </div>
+              {followStats && (
+                <>
+                  <button
+                    onClick={() => setFollowDialog('followers')}
+                    className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60 hover:bg-muted transition-colors"
+                  >
+                    <Star className="w-5 h-5 mb-0.5 text-muted-foreground" />
+                    <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
+                    <span className="text-xs text-muted-foreground select-none mt-0.5">Подписчики</span>
+                  </button>
+                  <button
+                    onClick={() => setFollowDialog('following')}
+                    className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60 hover:bg-muted transition-colors"
+                  >
+                    <BookOpen className="w-5 h-5 mb-0.5 text-muted-foreground" />
+                    <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
+                    <span className="text-xs text-muted-foreground select-none mt-0.5">Подписки</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -289,6 +302,16 @@ export default function UserProfilePage() {
           avatarUrl={getAvatarUrl(profile.avatar)!}
           userName={profile.name}
           onClose={() => setIsAvatarViewerOpen(false)}
+        />
+      )}
+
+      {/* Followers / Following Dialog */}
+      {followDialog && (
+        <FollowersDialog
+          userId={userId}
+          type={followDialog}
+          isOpen={true}
+          onClose={() => setFollowDialog(null)}
         />
       )}
     </div>
