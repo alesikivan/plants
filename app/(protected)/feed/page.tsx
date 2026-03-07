@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { feedApi, FeedItem } from '@/lib/api/feed';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { useAuthStore } from '@/lib/store/authStore';
-import { Globe, Users, Rss } from 'lucide-react';
+import { Globe, Users, Rss, RefreshCw } from 'lucide-react';
 
 type FeedMode = 'global' | 'following';
 
@@ -20,6 +20,13 @@ export default function FeedPage() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [lastSeenDate, setLastSeenDate] = useState<Date | null>(null);
+
+  // Pull-to-refresh state
+  const [pullY, setPullY] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartYRef = useRef(0);
+  const PULL_THRESHOLD = 70;
 
   // Refs to avoid stale closures in IntersectionObserver
   const cursorRef = useRef<string | undefined>(undefined);
@@ -74,6 +81,55 @@ export default function FeedPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
+  const doRefresh = useCallback(async () => {
+    if (loadingRef.current) return;
+    setIsRefreshing(true);
+    cursorRef.current = undefined;
+    hasMoreRef.current = true;
+    setHasMore(true);
+    loadingRef.current = true;
+    try {
+      const result = mode === 'global'
+        ? await feedApi.getGlobal(undefined)
+        : await feedApi.getFollowing(undefined);
+      setItems(result.items);
+      cursorRef.current = result.nextCursor ?? undefined;
+      hasMoreRef.current = result.hasMore;
+      setHasMore(result.hasMore);
+    } catch {
+      // handled by global error handler
+    } finally {
+      loadingRef.current = false;
+      setIsRefreshing(false);
+    }
+  }, [mode]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY === 0) {
+      touchStartYRef.current = e.touches[0].clientY;
+      setIsPulling(true);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling) return;
+    const delta = e.touches[0].clientY - touchStartYRef.current;
+    if (delta > 0) {
+      setPullY(Math.min(delta * 0.5, PULL_THRESHOLD + 20));
+    }
+  }, [isPulling]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isPulling) return;
+    setIsPulling(false);
+    if (pullY >= PULL_THRESHOLD) {
+      setPullY(0);
+      doRefresh();
+    } else {
+      setPullY(0);
+    }
+  }, [isPulling, pullY, doRefresh]);
+
   // Infinite scroll
   useEffect(() => {
     const element = loaderRef.current;
@@ -97,7 +153,30 @@ export default function FeedPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div
+      className="max-w-lg mx-auto"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div
+        className="flex items-center justify-center overflow-hidden"
+        style={{
+          height: isRefreshing ? 48 : pullY > 0 ? pullY : 0,
+          transition: isPulling ? 'none' : 'height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        }}
+      >
+        <RefreshCw
+          className={`w-6 h-6 text-primary ${isRefreshing ? 'animate-spin' : ''}`}
+          style={{
+            transform: !isRefreshing ? `rotate(${(pullY / PULL_THRESHOLD) * 360}deg)` : undefined,
+            transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            opacity: isRefreshing ? 1 : Math.min(pullY / PULL_THRESHOLD, 1),
+          }}
+        />
+      </div>
+
       {/* Header */}
       <div className="flex items-center gap-3 mb-3">
         <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
