@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Logo } from '@/components/logo';
-import { LayoutDashboard, Settings, Layers, Users, User, Leaf } from 'lucide-react';
+import { LayoutDashboard, Settings, Layers, Users, User, Leaf, Rss } from 'lucide-react';
 import { getAvatarUrl } from '@/lib/api/users';
 
 export default function ProtectedLayout({
@@ -65,6 +65,13 @@ export default function ProtectedLayout({
                   >
                     <Layers className="w-4 h-4" />
                     Полки
+                  </Link>
+                  <Link
+                    href="/feed"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
+                  >
+                    <Rss className="w-4 h-4" />
+                    Лента
                   </Link>
                   <Link
                     href="/users"
@@ -178,6 +185,13 @@ export default function ProtectedLayout({
             >
               <Leaf className="w-5 h-5" />
               <span className="text-xs font-medium select-none">Растения</span>
+            </Link>
+            <Link
+              href="/feed"
+              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
+            >
+              <Rss className="w-5 h-5" />
+              <span className="text-xs font-medium select-none">Лента</span>
             </Link>
             <Link
               href="/shelves"
