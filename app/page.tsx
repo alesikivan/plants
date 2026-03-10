@@ -1,22 +1,17 @@
-'use client';
-
 import Link from 'next/link';
-import { useAuthStore } from '@/lib/store/authStore';
-import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import {
   Leaf,
   BarChart3,
   BookOpen,
   Share2,
-  ArrowRight,
   Layers,
   Camera,
-  Users,
   Globe,
   Eye,
   Link2,
 } from 'lucide-react';
+import { HomeAuthButtons } from '@/components/home/HomeAuthButtons';
 
 const features = [
   {
@@ -82,8 +77,6 @@ const communityItems = [
 ];
 
 export default function HomePage() {
-  const user = useAuthStore((state) => state.user);
-
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -97,20 +90,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {user ? (
-              <Button asChild size="sm">
-                <Link href="/dashboard">Открыть панель</Link>
-              </Button>
-            ) : (
-              <>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/login">Войти</Link>
-                </Button>
-                <Button asChild size="sm" className="bg-gradient-to-r from-primary to-primary/80 font-semibold">
-                  <Link href="/register">✨ Начать бесплатно</Link>
-                </Button>
-              </>
-            )}
+            <HomeAuthButtons variant="nav" />
           </div>
         </div>
       </nav>
@@ -143,24 +123,7 @@ export default function HomePage() {
 
           {/* CTA */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            {user ? (
-              <Button asChild size="lg" className="px-10 gap-2">
-                <Link href="/dashboard">
-                  Открыть панель <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-            ) : (
-              <>
-                <Button asChild size="lg" className="px-12 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
-                  <Link href="/register">
-                    ✨ Начать бесплатно <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="px-10">
-                  <Link href="/login">Уже есть аккаунт</Link>
-                </Button>
-              </>
-            )}
+            <HomeAuthButtons variant="hero" />
           </div>
 
           {/* Decorative stat pills */}
@@ -293,24 +256,7 @@ export default function HomePage() {
           <p className="text-muted-foreground">
             Бесплатно. Без ограничений. Ваши растения заслуживают заботы и внимания.
           </p>
-          {user ? (
-            <Button asChild size="lg" className="px-12 gap-2">
-              <Link href="/dashboard">
-                Открыть панель <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="px-12 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
-                <Link href="/register">
-                  ✨ Создать аккаунт <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="px-12">
-                <Link href="/login">Войти</Link>
-              </Button>
-            </div>
-          )}
+          <HomeAuthButtons variant="final" />
         </div>
       </section>
 
@@ -322,6 +268,14 @@ export default function HomePage() {
             <span>PlantSheep</span>
           </div>
           <p>Трекер коллекции растений</p>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hover:text-foreground transition-colors">
+              Войти
+            </Link>
+            <Link href="/register" className="hover:text-foreground transition-colors">
+              Регистрация
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
