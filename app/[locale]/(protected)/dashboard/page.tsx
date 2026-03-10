@@ -188,7 +188,7 @@ export default function DashboardPage() {
 
             {showFilters && genera.length > 0 && (
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                {genera.length > 1 && (
+                {genera.length > 0 && (
                   <div className="w-full sm:flex-1">
                     <ComboBox
                       options={genusOptions}
