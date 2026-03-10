@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import {
   Dialog,
@@ -255,9 +256,9 @@ export function EditPlantModal({ open, onOpenChange, onSuccess, plant }: EditPla
     today.setHours(0, 0, 0, 0);
     return date > today;
   };
-
+  const locale = useLocale();
   const getDisplayName = (nameRu: string, nameEn: string) => {
-    return `${nameRu} / ${nameEn}`;
+    return locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
   };
 
   const genusOptions = genuses.map((genus) => ({

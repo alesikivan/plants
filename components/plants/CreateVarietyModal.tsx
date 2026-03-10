@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { varietyApi, Variety } from '@/lib/api';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
+import { getFullDisplayName } from '@/lib/utils/language';
 
 interface CreateVarietyModalProps {
   open: boolean;
@@ -33,6 +35,8 @@ interface Suggestion {
 }
 
 export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genusId, onCreated }: CreateVarietyModalProps) {
+  const t = useTranslations('CreateVarietyModal');
+  const locale = useLocale();
   const [query, setQuery] = useState(initialQuery);
   const [step, setStep] = useState<Step>('input');
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
@@ -83,7 +87,7 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
 
       setStep('confirm');
     } catch (error) {
-      toast.error('Не удалось проверить название. Попробуйте ещё раз.');
+      toast.error(t('toasts.validationError'));
     } finally {
       setIsValidating(false);
     }
@@ -99,14 +103,14 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
         nameEn: suggestion.nameEn,
         genusId,
       });
-      toast.success(`Сорт «${suggestion.nameRu}» успешно создан!`);
+      toast.success(t('toasts.createSuccess', { name: suggestion.nameRu }));
       onCreated(variety);
       handleOpenChange(false);
     } catch (error: any) {
       if (error?.response?.status === 409) {
-        toast.error('Такой сорт уже существует для этого рода');
+        toast.error(t('toasts.duplicateError'));
       } else {
-        toast.error('Ошибка при создании сорта');
+        toast.error(t('toasts.createError'));
       }
     } finally {
       setIsSaving(false);
@@ -130,19 +134,19 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Создать новый сорт</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Введите название сорта на русском или английском языке — мы проверим его через ИИ
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         {step === 'input' && (
           <>
             <div className="grid gap-3 py-4">
-              <Label htmlFor="variety-query">Название сорта</Label>
+              <Label htmlFor="variety-query">{t('label')}</Label>
               <Input
                 id="variety-query"
-                placeholder="Например: Амазонская или Amazonica"
+                placeholder={t('placeholder')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleValidate()}
@@ -151,16 +155,16 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Отмена
+                {t('buttons.cancel')}
               </Button>
               <Button onClick={() => handleValidate()} disabled={!String(query).trim() || isValidating}>
                 {isValidating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Проверяем...
+                    {t('buttons.verifying')}
                   </>
                 ) : (
-                  'Проверить'
+                  t('buttons.verify')
                 )}
               </Button>
             </DialogFooter>
@@ -173,20 +177,20 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
               <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-destructive">Сорт не найден</p>
+                  <p className="text-sm font-medium text-destructive">{t('alerts.notRecognized.title')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Не удалось найти «{query}» среди сортов этого рода.
+                    {t('alerts.notRecognized.description', { query })}
                   </p>
                 </div>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Отмена
+                {t('buttons.cancel')}
               </Button>
               <Button onClick={handleRetry}>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Ввести заново
+                {t('buttons.retryInput')}
               </Button>
             </DialogFooter>
           </>
@@ -198,9 +202,9 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-amber-800">Сорт уже существует в базе</p>
+                  <p className="text-sm font-medium text-amber-800">{t('alerts.duplicate.title')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Такой сорт уже есть для этого рода. Хотите использовать существующий?
+                    {t('alerts.duplicate.description')}
                   </p>
                 </div>
               </div>
@@ -208,7 +212,7 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                   <span className="text-sm font-medium">
-                    {existingVariety.nameRu} / {existingVariety.nameEn}
+                    {getFullDisplayName(existingVariety, locale)}
                   </span>
                 </div>
               </div>
@@ -216,10 +220,10 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={handleRetry}>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Ввести заново
+                {t('buttons.retryInput')}
               </Button>
               <Button onClick={handleUseExisting}>
-                Использовать этот сорт
+                {t('buttons.useExisting')}
               </Button>
             </DialogFooter>
           </>
@@ -228,30 +232,30 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
         {step === 'confirm' && suggestion && suggestion.recognized && (
           <>
             <div className="py-4 space-y-4">
-              <p className="text-sm text-muted-foreground">ИИ предлагает следующее название:</p>
+              <p className="text-sm text-muted-foreground">{t('aiSuggestion')}</p>
               <div className="rounded-lg border bg-muted/50 p-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                   <span className="text-sm font-medium">
-                    {suggestion.nameRu} / {suggestion.nameEn}
+                    {getFullDisplayName({ nameRu: suggestion.nameRu, nameEn: suggestion.nameEn } as any, locale)}
                   </span>
                 </div>
               </div>
-              <p className="text-sm">Это именно тот сорт, который вы искали?</p>
+              <p className="text-sm">{t('confirmText')}</p>
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={handleRetry} disabled={isSaving}>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Нет, ввести заново
+                {t('buttons.retryInput')}
               </Button>
               <Button onClick={handleConfirm} disabled={isSaving}>
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Сохранение...
+                    {t('buttons.saving')}
                   </>
                 ) : (
-                  'Да, создать'
+                  t('buttons.create')
                 )}
               </Button>
             </DialogFooter>

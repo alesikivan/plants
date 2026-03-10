@@ -307,6 +307,84 @@
     "removeButton": "Remove",
     "helperText": "Max size: {size}. Formats: {formats}"
   },
+  "ImageCropModal": {
+    "title": "Crop photo",
+    "titleQueue": "Crop photo — {current} of {total}",
+    "toggleFormat": "Toggle format",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "processing": "Processing..."
+  },
+  "CreateGenusModal": {
+    "title": "Create new genus",
+    "description": "Enter the genus name in Russian or English — we will verify it via AI",
+    "label": "Genus name",
+    "placeholder": "For example: Monstera",
+    "buttons": {
+      "cancel": "Cancel",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "retry": "Try again",
+      "retryInput": "Enter again",
+      "useExisting": "Use this genus",
+      "create": "Yes, create",
+      "saving": "Saving..."
+    },
+    "alerts": {
+      "notRecognized": {
+        "title": "Plant not found",
+        "description": "Could not recognize «{query}» as a plant genus name. Please clarify the name — there might be a typo or it was entered incorrectly."
+      },
+      "duplicate": {
+        "title": "Genus already exists in database",
+        "description": "This genus already exists. Would you like to use the existing one?"
+      }
+    },
+    "aiSuggestion": "AI suggests the following name:",
+    "confirmText": "Is this the genus you were looking for?",
+    "toasts": {
+      "validationError": "Could not verify name. Try again.",
+      "createSuccess": "Genus «{name}» created successfully!",
+      "duplicateError": "This genus already exists",
+      "createError": "Error creating genus"
+    }
+  },
+  "CreateVarietyModal": {
+    "title": "Create new variety",
+    "description": "Enter the variety name in Russian or English — we will verify it via AI",
+    "label": "Variety name",
+    "placeholder": "For example: Amazonian",
+    "buttons": {
+      "cancel": "Cancel",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "retry": "Try again",
+      "retryInput": "Enter again",
+      "useExisting": "Use this variety",
+      "create": "Yes, create",
+      "saving": "Saving..."
+    },
+    "alerts": {
+      "notRecognized": {
+        "title": "Variety not found",
+        "description": "Could not find «{query}» among the varieties of this genus."
+      },
+      "duplicate": {
+        "title": "Variety already exists in database",
+        "description": "This variety already exists for this genus. Would you like to use the existing one?"
+      }
+    },
+    "aiSuggestion": "AI suggests the following name:",
+    "confirmText": "Is this the variety you were looking for?",
+    "toasts": {
+      "validationError": "Could not verify name. Try again.",
+      "createSuccess": "Variety «{name}» created successfully!",
+      "duplicateError": "This variety already exists for this genus",
+      "createError": "Error creating variety"
+    }
+  },
   "Navigation": {
     "dashboard": "Dashboard",
     "myPlants": "My plants",

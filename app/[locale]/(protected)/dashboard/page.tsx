@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ const COMBOBOX_CLASS = 'h-10 rounded-xl border-2 text-sm font-normal';
 
 export default function DashboardPage() {
   const t = useTranslations('DashboardPage');
+  const locale = useLocale();
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
   const router = useRouter();
@@ -69,8 +70,8 @@ export default function DashboardPage() {
     const q = genusSearch.toLowerCase();
     return genera
       .filter((g) => !q || getDisplayName(g, language).toLowerCase().includes(q))
-      .map((g) => ({ value: g._id, label: `${g.nameRu} / ${g.nameEn}` }));
-  }, [genera, genusSearch, language]);
+      .map((g) => ({ value: g._id, label: locale === 'ru' ? `${g.nameRu} / ${g.nameEn}` : g.nameEn }));
+  }, [genera, genusSearch, language, locale]);
 
   const applyFilters = async (search: string, genusId: string) => {
     setIsFiltering(true);

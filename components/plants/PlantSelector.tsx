@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { ComboBox } from '@/components/ui/combobox';
 import { Label } from '@/components/ui/label';
 import { genusApi, varietyApi, Genus, Variety } from '@/lib/api';
@@ -30,6 +30,7 @@ export function PlantSelector({
   genusError = false,
 }: PlantSelectorProps) {
   const t = useTranslations('PlantSelector');
+  const locale = useLocale();
   const [genuses, setGenuses] = useState<Genus[]>([]);
   const [varieties, setVarieties] = useState<Variety[]>([]);
   const [genusSearch, setGenusSearch] = useState('');
@@ -110,7 +111,9 @@ export function PlantSelector({
     onVarietyChange(variety._id);
   };
 
-  const getDisplayName = (nameRu: string, nameEn: string) => `${nameRu} / ${nameEn}`;
+  const getDisplayName = (nameRu: string, nameEn: string) => {
+    return locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
+  };
 
   const genusOptions = genuses.map((genus) => ({
     value: genus._id,
