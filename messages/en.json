@@ -1,0 +1,100 @@
+{
+  "HomePage": {
+    "badge": "Plant collection tracker",
+    "description": "Keep a digital journal of your plant collection. Track history, organize shelves and share with the community in one place.",
+    "stats": {
+      "items": [
+        {
+          "emoji": "🌿",
+          "text": "Unlimited plants"
+        },
+        {
+          "emoji": "📸",
+          "text": "Photos for every entry"
+        },
+        {
+          "emoji": "🔒",
+          "text": "Flexible privacy"
+        }
+      ]
+    },
+    "features": {
+      "eyebrow": "Features",
+      "title": "Everything your collection needs",
+      "description": "Tools for plant collectors, from the first potting to a public profile.",
+      "items": [
+        {
+          "title": "Plant collection",
+          "description": "Build a personal library with descriptions, photos and notes for every plant."
+        },
+        {
+          "title": "Growth history",
+          "description": "Log repotting, blooming, pest treatment and more in a single timeline."
+        },
+        {
+          "title": "Shelves and zones",
+          "description": "Organize plants by spaces like balconies, windowsills or greenhouses."
+        },
+        {
+          "title": "Species database",
+          "description": "Link plants to genus and variety records and find the right names quickly."
+        },
+        {
+          "title": "Photo album",
+          "description": "Upload multiple photos to each history entry and watch your plants change."
+        },
+        {
+          "title": "Public profile",
+          "description": "Share your collection with the community or keep it private with full control."
+        }
+      ]
+    },
+    "steps": {
+      "eyebrow": "How it works",
+      "title": "Easy to start",
+      "items": [
+        {
+          "number": "01",
+          "title": "Add a plant",
+          "description": "Specify genus, variety, upload photos and describe where the plant lives."
+        },
+        {
+          "number": "02",
+          "title": "Keep history",
+          "description": "Record care, observations and events with dates and photos."
+        },
+        {
+          "number": "03",
+          "title": "Watch it grow",
+          "description": "See the full life story of each plant and share it with others."
+        }
+      ]
+    },
+    "community": {
+      "eyebrow": "Community",
+      "title": "Inspire other collectors",
+      "description": "Create a public profile and open your collection to the community. Share rare plants, show your shelves and document their progress.",
+      "items": [
+        "A public page with your plants and shelves",
+        "Separate visibility controls for each section",
+        "A profile link you can share anywhere"
+      ]
+    },
+    "cta": {
+      "title": "Start documenting your collection today",
+      "description": "Free. No limits. Your plants deserve attention and care."
+    },
+    "footer": {
+      "login": "Log in",
+      "register": "Register"
+    }
+  },
+  "HomeAuthButtons": {
+    "openDashboard": "Open dashboard",
+    "login": "Log in",
+    "headerStartFree": "Start free",
+    "startFree": "Start free",
+    "alreadyHaveAccount": "I already have an account",
+    "createAccount": "Create account"
+  }
+}

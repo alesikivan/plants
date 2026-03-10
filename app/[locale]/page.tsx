@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { Logo } from '@/components/logo';
 import {
   Leaf,
@@ -12,71 +12,39 @@ import {
   Link2,
 } from 'lucide-react';
 import { HomeAuthButtons } from '@/components/home/HomeAuthButtons';
+import { LocaleSwitcher } from '@/components/home/LocaleSwitcher';
+import { Link } from '@/i18n/navigation';
+import type { AppLocale } from '@/i18n/routing';
 
-const features = [
-  {
-    icon: Leaf,
-    title: 'Коллекция растений',
-    description:
-      'Создайте личную библиотеку с описаниями, фотографиями и заметками для каждого растения.',
-  },
-  {
-    icon: BarChart3,
-    title: 'История роста',
-    description:
-      'Фиксируйте изменения: пересадки, цветение, лечение болезней — вся жизнь растения в одной ленте.',
-  },
-  {
-    icon: Layers,
-    title: 'Полки и зоны',
-    description:
-      'Организуйте растения по местам — балкон, подоконник, теплица. Удобная структура для любой коллекции.',
-  },
-  {
-    icon: BookOpen,
-    title: 'База видов',
-    description:
-      'Привязывайте растения к роду и сорту из обширной базы. Находите правильные названия быстро.',
-  },
-  {
-    icon: Camera,
-    title: 'Фотоальбом',
-    description:
-      'Загружайте несколько фото к каждой записи истории и наблюдайте за преображением растения.',
-  },
-  {
-    icon: Share2,
-    title: 'Публичный профиль',
-    description:
-      'Делитесь коллекцией с сообществом или скрывайте данные — полный контроль приватности.',
-  },
-];
+const featureIcons = [Leaf, BarChart3, Layers, BookOpen, Camera, Share2];
+const communityIcons = [Globe, Eye, Link2];
 
-const steps = [
-  {
-    number: '01',
-    title: 'Добавьте растение',
-    description: 'Укажите вид, сорт, загрузите фото и опишите, где оно стоит.',
-  },
-  {
-    number: '02',
-    title: 'Ведите историю',
-    description: 'Записывайте уход, наблюдения и события — с датами и фотографиями.',
-  },
-  {
-    number: '03',
-    title: 'Наблюдайте за ростом',
-    description: 'Смотрите полную хронику жизни каждого растения и делитесь с другими.',
-  },
-];
+type ItemWithTitle = {
+  title: string;
+  description: string;
+};
 
-const communityItems = [
-  { icon: Globe, text: 'Публичная страница с вашими растениями и полками' },
-  { icon: Eye, text: 'Раздельный контроль видимости разделов' },
-  { icon: Link2, text: 'Ссылка на профиль, которой можно поделиться' },
-];
+type StepItem = ItemWithTitle & {
+  number: string;
+};
 
-export default function HomePage() {
+type StatItem = {
+  emoji: string;
+  text: string;
+};
+
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{locale: AppLocale}>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations('HomePage');
+  const stats = t.raw('stats.items') as StatItem[];
+  const features = t.raw('features.items') as ItemWithTitle[];
+  const steps = t.raw('steps.items') as StepItem[];
+  const communityItems = t.raw('community.items') as string[];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -90,6 +58,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <LocaleSwitcher locale={locale} />
             <HomeAuthButtons variant="nav" />
           </div>
         </div>
@@ -101,7 +70,7 @@ export default function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
             <Leaf className="w-3.5 h-3.5" />
-            Трекер коллекции растений
+            {t('badge')}
           </div>
 
           {/* Logo + Title */}
@@ -116,8 +85,7 @@ export default function HomePage() {
               <span className="text-foreground">Sheep</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Ведите цифровой дневник своей коллекции растений. Отслеживайте историю, организуйте по
-              полкам и делитесь с сообществом — всё в одном месте.
+              {t('description')}
             </p>
           </div>
 
@@ -128,11 +96,7 @@ export default function HomePage() {
 
           {/* Decorative stat pills */}
           <div className="flex flex-wrap justify-center gap-3 pt-6">
-            {[
-              { emoji: '🌿', text: 'Любое количество растений' },
-              { emoji: '📸', text: 'Фото для каждой записи' },
-              { emoji: '🔒', text: 'Гибкая приватность' },
-            ].map((item) => (
+            {stats.map((item) => (
               <div
                 key={item.text}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border text-sm text-muted-foreground"
@@ -150,18 +114,17 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-3 mb-14">
             <p className="text-xs font-semibold text-primary uppercase tracking-widest">
-              Возможности
+              {t('features.eyebrow')}
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Всё для вашей коллекции</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold">{t('features.title')}</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Инструменты, которые нужны коллекционеру растений — от первой посадки до публичного
-              профиля
+              {t('features.description')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => {
-              const Icon = feature.icon;
+            {features.map((feature, index) => {
+              const Icon = featureIcons[index];
               return (
                 <div
                   key={feature.title}
@@ -186,9 +149,9 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center space-y-3 mb-14">
             <p className="text-xs font-semibold text-primary uppercase tracking-widest">
-              Как это работает
+              {t('steps.eyebrow')}
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Просто начать</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold">{t('steps.title')}</h2>
           </div>
 
           <div className="relative">
@@ -219,25 +182,24 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
               <div className="space-y-4">
                 <p className="text-xs font-semibold text-primary uppercase tracking-widest">
-                  Сообщество
+                  {t('community.eyebrow')}
                 </p>
                 <h2 className="text-2xl sm:text-3xl font-bold">
-                  Вдохновляйте других коллекционеров
+                  {t('community.title')}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Создайте публичный профиль и откройте свою коллекцию сообществу. Делитесь
-                  редкими видами, показывайте полки и документируйте историю роста.
+                  {t('community.description')}
                 </p>
               </div>
               <div className="space-y-4">
-                {communityItems.map((item) => {
-                  const Icon = item.icon;
+                {communityItems.map((item, index) => {
+                  const Icon = communityIcons[index];
                   return (
-                    <div key={item.text} className="flex items-center gap-3">
+                    <div key={item} className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="text-sm">{item.text}</span>
+                      <span className="text-sm">{item}</span>
                     </div>
                   );
                 })}
@@ -250,12 +212,8 @@ export default function HomePage() {
       {/* Final CTA */}
       <section className="py-24 px-4">
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-bold">
-            Начните вести коллекцию сегодня
-          </h2>
-          <p className="text-muted-foreground">
-            Бесплатно. Без ограничений. Ваши растения заслуживают заботы и внимания.
-          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold">{t('cta.title')}</h2>
+          <p className="text-muted-foreground">{t('cta.description')}</p>
           <HomeAuthButtons variant="final" />
         </div>
       </section>
@@ -267,13 +225,13 @@ export default function HomePage() {
             <Logo size="sm" />
             <span>PlantSheep</span>
           </div>
-          <p>Трекер коллекции растений</p>
+          <p>{t('badge')}</p>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hover:text-foreground transition-colors">
-              Войти
+              {t('footer.login')}
             </Link>
             <Link href="/register" className="hover:text-foreground transition-colors">
-              Регистрация
+              {t('footer.register')}
             </Link>
           </div>
         </div>

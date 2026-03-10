@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import Script from 'next/script';
 import './globals.css';
 import { Providers } from './providers';
@@ -123,13 +124,15 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = (await headers()).get('x-next-intl-locale') || 'en';
+
   return (
-    <html lang="ru">
+    <html lang={locale}>
       <head>
         <script
           type="application/ld+json"

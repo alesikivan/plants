@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { handleApiError } from './error-handler';
+import { stripLocaleFromPathname } from '@/lib/locale';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -49,7 +50,7 @@ const AUTH_PATHS = ['/', '/login', '/register', '/verify-email', '/forgot-passwo
 // Clear session cookies and redirect to login page
 async function forceLogout(reason?: string) {
   if (typeof window === 'undefined') return;
-  const currentPath = window.location.pathname;
+  const currentPath = stripLocaleFromPathname(window.location.pathname);
   if (AUTH_PATHS.some((p) => p === '/' ? currentPath === p : currentPath.startsWith(p))) return;
 
   try {
