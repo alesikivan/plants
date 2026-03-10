@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,6 +26,8 @@ export function AddHistoryModal({
   onSuccess,
   plantId,
 }: AddHistoryModalProps) {
+  const t = useTranslations('AddHistoryModal');
+  const locale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [comment, setComment] = useState('');
@@ -33,7 +37,7 @@ export function AddHistoryModal({
   const handleDateFound = (date: Date | null) => {
     setDate(date ?? new Date());
     if (date) {
-      toast.info(`Дата обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+      toast.info(t('toasts.dateFound', { date: date.toLocaleDateString(locale) }));
     }
   };
 
@@ -63,7 +67,7 @@ export function AddHistoryModal({
     e.preventDefault();
 
     if (!date) {
-      toast.error('Выберите дату');
+      toast.error(t('dateLabel'));
       return;
     }
 
@@ -71,7 +75,7 @@ export function AddHistoryModal({
     const hasComment = comment.trim().length > 0;
 
     if (!hasComment && !hasPhotos) {
-      toast.error('Добавьте комментарий или фотографии');
+      toast.error(t('commentLabel'));
       return;
     }
 
@@ -84,7 +88,7 @@ export function AddHistoryModal({
       };
 
       await plantHistoryApi.create(plantId, historyData);
-      toast.success('Запись добавлена');
+      toast.success(t('toasts.success'));
       onSuccess();
       onOpenChange(false);
       // Reset form
@@ -93,7 +97,7 @@ export function AddHistoryModal({
       setPhotos([]);
       setPhotoPreviews([]);
     } catch (error) {
-      toast.error('Ошибка при добавлении записи');
+      toast.error(t('toasts.error'));
       console.error('Failed to add history:', error);
     } finally {
       setIsSubmitting(false);
@@ -106,26 +110,26 @@ export function AddHistoryModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
-            Добавить запись в историю
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="grid gap-2">
-            <Label htmlFor="date">Дата</Label>
+            <Label htmlFor="date">{t('dateLabel')}</Label>
             <DatePicker
               date={date}
               onDateChange={setDate}
-              placeholder="Выберите дату события"
+              placeholder={t('datePlaceholder')}
               disabledMatcher={disableFutureDates}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="comment">Комментарий</Label>
+            <Label htmlFor="comment">{t('commentLabel')}</Label>
             <Textarea
               id="comment"
-              placeholder="Опишите, что произошло с растением..."
+              placeholder={t('commentPlaceholder')}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={4}
@@ -133,7 +137,7 @@ export function AddHistoryModal({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="photos">Фотографии</Label>
+            <Label htmlFor="photos">{t('photosLabel')}</Label>
             <MultiFileInput
               id="photos"
               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
@@ -154,13 +158,13 @@ export function AddHistoryModal({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Отмена
+              {t('buttons.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || (!comment.trim() && photos.length === 0)}
             >
-              {isSubmitting ? 'Добавление...' : 'Добавить'}
+              {isSubmitting ? t('buttons.adding') : t('buttons.add')}
             </Button>
           </DialogFooter>
         </form>

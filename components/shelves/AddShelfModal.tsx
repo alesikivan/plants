@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ interface ShelfFormData {
 }
 
 export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddShelfModalProps) {
+  const t = useTranslations('AddShelfModal');
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +88,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
         setPlants(data);
       }
     } catch (error) {
-      toast.error('Ошибка загрузки растений');
+      toast.error(t('plants.loadError'));
       console.error('Failed to load plants:', error);
     } finally {
       setIsLoadingPlants(false);
@@ -125,7 +127,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
           );
         }
 
-        toast.success('Полка успешно обновлена!');
+        toast.success(t('toasts.editSuccess'));
       } else {
         const shelf = await shelvesApi.create({
           name: data.name,
@@ -142,7 +144,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
           );
         }
 
-        toast.success('Полка успешно создана!');
+        toast.success(t('toasts.createSuccess'));
       }
 
       reset();
@@ -154,7 +156,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      toast.error(editShelf ? 'Ошибка при обновлении полки' : 'Ошибка при создании полки');
+      toast.error(editShelf ? t('toasts.editError') : t('toasts.createError'));
       console.error('Failed to save shelf:', error);
     } finally {
       setIsLoading(false);
@@ -169,7 +171,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
     }
 
     if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
-      toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
+      toast.error(t('invalidFileType'));
       return;
     }
 
@@ -220,9 +222,9 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{editShelf ? 'Редактировать полку' : 'Создать полку'}</DialogTitle>
+          <DialogTitle>{editShelf ? t('titleEdit') : t('titleCreate')}</DialogTitle>
           <DialogDescription>
-            {editShelf ? 'Измените информацию о полке' : 'Создайте новую полку для ваших растений'}
+            {editShelf ? t('descriptionEdit') : t('descriptionCreate')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -230,21 +232,21 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
             {/* Название полки */}
             <div className="grid gap-2">
               <Label htmlFor="name">
-                Название полки <span className="text-destructive">*</span>
+                {t('fields.name.label')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="name"
-                placeholder="Полка №1"
+                placeholder={t('fields.name.placeholder')}
                 {...register('name', { required: true })}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">Это поле обязательно</p>
+                <p className="text-sm text-destructive">{t('fields.name.required')}</p>
               )}
             </div>
 
             {/* Фото полки */}
             <div className="grid gap-2">
-              <Label htmlFor="photo">Фото полки </Label>
+              <Label htmlFor="photo">{t('fields.photo.label')} </Label>
               <FileInput
                 id="photo"
                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -255,21 +257,21 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
                 acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP']}
               />
               <p className="text-xs text-muted-foreground">
-                Если фото не загружено, будут отображены первые 3 растения с этой полки
+                {t('fields.photo.helper')}
               </p>
             </div>
 
             {/* Выбор растений */}
             <div className="grid gap-2">
-              <Label>{editShelf ? 'Управление растениями' : 'Добавить растения'}</Label>
+              <Label>{editShelf ? t('plants.manageLabel') : t('plants.addLabel')}</Label>
                 {isLoadingPlants ? (
                   <div className="flex items-center justify-center py-4">
                     <Leaf className="w-5 h-5 text-primary/50 animate-pulse" />
-                    <span className="ml-2 text-sm text-muted-foreground">Загрузка растений...</span>
+                    <span className="ml-2 text-sm text-muted-foreground">{t('plants.loadingText')}</span>
                   </div>
                 ) : plants.length === 0 ? (
                   <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-                    У вас пока нет растений без полки
+                    {t('plants.noPlants')}
                   </div>
                 ) : (
                   <>
@@ -277,7 +279,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        placeholder="Поиск растений..."
+                        placeholder={t('plants.search.placeholder')}
                         value={plantSearch}
                         onChange={(e) => setPlantSearch(e.target.value)}
                         className="pl-9"
@@ -288,7 +290,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
                     <div className="border rounded-md max-h-60 overflow-y-auto">
                       {filteredPlants.length === 0 ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
-                          Ничего не найдено
+                          {t('plants.notFound')}
                         </div>
                       ) : (
                         <div className="p-2 space-y-2">
@@ -335,7 +337,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
                 )}
                 {selectedPlantIds.length > 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Выбрано растений: {selectedPlantIds.length}
+                    {t('plants.selectedCount', { count: selectedPlantIds.length })}
                   </p>
                 )}
             </div>
@@ -356,10 +358,12 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
               }}
               disabled={isLoading}
             >
-              Отмена
+              {t('buttons.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? (editShelf ? 'Сохранение...' : 'Создание...') : (editShelf ? 'Сохранить' : 'Создать')}
+              {isLoading
+                ? (editShelf ? t('buttons.editing') : t('buttons.creating'))
+                : (editShelf ? t('buttons.editButton') : t('buttons.createButton'))}
             </Button>
           </DialogFooter>
         </form>

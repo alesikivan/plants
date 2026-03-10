@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Layers, Search, X } from 'lucide-react';
@@ -10,6 +11,7 @@ import { ShelfCard } from '@/components/shelves/ShelfCard';
 import { toast } from 'sonner';
 
 export default function ShelvesPage() {
+  const t = useTranslations('ShelvesPage');
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
@@ -28,7 +30,7 @@ export default function ShelvesPage() {
       const data = await shelvesApi.getAll();
       setShelves(data);
     } catch (error) {
-      toast.error('Ошибка загрузки полок');
+      toast.error(t('messages.loadError'));
       console.error('Failed to load shelves:', error);
     } finally {
       setIsLoading(false);
@@ -41,7 +43,7 @@ export default function ShelvesPage() {
       const data = await shelvesApi.getAll({ search: search || undefined });
       setShelves(data);
     } catch (error) {
-      toast.error('Ошибка загрузки полок');
+      toast.error(t('messages.loadError'));
       console.error('Failed to search shelves:', error);
     } finally {
       setIsFiltering(false);
@@ -75,14 +77,14 @@ export default function ShelvesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Мои полки</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t('header.title')}</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-            Организуйте свои<br className="sm:hidden" /> растения по полкам
+            {t('header.description')}
           </p>
         </div>
         <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all active:scale-95 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
-          Создать полку
+          {t('buttons.createShelf')}
         </Button>
       </div>
 
@@ -91,7 +93,7 @@ export default function ShelvesPage() {
         <div className="relative animate-in fade-in duration-500">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Поиск по названию полки..."
+            placeholder={t('search.placeholder')}
             value={searchQuery}
             onChange={handleSearchChange}
             className="pl-9 pr-9"
@@ -112,31 +114,31 @@ export default function ShelvesPage() {
         <div className="flex items-center justify-center h-64 animate-in fade-in duration-500">
           <div className="text-center space-y-2">
             <Layers className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
-            <p className="text-muted-foreground">Загрузка полок...</p>
+            <p className="text-muted-foreground">{t('messages.loading')}</p>
           </div>
         </div>
       ) : shelves.length === 0 && !searchQuery ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
           <Layers className="w-16 h-16 text-muted-foreground/50 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">У вас пока нет полок</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('empty.noShelves.title')}</h3>
           <p className="text-muted-foreground mb-6">
-            Создайте свою первую полку, чтобы организовать растения
+            {t('empty.noShelves.description')}
           </p>
           <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all active:scale-95">
             <Plus className="w-4 h-4" />
-            Создать первую полку
+            {t('empty.noShelves.button')}
           </Button>
         </div>
       ) : shelves.length === 0 && searchQuery ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
           <Search className="w-16 h-16 text-muted-foreground/50 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Ничего не найдено</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('empty.noResults.title')}</h3>
           <p className="text-muted-foreground mb-4">
-            Попробуйте изменить поисковый запрос
+            {t('empty.noResults.description')}
           </p>
           <Button variant="outline" onClick={handleClearSearch} className="gap-2">
             <X className="w-4 h-4" />
-            Сбросить поиск
+            {t('empty.noResults.button')}
           </Button>
         </div>
       ) : (

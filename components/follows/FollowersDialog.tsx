@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface FollowersDialogProps {
 }
 
 export function FollowersDialog({ userId, type, isOpen, onClose }: FollowersDialogProps) {
+  const t = useTranslations('FollowersDialog');
   const [users, setUsers] = useState<FollowUser[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -70,7 +72,7 @@ export function FollowersDialog({ userId, type, isOpen, onClose }: FollowersDial
   };
 
   const hasMore = users.length < total;
-  const title = type === 'followers' ? 'Подписчики' : 'Подписки';
+  const title = type === 'followers' ? t('titleFollowers') : t('titleFollowing');
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -87,10 +89,11 @@ export function FollowersDialog({ userId, type, isOpen, onClose }: FollowersDial
         <div className="relative mt-2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Поиск по имени..."
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-9"
+            autoFocus={false}
           />
         </div>
 
@@ -102,10 +105,10 @@ export function FollowersDialog({ userId, type, isOpen, onClose }: FollowersDial
           ) : users.length === 0 ? (
             <div className="py-10 text-center text-muted-foreground text-sm">
               {search
-                ? 'Никого не найдено'
+                ? t('noResults')
                 : type === 'followers'
-                  ? 'Нет подписчиков'
-                  : 'Нет подписок'}
+                  ? t('emptyFollowers')
+                  : t('emptyFollowing')}
             </div>
           ) : (
             <>
@@ -146,7 +149,7 @@ export function FollowersDialog({ userId, type, isOpen, onClose }: FollowersDial
                     {loadingMore ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      `Загрузить ещё (${total - users.length})`
+                      t('loadMore', { count: total - users.length })
                     )}
                   </Button>
                 </div>

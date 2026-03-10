@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import UserPlantDetailClient from './UserPlantDetailClient';
+import PublicUserPlantDetailClient from './PublicUserPlantDetailClient';
 import { getPublicProfilePlantPageData } from '@/lib/server/public-data';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: `${title} — PlantSheep`,
         description,
-        url: `${SITE_URL}/profile/${id}/plants/${plantId}`,
+        url: `${SITE_URL}/public/profile/${id}/plants/${plantId}`,
         ...(plant.photo && {
           images: [{ url: `${API_URL}/plants/photo/${plant.photo}`, width: 600, height: 600, alt: plantName }],
         }),
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${title} — PlantSheep`,
         description,
       },
-      alternates: { canonical: `${SITE_URL}/profile/${id}/plants/${plantId}` },
+      alternates: { canonical: `${SITE_URL}/public/profile/${id}/plants/${plantId}` },
     };
   } catch {
     return {
@@ -90,7 +90,7 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <UserPlantDetailClient
+    <PublicUserPlantDetailClient
       initialPlant={plant}
       initialHistory={history}
       initialPlantHidden={plantHidden}

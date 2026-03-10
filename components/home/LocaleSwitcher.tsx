@@ -3,6 +3,7 @@
 import {useEffect, useState, useTransition} from 'react';
 import {useRouter} from '@/i18n/navigation';
 import type {AppLocale} from '@/i18n/routing';
+import {useAuthStore} from '@/lib/store/authStore';
 import {
   Select,
   SelectContent,
@@ -20,6 +21,7 @@ export function LocaleSwitcher({locale}: {locale: AppLocale}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const updateProfile = useAuthStore((state) => state.updateProfile);
 
   useEffect(() => {
     if (open) {
@@ -39,7 +41,12 @@ export function LocaleSwitcher({locale}: {locale: AppLocale}) {
       value={locale}
       disabled={isPending}
       onValueChange={(nextLocale) => {
-        startTransition(() => {
+        startTransition(async () => {
+          // Update user preferred language based on selected locale
+          const preferredLanguage = nextLocale === 'ru' ? 'ru' : 'en';
+          await updateProfile({ preferredLanguage }).catch(() => {});
+
+          // Change application locale
           router.replace('/', {locale: nextLocale as AppLocale});
         });
       }}

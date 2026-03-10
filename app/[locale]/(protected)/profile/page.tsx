@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ const MOBILE_PREVIEW = 3;
 
 export default function ProfilePage() {
   const t = useTranslations('ProfilePage');
+  const locale = useLocale();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);
@@ -59,7 +60,8 @@ export default function ProfilePage() {
   const handleLanguageChange = async (language: string) => {
     setIsUpdating(true);
     try {
-      await updateProfile({ preferredLanguage: language });
+      const targetLanguage = language === 'ru' ? 'ru' : 'en';
+      await updateProfile({ preferredLanguage: targetLanguage });
       toast.success(t('preferences.successToast'));
     } catch (error) {
       toast.error(t('preferences.errorToast'));
@@ -314,7 +316,7 @@ export default function ProfilePage() {
                 <span className="text-sm font-semibold">{t('profile.memberSince')}</span>
               </div>
               <p className="font-medium">
-                {new Date(user.createdAt).toLocaleDateString('ru-RU', {
+                {new Date(user.createdAt).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -324,55 +326,6 @@ export default function ProfilePage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Settings Row */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Preferences */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{t('preferences.title')}</CardTitle>
-            <CardDescription>{t('preferences.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Languages className="w-4 h-4" />
-                <span className="text-sm font-semibold">{t('preferences.languageLabel')}</span>
-              </div>
-              <Select
-                value={user.preferredLanguage || 'ru'}
-                onValueChange={handleLanguageChange}
-                disabled={isUpdating}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t('preferences.languagePlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ru">Русский</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                {t('preferences.languageDescription')}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Logout */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{t('logout.title')}</CardTitle>
-            <CardDescription>{t('logout.description')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={handleLogout} className="w-full gap-2" variant="outline">
-              <LogOut className="w-4 h-4" />
-              {t('logout.button')}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Privacy Settings */}
       <Card>
@@ -466,6 +419,56 @@ export default function ProfilePage() {
           />
         </CardContent>
       </Card>
+
+      {/* Settings Row */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Preferences - only show for RU */}
+        {locale === 'ru' && (<Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{t('preferences.title')}</CardTitle>
+            <CardDescription>{t('preferences.description')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Languages className="w-4 h-4" />
+                <span className="text-sm font-semibold">{t('preferences.languageLabel')}</span>
+              </div>
+              <Select
+                value={user.preferredLanguage || 'ru'}
+                onValueChange={handleLanguageChange}
+                disabled={isUpdating}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t('preferences.languagePlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ru">Русский</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {t('preferences.languageDescription')}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        )}
+
+        {/* Logout */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{t('logout.title')}</CardTitle>
+            <CardDescription>{t('logout.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={handleLogout} className="w-full gap-2" variant="outline">
+              <LogOut className="w-4 h-4" />
+              {t('logout.button')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* My Plants */}
       <Card>

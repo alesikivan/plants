@@ -307,6 +307,13 @@
     "removeButton": "Remove",
     "helperText": "Max size: {size}. Formats: {formats}"
   },
+  "MultiFileInput": {
+    "selectButton": "Select photos",
+    "addMore": "Add more photos",
+    "processing": "Processing photo...",
+    "skipButton": "Skip",
+    "helperText": "Max size: {size} per file. Formats: {formats}. Up to {maxFiles} photos"
+  },
   "ImageCropModal": {
     "title": "Crop photo",
     "titleQueue": "Crop photo — {current} of {total}",
@@ -611,6 +618,464 @@
     "toasts": {
       "success": "Plant deleted successfully",
       "error": "Failed to delete plant"
+    }
+  },
+  "SocialLinksSection": {
+    "saving": "Saving...",
+    "empty": "No contact methods added"
+  },
+  "SocialLinkItem": {
+    "copied": "Copied",
+    "editTitle": "Edit {type}",
+    "valueLabel": "Value",
+    "showInProfileLabel": "Show in profile",
+    "cancelButton": "Cancel",
+    "saveButton": "Save",
+    "types": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "placeholders": {
+      "telegram": "@username or t.me/username",
+      "instagram": "@username",
+      "phone": "+1 (555) 123-4567",
+      "email": "example@mail.com"
+    }
+  },
+  "AddSocialLinkDialog": {
+    "addButton": "Add",
+    "title": "Add contact method",
+    "typeLabel": "Type",
+    "typePlaceholder": "Select type",
+    "valueLabel": "Value",
+    "cancelButton": "Cancel",
+    "types": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "placeholders": {
+      "telegram": "@username or t.me/username",
+      "instagram": "@username",
+      "phone": "+1 (555) 123-4567",
+      "email": "example@mail.com"
+    }
+  },
+  "PlantDetailPage": {
+    "loadError": "Failed to load plant",
+    "deleteSuccess": "Plant deleted successfully",
+    "deleteError": "Failed to delete plant",
+    "archiveSuccess": "Plant moved to archive",
+    "archiveError": "Failed to archive plant",
+    "unarchiveSuccess": "Plant restored from archive",
+    "unarchiveError": "Failed to restore plant",
+    "linkCopied": "Link copied to clipboard",
+    "linkCopyError": "Failed to copy link",
+    "buttons": {
+      "back": "Back to list",
+      "edit": "Edit",
+      "restore": "Restore",
+      "restoring": "Restoring...",
+      "archive": "Archive",
+      "archiving": "Archiving...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "copyLink": "Link",
+      "linkCopied": "Copied"
+    },
+    "dialogs": {
+      "archiveTitle": "Archive plant?",
+      "archiveDescription": "The plant will be removed from all shelves and moved to archive.",
+      "deleteTitle": "Are you sure?",
+      "deleteDescription": "This action cannot be undone. The plant will be deleted permanently.",
+      "cancel": "Cancel"
+    },
+    "info": {
+      "title": "Plant information",
+      "noName": "No name",
+      "archivedBadge": "Archived",
+      "genus": "Plant genus",
+      "genusNotSet": "Not set",
+      "variety": "Plant variety",
+      "purchaseDate": "Purchase date",
+      "description": "Description",
+      "shelves": "Shelves"
+    },
+    "loading": "Loading..."
+  },
+  "PlantHistoryTimeline": {
+    "loadError": "Failed to load history",
+    "deleteError": "Failed to delete entry",
+    "deleteSuccess": "Entry deleted",
+    "loading": "Loading history...",
+    "title": "Plant history",
+    "total": "Total entries: {count}",
+    "empty": "History is empty",
+    "addButton": "Add entry",
+    "emptyMessage": "Add the first entry to your plant's history",
+    "deleteDialog": {
+      "title": "Delete entry?",
+      "description": "This action cannot be undone. The entry and all its photos will be deleted.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    }
+  },
+  "AddHistoryModal": {
+    "title": "Add history entry",
+    "description": "Document changes to your plant",
+    "dateLabel": "Event date",
+    "datePlaceholder": "Select date",
+    "commentLabel": "Description",
+    "commentPlaceholder": "What happened to the plant...",
+    "photosLabel": "Event photos (optional)",
+    "buttons": {
+      "cancel": "Cancel",
+      "add": "Add",
+      "adding": "Adding..."
+    },
+    "toasts": {
+      "success": "Entry added!",
+      "error": "Failed to add entry",
+      "dateFound": "Date updated from photo metadata: {date}"
+    }
+  },
+  "EditHistoryModal": {
+    "title": "Edit entry",
+    "description": "Change event information",
+    "dateLabel": "Event date",
+    "datePlaceholder": "Select date",
+    "commentLabel": "Description",
+    "commentPlaceholder": "What happened to the plant...",
+    "photosLabel": "Event photos (optional)",
+    "deletePhotoTitle": "Delete photo?",
+    "deletePhotoDescription": "This action cannot be undone.",
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "deletePhoto": "Delete photo"
+    },
+    "toasts": {
+      "success": "Entry updated!",
+      "error": "Failed to update entry",
+      "dateFound": "Date updated from photo metadata: {date}",
+      "photoDeleteSuccess": "Photo deleted"
+    }
+  },
+  "ShelvesPage": {
+    "header": {
+      "title": "My shelves",
+      "description": "Organize your plants by shelves"
+    },
+    "buttons": {
+      "createShelf": "Create shelf"
+    },
+    "search": {
+      "placeholder": "Search by shelf name..."
+    },
+    "messages": {
+      "loading": "Loading shelves...",
+      "loadError": "Failed to load shelves"
+    },
+    "empty": {
+      "noShelves": {
+        "title": "You don't have any shelves yet",
+        "description": "Create your first shelf to organize your plants",
+        "button": "Create first shelf"
+      },
+      "noResults": {
+        "title": "Nothing found",
+        "description": "Try changing your search query",
+        "button": "Clear search"
+      }
+    }
+  },
+  "ShelfDetailPage": {
+    "header": {
+      "backButton": "Back to list"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Are you sure?",
+      "description": "This action cannot be undone. The shelf will be deleted forever. Plants will remain, but will be detached from the shelf.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "info": {
+      "title": "Shelf information",
+      "nameLabel": "Name",
+      "plantsCountLabel": "Number of plants"
+    },
+    "plants": {
+      "title": "Plants on shelf",
+      "description": "Click on a plant to see details",
+      "empty": "Add plants to this shelf",
+      "manageButton": "Manage plants",
+      "emptyState": {
+        "title": "No plants yet",
+        "description": "You can add plants to this shelf by editing existing plants or creating new ones",
+        "button": "Go to plants"
+      }
+    },
+    "toasts": {
+      "loadError": "Failed to load shelf",
+      "deleteSuccess": "Shelf deleted successfully",
+      "deleteError": "Error deleting shelf"
+    }
+  },
+  "AddShelfModal": {
+    "titleCreate": "Create shelf",
+    "titleEdit": "Edit shelf",
+    "descriptionCreate": "Create a new shelf for your plants",
+    "descriptionEdit": "Change shelf information",
+    "fields": {
+      "name": {
+        "label": "Shelf name",
+        "placeholder": "Shelf №1",
+        "required": "This field is required"
+      },
+      "photo": {
+        "label": "Shelf photo",
+        "helper": "If no photo is uploaded, the first 3 plants from this shelf will be displayed"
+      }
+    },
+    "plants": {
+      "manageLabel": "Manage plants",
+      "addLabel": "Add plants",
+      "loadError": "Failed to load plants",
+      "loadingText": "Loading plants...",
+      "noPlants": "You don't have any plants without a shelf",
+      "search": {
+        "placeholder": "Search plants..."
+      },
+      "notFound": "Nothing found",
+      "selectedCount": "Plants selected: {count}"
+    },
+    "invalidFileType": "Only images are allowed (JPG, JPEG, PNG, GIF, WebP)",
+    "buttons": {
+      "cancel": "Cancel",
+      "createButton": "Create",
+      "editButton": "Save",
+      "creating": "Creating...",
+      "editing": "Saving..."
+    },
+    "toasts": {
+      "createSuccess": "Shelf created successfully!",
+      "createError": "Error creating shelf",
+      "editSuccess": "Shelf updated successfully!",
+      "editError": "Error updating shelf"
+    }
+  },
+  "ManagePlantsModal": {
+    "title": "Manage plants on shelf",
+    "description": "Select plants for shelf \"{shelfName}\"",
+    "stats": {
+      "selected": "Plants selected:",
+      "available": "Available:"
+    },
+    "search": {
+      "placeholder": "Search plants..."
+    },
+    "loadingText": "Loading plants...",
+    "noPlants": "You don't have any available plants",
+    "notFound": "Nothing found",
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "toasts": {
+      "updated": "Updated plants: {count}",
+      "noChanges": "No changes",
+      "updateError": "Error updating plants"
+    }
+  },
+  "FeedPage": {
+    "header": {
+      "title": "Feed",
+      "description": "New plants and history entries"
+    },
+    "tabs": {
+      "global": "Global",
+      "following": "Following"
+    },
+    "loading": "Loading...",
+    "endOfFeed": "You've reached the end of the feed",
+    "emptyFollowing": {
+      "title": "Nothing here yet.",
+      "description": "Follow users to see their updates",
+      "linkText": "Follow users"
+    },
+    "emptyGlobal": {
+      "title": "Feed is empty"
+    },
+    "badges": {
+      "new": "New"
+    }
+  },
+  "FeedCard": {
+    "plantAction": "added a plant",
+    "historyAction": "added plant history",
+    "photoAlt": "Photo {number}",
+    "timeAgo": {
+      "justNow": "just now",
+      "minutes": "{count} min ago",
+      "hours": "{count} hours ago",
+      "days": "{count} days ago",
+      "weeks": "{count} weeks ago",
+      "months": "{count} months ago",
+      "years": "{count} years ago"
+    }
+  },
+  "PublicProfilePage": {
+    "metadata": {
+      "title": "User profile"
+    },
+    "header": {
+      "backButton": "Back",
+      "loading": "Loading...",
+      "notFound": "User not found"
+    },
+    "stats": {
+      "plants": "Plants",
+      "shelves": "Shelves",
+      "followers": "Followers",
+      "following": "Following"
+    },
+    "sections": {
+      "plants": {
+        "title": "Plants",
+        "showAll": "Show all",
+        "showAllWithCount": "Show all {count} plants",
+        "empty": "No plants",
+        "hidden": "User hid their plant collection",
+        "loading": "Loading..."
+      },
+      "shelves": {
+        "title": "Shelves",
+        "showAll": "Show all",
+        "showAllWithCount": "Show all {count} shelves",
+        "empty": "No shelves",
+        "hidden": "User hid their shelves",
+        "loading": "Loading..."
+      }
+    },
+    "errors": {
+      "loadError": "Failed to load user profile"
+    }
+  },
+  "UserPlantsPage": {
+    "header": {
+      "title": "Plants",
+      "description": "User's collection",
+      "backButton": "Back"
+    },
+    "empty": {
+      "title": "No plants",
+      "description": "This user doesn't have any plants yet"
+    },
+    "hidden": {
+      "title": "Collection hidden",
+      "description": "User hid their plant collection"
+    },
+    "loading": "Loading plants...",
+    "errors": {
+      "loadError": "Failed to load plants"
+    }
+  },
+  "UserShelvesPage": {
+    "header": {
+      "title": "Shelves",
+      "description": "User's collection",
+      "backButton": "Back"
+    },
+    "empty": {
+      "title": "No shelves",
+      "description": "This user doesn't have any shelves yet"
+    },
+    "hidden": {
+      "title": "Shelves hidden",
+      "description": "User hid their shelves"
+    },
+    "loading": "Loading shelves...",
+    "errors": {
+      "loadError": "Failed to load shelves"
+    }
+  },
+  "FollowersDialog": {
+    "titleFollowers": "Followers",
+    "titleFollowing": "Following",
+    "searchPlaceholder": "Search by name...",
+    "noResults": "No users found",
+    "emptyFollowers": "No followers",
+    "emptyFollowing": "No following",
+    "loadMore": "Load more ({count})"
+  },
+  "FollowButton": {
+    "follow": "Follow",
+    "following": "Following",
+    "error": "Error. Try again"
+  },
+  "DiscoverBanner": {
+    "joinCommunity": "Join our community",
+    "title": "Share your collection",
+    "description": "Share your rare plant varieties, get inspired by others' finds, and together document the growth history of each plant 🌱",
+    "buttonText": "Create your profile"
+  },
+  "PublicPlantDetailPage": {
+    "loading": "Loading...",
+    "plantInfo": {
+      "owner": "Owner:",
+      "genus": "Genus",
+      "variety": "Variety",
+      "purchaseDate": "Purchase date",
+      "description": "Description"
+    },
+    "errors": {
+      "notFound": "Plant not found or hidden by owner",
+      "loadError": "Error loading plant"
+    },
+    "history": {
+      "hidden": "Plant history is hidden by owner"
+    }
+  },
+  "UserPlantDetailPage": {
+    "back": "Back",
+    "loading": "Loading...",
+    "plantHidden": {
+      "title": "Plant hidden",
+      "description": "User has hidden their plant collection"
+    },
+    "plantInfo": {
+      "title": "Plant information",
+      "genus": "Plant genus",
+      "genusEmpty": "Not specified",
+      "variety": "Plant variety",
+      "purchaseDate": "Purchase date",
+      "description": "Description",
+      "copyLinkTooltip": "Copy plant link",
+      "copyButton": "Link",
+      "copiedButton": "Copied"
+    },
+    "history": {
+      "title": "Plant history",
+      "hiddenByUser": "Hidden by user",
+      "total": "Total records: {count}",
+      "empty": "No history",
+      "emptyState": "History is empty",
+      "hiddenMessage": "User has hidden their plant history"
+    },
+    "errors": {
+      "loadError": "Error loading plant",
+      "copyLinkError": "Failed to copy link",
+      "copyLinkSuccess": "Plant link copied to clipboard"
     }
   },
   "ProfilePage": {

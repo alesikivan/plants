@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Pencil, Trash2, Camera } from 'lucide-react';
@@ -36,6 +37,7 @@ export function PlantHistoryItem({
   isLast = false,
   isPublic = false,
 }: PlantHistoryItemProps) {
+  const t = useTranslations('PlantHistoryTimeline');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
@@ -91,20 +93,20 @@ export function PlantHistoryItem({
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Удалить запись?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Это действие нельзя отменить. Запись и все её фотографии будут удалены.
+                        {t('deleteDialog.description')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel className="transition-all active:scale-95">
-                        Отмена
+                        {t('deleteDialog.cancel')}
                       </AlertDialogCancel>
                       <AlertDialogAction
                         onClick={onDelete}
-                        className="transition-all active:scale-95"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-all active:scale-95"
                       >
-                        Удалить
+                        {t('deleteDialog.delete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

@@ -7,33 +7,30 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare, Copy, Check } from 'lucide-react';
 import { usersApi, Plant, PlantHistory, Genus, Variety, getPlantPhotoUrl, getPlantHistoryPhotoUrl } from '@/lib/api';
-import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
+import { DiscoverBanner } from '@/components/public/DiscoverBanner';
 
-interface UserPlantDetailClientProps {
+interface PublicUserPlantDetailClientProps {
   initialPlant?: Plant | null;
   initialHistory?: PlantHistory[];
   initialPlantHidden?: boolean;
   initialHistoryHidden?: boolean;
 }
 
-export default function UserPlantDetailClient({
+export default function PublicUserPlantDetailClient({
   initialPlant = null,
   initialHistory = [],
   initialPlantHidden = false,
   initialHistoryHidden = false,
-}: UserPlantDetailClientProps) {
+}: PublicUserPlantDetailClientProps) {
   const t = useTranslations('UserPlantDetailPage');
   const locale = useLocale();
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
   const plantId = params.plantId as string;
-
-  const user = useAuthStore((state) => state.user);
-  const language = user?.preferredLanguage || 'ru';
 
   const [plant, setPlant] = useState<Plant | null>(initialPlant);
   const [history, setHistory] = useState<PlantHistory[]>(initialHistory);
@@ -71,11 +68,11 @@ export default function UserPlantDetailClient({
         router.back();
       })
       .finally(() => setIsLoading(false));
-  }, [initialPlant, initialPlantHidden, plantId, router, userId]);
+  }, [initialPlant, initialPlantHidden, plantId, router, userId, t]);
 
   const handleCopyPlantLink = async () => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const plantUrl = `${baseUrl}/profile/${userId}/plants/${plantId}`;
+    const plantUrl = `${baseUrl}/public/profile/${userId}/plants/${plantId}`;
 
     try {
       await navigator.clipboard.writeText(plantUrl);
@@ -121,6 +118,8 @@ export default function UserPlantDetailClient({
             </div>
           </CardContent>
         </Card>
+
+        <DiscoverBanner />
       </div>
     );
   }
@@ -130,7 +129,7 @@ export default function UserPlantDetailClient({
   const genus = typeof plant.genusId === 'object' ? plant.genusId as Genus : null;
   const variety = typeof plant.varietyId === 'object' ? plant.varietyId as Variety : null;
 
-  const plantName = [getDisplayName(genus, language), getDisplayName(variety, language)]
+  const plantName = [getDisplayName(genus, locale === 'ru' ? 'ru' : 'en'), getDisplayName(variety, locale === 'ru' ? 'ru' : 'en')]
     .filter(Boolean).join(' - ');
   const photoUrl = getPlantPhotoUrl(plant.photo);
 
@@ -203,7 +202,7 @@ export default function UserPlantDetailClient({
                   <div className="min-w-0">
                     <p className="text-sm font-medium">{t('plantInfo.genus')}</p>
                     <p className="text-sm text-muted-foreground truncate">
-                      {getDisplayName(genus, language) || t('plantInfo.genusEmpty')}
+                      {getDisplayName(genus, locale === 'ru' ? 'ru' : 'en') || t('plantInfo.genusEmpty')}
                     </p>
                   </div>
                 </div>
@@ -214,7 +213,7 @@ export default function UserPlantDetailClient({
                     <div className="min-w-0">
                       <p className="text-sm font-medium">{t('plantInfo.variety')}</p>
                       <p className="text-sm text-muted-foreground truncate">
-                        {getDisplayName(variety, language)}
+                        {getDisplayName(variety, locale === 'ru' ? 'ru' : 'en')}
                       </p>
                     </div>
                   </div>
@@ -325,6 +324,9 @@ export default function UserPlantDetailClient({
           )}
         </CardContent>
       </Card>
+
+      {/* Discovery Banner */}
+      <DiscoverBanner />
 
       {isPhotoGalleryOpen && photoUrl && (
         <PhotoGallery

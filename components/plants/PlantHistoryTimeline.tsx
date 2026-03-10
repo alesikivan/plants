@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus, MessageSquare } from 'lucide-react';
@@ -20,6 +21,7 @@ export function PlantHistoryTimeline({
   isPublic = false,
   initialHistory = [],
 }: PlantHistoryTimelineProps) {
+  const t = useTranslations('PlantHistoryTimeline');
   const [history, setHistory] = useState<PlantHistory[]>(initialHistory);
   const [isLoading, setIsLoading] = useState(initialHistory.length === 0);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -37,7 +39,7 @@ export function PlantHistoryTimeline({
         : await plantHistoryApi.getAll(plantId);
       setHistory(data);
     } catch (error) {
-      toast.error('Ошибка загрузки истории');
+      toast.error(t('loadError'));
       console.error('Failed to load history:', error);
     } finally {
       setIsLoading(false);
@@ -55,10 +57,10 @@ export function PlantHistoryTimeline({
   const handleDelete = async (historyId: string) => {
     try {
       await plantHistoryApi.delete(plantId, historyId);
-      toast.success('Запись удалена');
+      toast.success(t('deleteSuccess'));
       loadHistory();
     } catch (error) {
-      toast.error('Ошибка при удалении записи');
+      toast.error(t('deleteError'));
       console.error('Failed to delete history:', error);
     }
   };
@@ -67,7 +69,7 @@ export function PlantHistoryTimeline({
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center text-muted-foreground">Загрузка истории...</div>
+          <div className="text-center text-muted-foreground">{t('loading')}</div>
         </CardContent>
       </Card>
     );
@@ -79,11 +81,11 @@ export function PlantHistoryTimeline({
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <CardTitle className="text-lg">История растения</CardTitle>
+              <CardTitle className="text-lg">{t('title')}</CardTitle>
               <CardDescription className="mt-1">
                 {history.length > 0
-                  ? `Всего записей: ${history.length}`
-                  : 'История пока пуста'}
+                  ? t('total', { count: history.length })
+                  : t('empty')}
               </CardDescription>
             </div>
             {!isPublic && (
@@ -93,7 +95,7 @@ export function PlantHistoryTimeline({
                 size="sm"
               >
                 <Plus className="w-4 h-4" />
-                Добавить запись
+                {t('addButton')}
               </Button>
             )}
           </div>
@@ -104,7 +106,7 @@ export function PlantHistoryTimeline({
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
                 <MessageSquare className="w-8 h-8 text-primary/50" />
               </div>
-              <p className="text-sm">Добавьте первую запись в историю растения</p>
+              <p className="text-sm">{t('emptyMessage')}</p>
             </div>
           ) : (
             <div className="relative">

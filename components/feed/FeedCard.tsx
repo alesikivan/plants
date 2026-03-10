@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { User } from 'lucide-react';
 import {
   FeedItem,
@@ -14,21 +15,21 @@ import {
   getFeedAvatarUrl,
 } from '@/lib/api/feed';
 
-function formatTimeAgo(dateStr: string): string {
+function formatTimeAgo(dateStr: string, t: any): string {
   const date = new Date(dateStr);
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return 'только что';
+  if (seconds < 60) return t('timeAgo.justNow');
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} мин.`;
+  if (minutes < 60) return t('timeAgo.minutes', { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ч.`;
+  if (hours < 24) return t('timeAgo.hours', { count: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} дн.`;
+  if (days < 7) return t('timeAgo.days', { count: days });
   const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `${weeks} нед.`;
+  if (weeks < 5) return t('timeAgo.weeks', { count: weeks });
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months} мес.`;
-  return `${Math.floor(months / 12)} г.`;
+  if (months < 12) return t('timeAgo.months', { count: months });
+  return t('timeAgo.years', { count: Math.floor(months / 12) });
 }
 
 function getNames(genus: FeedGenus, variety: FeedVariety | undefined, language: string) {
@@ -74,11 +75,14 @@ function PlantFeedCard({
   item,
   isNew,
   language,
+  t,
 }: {
   item: FeedPlantItem;
   isNew: boolean;
   language: string;
+  t: any;
 }) {
+  const tCard = t as any;
   const photoUrl = getFeedPlantPhotoUrl(item.plant.photo);
   const { genusName, varietyName } = getNames(item.plant.genusId, item.plant.varietyId, language);
 
@@ -86,7 +90,7 @@ function PlantFeedCard({
     <div className={`relative bg-card border border-border rounded-2xl overflow-hidden`}>
       {isNew && (
         <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-bl-xl z-10">
-          Новое
+          {tCard('badges.new')}
         </span>
       )}
       {/* Header */}
@@ -100,10 +104,10 @@ function PlantFeedCard({
           >
             {item.user.name}
           </Link>
-          <p className="text-xs text-muted-foreground">добавил(а) растение</p>
+          <p className="text-xs text-muted-foreground">{tCard('plantAction')}</p>
         </div>
         <span className="text-xs text-muted-foreground flex-shrink-0">
-          {formatTimeAgo(item.createdAt)}
+          {formatTimeAgo(item.createdAt, tCard)}
         </span>
       </div>
 
@@ -143,11 +147,14 @@ function HistoryFeedCard({
   item,
   isNew,
   language,
+  t,
 }: {
   item: FeedHistoryItem;
   isNew: boolean;
   language: string;
+  t: any;
 }) {
+  const tCard = t as any;
   const { genusName, varietyName } = getNames(
     item.plantMeta.genusId,
     item.plantMeta.varietyId,
@@ -166,7 +173,7 @@ function HistoryFeedCard({
     <div className={`relative bg-card border border-border rounded-2xl overflow-hidden`}>
       {isNew && (
         <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-bl-xl z-10">
-          Новое
+          {tCard('badges.new')}
         </span>
       )}
       {/* Header */}
@@ -182,10 +189,10 @@ function HistoryFeedCard({
               {item.user.name}
             </Link>
           </div>
-          <p className="text-xs text-muted-foreground">добавил(а) историю растения</p>
+          <p className="text-xs text-muted-foreground">{tCard('historyAction')}</p>
         </div>
         <span className="text-xs text-muted-foreground flex-shrink-0">
-          {formatTimeAgo(item.createdAt)}
+          {formatTimeAgo(item.createdAt, tCard)}
         </span>
       </div>
 
@@ -217,7 +224,7 @@ function HistoryFeedCard({
             >
               <img
                 src={getFeedHistoryPhotoUrl(photo)!}
-                alt={`Фото ${index + 1}`}
+                alt={tCard('photoAlt', { number: index + 1 })}
                 className="w-full h-full object-cover"
               />
               {index === 2 && photos.length > 3 && (
@@ -243,8 +250,10 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ item, isNew, language }: FeedCardProps) {
+  const t = useTranslations('FeedCard');
+
   if (item.type === 'plant') {
-    return <PlantFeedCard item={item} isNew={isNew} language={language} />;
+    return <PlantFeedCard item={item} isNew={isNew} language={language} t={t} />;
   }
-  return <HistoryFeedCard item={item} isNew={isNew} language={language} />;
+  return <HistoryFeedCard item={item} isNew={isNew} language={language} t={t} />;
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Layers, Trash2, Pencil, Leaf } from 'lucide-react';
@@ -24,6 +25,7 @@ import {
 export default function ShelfDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations('ShelfDetailPage');
   const [shelf, setShelf] = useState<Shelf | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,7 +44,7 @@ export default function ShelfDetailPage() {
       const data = await shelvesApi.getOne(id);
       setShelf(data);
     } catch (error) {
-      toast.error('Ошибка загрузки полки');
+      toast.error(t('toasts.loadError'));
       console.error('Failed to load shelf:', error);
       router.push('/shelves');
     } finally {
@@ -56,10 +58,10 @@ export default function ShelfDetailPage() {
     setIsDeleting(true);
     try {
       await shelvesApi.delete(shelf._id);
-      toast.success('Полка успешно удалена');
+      toast.success(t('toasts.deleteSuccess'));
       router.push('/shelves');
     } catch (error) {
-      toast.error('Ошибка при удалении полки');
+      toast.error(t('toasts.deleteError'));
       console.error('Failed to delete shelf:', error);
     } finally {
       setIsDeleting(false);
@@ -77,7 +79,7 @@ export default function ShelfDetailPage() {
       <div className="flex items-center justify-center h-64 animate-in fade-in duration-300">
         <div className="text-center space-y-2">
           <Layers className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
-          <p className="text-muted-foreground">Загрузка...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -104,7 +106,7 @@ export default function ShelfDetailPage() {
           className="gap-2 transition-all active:scale-95 flex-shrink-0"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Назад к списку</span>
+          <span className="hidden sm:inline">{t('header.backButton')}</span>
         </Button>
         <div className="flex gap-1 sm:gap-2 flex-shrink-0">
           <Button
@@ -113,30 +115,30 @@ export default function ShelfDetailPage() {
             className="gap-2 transition-all active:scale-95"
           >
             <Pencil className="w-4 h-4" />
-            <span className="hidden sm:inline">Редактировать</span>
+            <span className="hidden sm:inline">{t('buttons.edit')}</span>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" className="gap-2 border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground transition-all active:scale-95">
                 <Trash2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Удалить</span>
+                <span className="hidden sm:inline">{t('buttons.delete')}</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Вы уверены?</AlertDialogTitle>
+                <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Это действие нельзя отменить. Полка будет удалена навсегда. Растения останутся, но будут откреплены от полки.
+                  {t('deleteDialog.description')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="transition-all active:scale-95">Отмена</AlertDialogCancel>
+                <AlertDialogCancel className="transition-all active:scale-95">{t('deleteDialog.cancel')}</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="transition-all active:scale-95"
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-all active:scale-95"
                 >
-                  {isDeleting ? 'Удаление...' : 'Удалить'}
+                  {isDeleting ? t('deleteDialog.deleting') : t('deleteDialog.delete')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -231,7 +233,7 @@ export default function ShelfDetailPage() {
               <div className="flex items-start gap-3">
                 <Layers className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium">Название</p>
+                  <p className="text-sm font-medium">{t('info.nameLabel')}</p>
                   <p className="text-sm text-muted-foreground">{shelf.name}</p>
                 </div>
               </div>
@@ -239,7 +241,7 @@ export default function ShelfDetailPage() {
               <div className="flex items-start gap-3">
                 <Leaf className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium">Количество растений</p>
+                  <p className="text-sm font-medium">{t('info.plantsCountLabel')}</p>
                   <p className="text-sm text-muted-foreground">{plants.length}</p>
                 </div>
               </div>
@@ -267,11 +269,11 @@ export default function ShelfDetailPage() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex-1">
-              <CardTitle>Растения на полке</CardTitle>
+              <CardTitle>{t('plants.title')}</CardTitle>
               <CardDescription>
                 {plants.length > 0
-                  ? 'Нажмите на растение, чтобы посмотреть детали'
-                  : 'Добавьте растения на эту полку'}
+                  ? t('plants.description')
+                  : t('plants.empty')}
               </CardDescription>
             </div>
             <Button
@@ -280,7 +282,7 @@ export default function ShelfDetailPage() {
               className="gap-2 w-full sm:w-auto"
             >
               <Leaf className="w-4 h-4" />
-              Управление растениями
+              {t('plants.manageButton')}
             </Button>
           </div>
         </CardHeader>
@@ -294,13 +296,13 @@ export default function ShelfDetailPage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Leaf className="w-16 h-16 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Пока нет растений</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('plants.emptyState.title')}</h3>
               <p className="text-muted-foreground mb-6 max-w-md">
-                Вы можете добавить растения на эту полку, редактируя существующие растения или создавая новые
+                {t('plants.emptyState.description')}
               </p>
               <Button onClick={() => router.push('/plants')} className="gap-2">
                 <Leaf className="w-4 h-4" />
-                Перейти к растениям
+                {t('plants.emptyState.button')}
               </Button>
             </div>
           )}

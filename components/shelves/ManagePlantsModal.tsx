@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ interface ManagePlantsModalProps {
 }
 
 export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: ManagePlantsModalProps) {
+  const t = useTranslations('ManagePlantsModal');
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +62,7 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
       // Теперь все растения могут быть на нескольких полках, показываем все
       setPlants(data);
     } catch (error) {
-      toast.error('Ошибка загрузки растений');
+      toast.error(t('loadingText'));
       console.error('Failed to load plants:', error);
     } finally {
       setIsLoadingPlants(false);
@@ -82,9 +84,9 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
         currentPlantIds.filter(id => !validPlantIds.includes(id)).length;
 
       if (totalChanges > 0) {
-        toast.success(`Обновлено растений: ${totalChanges}`);
+        toast.success(t('toasts.updated', { count: totalChanges }));
       } else {
-        toast.info('Изменений не было');
+        toast.info(t('toasts.noChanges'));
       }
 
       setSelectedPlantIds([]);
@@ -92,7 +94,7 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      toast.error('Ошибка при обновлении растений');
+      toast.error(t('toasts.updateError'));
       console.error('Failed to update plants:', error);
     } finally {
       setIsLoading(false);
@@ -134,9 +136,9 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Управление растениями на полке</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Выберите растения для полки "{shelf.name}"
+            {t('description', { shelfName: shelf.name })}
           </DialogDescription>
         </DialogHeader>
 
@@ -144,11 +146,11 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
           {/* Статистика */}
           <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
             <div className="text-sm">
-              <span className="font-medium">Выбрано растений:</span>
+              <span className="font-medium">{t('stats.selected')}</span>
               <span className="ml-2 text-primary font-semibold">{selectedPlantIds.length}</span>
             </div>
             <div className="text-sm text-muted-foreground">
-              Доступно: {plants.length}
+              {t('stats.available')} {plants.length}
             </div>
           </div>
 
@@ -156,11 +158,11 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
           {isLoadingPlants ? (
             <div className="flex items-center justify-center py-8">
               <Leaf className="w-5 h-5 text-primary/50 animate-pulse" />
-              <span className="ml-2 text-sm text-muted-foreground">Загрузка растений...</span>
+              <span className="ml-2 text-sm text-muted-foreground">{t('loadingText')}</span>
             </div>
           ) : plants.length === 0 ? (
             <div className="text-sm text-muted-foreground py-8 px-3 bg-muted/30 rounded-md text-center">
-              У вас пока нет доступных растений
+              {t('noPlants')}
             </div>
           ) : (
             <>
@@ -168,7 +170,7 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Поиск растений..."
+                  placeholder={t('search.placeholder')}
                   value={plantSearch}
                   onChange={(e) => setPlantSearch(e.target.value)}
                   className="pl-9"
@@ -179,7 +181,7 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
               <div className="border rounded-md max-h-96 overflow-y-auto">
                 {filteredPlants.length === 0 ? (
                   <div className="p-4 text-center text-sm text-muted-foreground">
-                    Ничего не найдено
+                    {t('notFound')}
                   </div>
                 ) : (
                   <div className="p-2 space-y-2">
@@ -237,10 +239,10 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
             }}
             disabled={isLoading}
           >
-            Отмена
+            {t('buttons.cancel')}
           </Button>
           <Button onClick={onSubmit} disabled={isLoading}>
-            {isLoading ? 'Сохранение...' : 'Сохранить'}
+            {isLoading ? t('buttons.saving') : t('buttons.save')}
           </Button>
         </DialogFooter>
       </DialogContent>

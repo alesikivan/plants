@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
@@ -34,6 +35,7 @@ export default function ProfilePageClient({
   initialPlants = [],
   initialShelves = [],
 }: ProfilePageClientProps) {
+  const t = useTranslations('PublicProfilePage');
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
@@ -75,14 +77,14 @@ export default function ProfilePageClient({
             .then(setShelves).catch(() => {}).finally(() => setLoadingShelves(false));
         }
       })
-      .catch(() => toast.error('Ошибка загрузки профиля пользователя'))
+      .catch(() => toast.error(t('errors.loadError')))
       .finally(() => setIsLoading(false));
   }, [initialProfile, isAdmin, userId]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted-foreground">Загрузка...</div>
+        <div className="text-muted-foreground">{t('header.loading')}</div>
       </div>
     );
   }
@@ -91,8 +93,8 @@ export default function ProfilePageClient({
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center space-y-4">
-          <p className="text-muted-foreground">Пользователь не найден</p>
-          <Button variant="outline" onClick={() => router.back()}>Назад</Button>
+          <p className="text-muted-foreground">{t('header.notFound')}</p>
+          <Button variant="outline" onClick={() => router.back()}>{t('header.backButton')}</Button>
         </div>
       </div>
     );
@@ -109,7 +111,7 @@ export default function ProfilePageClient({
         className="gap-2 transition-all active:scale-95"
       >
         <ArrowLeft className="w-4 h-4" />
-        Назад
+        {t('header.backButton')}
       </Button>
 
       {/* Profile Card */}
@@ -155,12 +157,12 @@ export default function ProfilePageClient({
               <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-green-50 dark:bg-green-950/20 rounded-lg">
                 <Leaf className="w-5 h-5 text-green-600 mb-0.5" />
                 <p className="text-lg font-bold text-green-700 dark:text-green-400 leading-tight">{profile.stats.totalPlants}</p>
-                <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">Растения</p>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{t('stats.plants')}</p>
               </div>
               <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                 <Layers className="w-5 h-5 text-blue-600 mb-0.5" />
                 <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">{profile.stats.totalShelves}</p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Полки</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">{t('stats.shelves')}</p>
               </div>
               {followStats && (
                 <>
@@ -170,7 +172,7 @@ export default function ProfilePageClient({
                   >
                     <Star className="w-5 h-5 mb-0.5 text-muted-foreground" />
                     <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
-                    <span className="text-xs text-muted-foreground select-none mt-0.5">Подписчики</span>
+                    <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.followers')}</span>
                   </button>
                   <button
                     onClick={() => setFollowDialog('following')}
@@ -178,7 +180,7 @@ export default function ProfilePageClient({
                   >
                     <BookOpen className="w-5 h-5 mb-0.5 text-muted-foreground" />
                     <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
-                    <span className="text-xs text-muted-foreground select-none mt-0.5">Подписки</span>
+                    <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.following')}</span>
                   </button>
                 </>
               )}
@@ -207,12 +209,12 @@ export default function ProfilePageClient({
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <Leaf className="w-5 h-5 text-green-600" />
-              Растения
+              {t('sections.plants.title')}
             </CardTitle>
             {(isAdmin || (profile.showPlants ?? true)) && plants.length > 0 && (
               <Button variant="ghost" size="sm" asChild className="gap-1">
                 <Link href={`/profile/${userId}/plants`}>
-                  Показать все <ChevronRight className="w-4 h-4" />
+                  {t('sections.plants.showAll')} <ChevronRight className="w-4 h-4" />
                 </Link>
               </Button>
             )}
@@ -222,14 +224,14 @@ export default function ProfilePageClient({
           {!isAdmin && !(profile.showPlants ?? true) ? (
             <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
               <EyeOff className="w-5 h-5" />
-              <span>Пользователь скрыл свою коллекцию растений</span>
+              <span>{t('sections.plants.hidden')}</span>
             </div>
           ) : loadingPlants ? (
-            <div className="text-center text-muted-foreground py-6">Загрузка...</div>
+            <div className="text-center text-muted-foreground py-6">{t('sections.plants.loading')}</div>
           ) : plants.length === 0 ? (
             <div className="text-center text-muted-foreground py-6">
               <Leaf className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-              <p>Нет растений</p>
+              <p>{t('sections.plants.empty')}</p>
             </div>
           ) : (
             <>
@@ -248,7 +250,7 @@ export default function ProfilePageClient({
                 <div className="mt-4 text-center">
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/profile/${userId}/plants`}>
-                      Показать все {plants.length} растений
+                      {t('sections.plants.showAllWithCount', { count: plants.length })}
                     </Link>
                   </Button>
                 </div>
@@ -264,12 +266,12 @@ export default function ProfilePageClient({
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <Layers className="w-5 h-5 text-blue-600" />
-              Полки
+              {t('sections.shelves.title')}
             </CardTitle>
             {(isAdmin || (profile.showShelves ?? true)) && shelves.length > 0 && (
               <Button variant="ghost" size="sm" asChild className="gap-1">
                 <Link href={`/profile/${userId}/shelves`}>
-                  Показать все <ChevronRight className="w-4 h-4" />
+                  {t('sections.shelves.showAll')} <ChevronRight className="w-4 h-4" />
                 </Link>
               </Button>
             )}
@@ -279,14 +281,14 @@ export default function ProfilePageClient({
           {!isAdmin && !(profile.showShelves ?? true) ? (
             <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
               <EyeOff className="w-5 h-5" />
-              <span>Пользователь скрыл свои полки</span>
+              <span>{t('sections.shelves.hidden')}</span>
             </div>
           ) : loadingShelves ? (
-            <div className="text-center text-muted-foreground py-6">Загрузка...</div>
+            <div className="text-center text-muted-foreground py-6">{t('sections.shelves.loading')}</div>
           ) : shelves.length === 0 ? (
             <div className="text-center text-muted-foreground py-6">
               <Layers className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-              <p>Нет полок</p>
+              <p>{t('sections.shelves.empty')}</p>
             </div>
           ) : (
             <>
@@ -305,7 +307,7 @@ export default function ProfilePageClient({
                 <div className="mt-4 text-center">
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/profile/${userId}/shelves`}>
-                      Показать все {shelves.length} полок
+                      {t('sections.shelves.showAllWithCount', { count: shelves.length })}
                     </Link>
                   </Button>
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { feedApi, FeedItem } from '@/lib/api/feed';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -12,6 +13,7 @@ type FeedMode = 'global' | 'following';
 const STORAGE_KEY = (mode: FeedMode) => `feedLastSeen_${mode}`;
 
 export default function FeedPage() {
+  const t = useTranslations('FeedPage');
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
 
@@ -186,8 +188,8 @@ export default function FeedPage() {
           <Rss className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Лента</h1>
-          <p className="text-sm text-muted-foreground">Новые растения и записи</p>
+          <h1 className="text-2xl font-bold">{t('header.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('header.description')}</p>
         </div>
       </div>
 
@@ -202,7 +204,7 @@ export default function FeedPage() {
           }`}
         >
           <Globe className="w-4 h-4" />
-          Глобальная
+          {t('tabs.global')}
         </button>
         <button
           onClick={() => setMode('following')}
@@ -213,7 +215,7 @@ export default function FeedPage() {
           }`}
         >
           <Users className="w-4 h-4" />
-          Подписки
+          {t('tabs.following')}
         </button>
       </div>
 
@@ -236,28 +238,28 @@ export default function FeedPage() {
         {loading && (
           <div className="flex items-center justify-center gap-2">
             <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-            <span>Загрузка...</span>
+            <span>{t('loading')}</span>
           </div>
         )}
         {!loading && !hasMore && items.length > 0 && (
-          <p className="text-muted-foreground/60">Вы дошли до конца ленты</p>
+          <p className="text-muted-foreground/60">{t('endOfFeed')}</p>
         )}
         {!loading && !hasMore && items.length === 0 && mode === 'following' && (
           <div className="text-center space-y-2 py-8">
             <Users className="w-10 h-10 text-muted-foreground/30 mx-auto" />
-            <p className="text-muted-foreground">Здесь пока ничего нет.</p>
+            <p className="text-muted-foreground">{t('emptyFollowing.title')}</p>
             <p className="text-sm text-muted-foreground/70">
               <Link href="/users" className="text-primary hover:underline">
-                Подпишитесь на пользователей
+                {t('emptyFollowing.linkText')}
               </Link>{' '}
-              чтобы видеть их обновления
+              {t('emptyFollowing.description')}
             </p>
           </div>
         )}
         {!loading && !hasMore && items.length === 0 && mode === 'global' && (
           <div className="text-center py-8">
             <Rss className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-            <p className="text-muted-foreground">Лента пуста</p>
+            <p className="text-muted-foreground">{t('emptyGlobal.title')}</p>
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SocialLink } from '@/lib/types/user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,13 +15,6 @@ import {
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Trash2, Edit2, Mail, Phone, Send, Instagram, Check } from 'lucide-react';
-
-const SOCIAL_LABELS: Record<string, string> = {
-  telegram: 'Telegram',
-  instagram: 'Instagram',
-  phone: 'Телефон',
-  email: 'Почта',
-};
 
 const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   telegram: <Send className="w-4 h-4" />,
@@ -42,6 +36,7 @@ export function SocialLinkItem({
   onDelete,
   isReadOnly = false,
 }: SocialLinkItemProps) {
+  const t = useTranslations('SocialLinkItem');
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editValue, setEditValue] = useState(link.value);
   const [editIsPublic, setEditIsPublic] = useState(link.isPublic);
@@ -94,7 +89,7 @@ export function SocialLinkItem({
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {SOCIAL_LABELS[link.type] || link.type}
+              {t(`types.${link.type}`) || link.type}
             </p>
             <button
               onClick={handleCopy}
@@ -103,7 +98,7 @@ export function SocialLinkItem({
               {isCopied ? (
                 <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
                   <Check className="w-3.5 h-3.5" />
-                  Скопировано
+                  {t('copied')}
                 </span>
               ) : (
                 link.value
@@ -149,35 +144,27 @@ export function SocialLinkItem({
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              Редактировать {SOCIAL_LABELS[link.type] || link.type}
+              {t('editTitle', { type: t(`types.${link.type}`) || link.type })}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-5 py-4">
             <div>
               <Label htmlFor="edit-value" className="text-sm mb-2 block">
-                Значение
+                {t('valueLabel')}
               </Label>
               <Input
                 id="edit-value"
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
-                placeholder={
-                  link.type === 'telegram'
-                    ? '@username или t.me/username'
-                    : link.type === 'instagram'
-                      ? '@username'
-                      : link.type === 'phone'
-                        ? '+7 999 123-45-67'
-                        : ''
-                }
+                placeholder={t(`placeholders.${link.type}`) || ''}
                 className="h-10"
               />
             </div>
 
             <div className="flex items-center justify-between gap-4 pt-2">
               <Label htmlFor="edit-public" className="text-sm">
-                Показывать в профиле
+                {t('showInProfileLabel')}
               </Label>
               <Switch
                 id="edit-public"
@@ -189,9 +176,9 @@ export function SocialLinkItem({
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setIsEditOpen(false)}>
-              Отмена
+              {t('cancelButton')}
             </Button>
-            <Button onClick={handleSave}>Сохранить</Button>
+            <Button onClick={handleSave}>{t('saveButton')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
