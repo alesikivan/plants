@@ -22,6 +22,7 @@ export default function UserPlantDetailClient() {
 
   const [plant, setPlant] = useState<Plant | null>(null);
   const [history, setHistory] = useState<PlantHistory[]>([]);
+  const [plantHidden, setPlantHidden] = useState(false);
   const [historyHidden, setHistoryHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
@@ -31,7 +32,13 @@ export default function UserPlantDetailClient() {
     if (!userId || !plantId) return;
     setIsLoading(true);
     Promise.all([
-      usersApi.getUserPlant(userId, plantId),
+      usersApi.getUserPlant(userId, plantId).catch((err) => {
+        if (err?.response?.status === 403) {
+          setPlantHidden(true);
+          return null;
+        }
+        throw err;
+      }),
       usersApi.getUserPlantHistory(userId, plantId).catch((err) => {
         if (err?.response?.status === 403) setHistoryHidden(true);
         return [];
@@ -55,6 +62,31 @@ export default function UserPlantDetailClient() {
           <Leaf className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
           <p className="text-muted-foreground">Загрузка...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (plantHidden) {
+    return (
+      <div className="space-y-6 fade-in slide-in-from-bottom-2 duration-700">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="gap-2 transition-all active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Назад
+        </Button>
+
+        <Card>
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <EyeOff className="w-16 h-16 text-muted-foreground/50 mb-4" />
+              <h1 className="text-xl font-semibold mb-2">Растение скрыто</h1>
+              <p className="text-muted-foreground">Пользователь скрыл свою коллекцию растений</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

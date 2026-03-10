@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Paths where forceLogout should not redirect (already public/auth pages)
-const AUTH_PATHS = ['/', '/login', '/register', '/verify-email', '/forgot-password', '/reset-password'];
+const AUTH_PATHS = ['/', '/login', '/register', '/verify-email', '/forgot-password', '/reset-password', '/profile/'];
 
 // Clear session cookies and redirect to login page
 async function forceLogout(reason?: string) {

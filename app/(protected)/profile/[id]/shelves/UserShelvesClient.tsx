@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Layers } from 'lucide-react';
+import { ArrowLeft, EyeOff, Layers } from 'lucide-react';
 import { usersApi, Shelf } from '@/lib/api';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
 import { toast } from 'sonner';
@@ -15,12 +15,19 @@ export default function UserShelvesClient() {
 
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
     usersApi.getUserShelves(userId)
       .then(setShelves)
-      .catch(() => toast.error('Ошибка загрузки полок'))
+      .catch((error) => {
+        if (error?.response?.status === 403) {
+          setIsHidden(true);
+          return;
+        }
+        toast.error('Ошибка загрузки полок');
+      })
       .finally(() => setIsLoading(false));
   }, [userId]);
 
@@ -47,6 +54,12 @@ export default function UserShelvesClient() {
             <Layers className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
             <p className="text-muted-foreground">Загрузка полок...</p>
           </div>
+        </div>
+      ) : isHidden ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
+          <EyeOff className="w-16 h-16 text-muted-foreground/50 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Полки скрыты</h3>
+          <p className="text-muted-foreground">Пользователь скрыл свои полки</p>
         </div>
       ) : shelves.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">

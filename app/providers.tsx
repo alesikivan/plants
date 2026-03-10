@@ -25,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   // Проверяем, находимся ли мы на страницах авторизации или публичных страницах
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register');
-  const isPublicPage = pathname?.startsWith('/public');
+  const isPublicPage = pathname?.startsWith('/public') || pathname?.startsWith('/profile/');
 
   useEffect(() => {
     // Не загружаем профиль на страницах авторизации и публичных страницах

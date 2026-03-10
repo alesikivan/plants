@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Layers, Leaf } from 'lucide-react';
+import { ArrowLeft, EyeOff, Layers, Leaf } from 'lucide-react';
 import { usersApi, Shelf, getShelfPhotoUrl, getPlantPhotoUrl } from '@/lib/api';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { toast } from 'sonner';
@@ -17,12 +17,17 @@ export default function UserShelfDetailClient() {
 
   const [shelf, setShelf] = useState<Shelf | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     if (!userId || !shelfId) return;
     usersApi.getUserShelf(userId, shelfId)
       .then(setShelf)
-      .catch(() => {
+      .catch((error) => {
+        if (error?.response?.status === 403) {
+          setIsHidden(true);
+          return;
+        }
         toast.error('Ошибка загрузки полки');
         router.back();
       })
@@ -36,6 +41,31 @@ export default function UserShelfDetailClient() {
           <Layers className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
           <p className="text-muted-foreground">Загрузка...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (isHidden) {
+    return (
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="gap-2 transition-all active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Назад
+        </Button>
+
+        <Card>
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <EyeOff className="w-16 h-16 text-muted-foreground/50 mb-4" />
+              <h1 className="text-xl font-semibold mb-2">Полка скрыта</h1>
+              <p className="text-muted-foreground">Пользователь скрыл свои полки</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

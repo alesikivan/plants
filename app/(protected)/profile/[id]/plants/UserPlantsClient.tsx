@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Leaf } from 'lucide-react';
+import { ArrowLeft, EyeOff, Leaf } from 'lucide-react';
 import { usersApi, Plant } from '@/lib/api';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { toast } from 'sonner';
@@ -15,12 +15,19 @@ export default function UserPlantsClient() {
 
   const [plants, setPlants] = useState<Plant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
     usersApi.getUserPlants(userId)
       .then(setPlants)
-      .catch(() => toast.error('Ошибка загрузки растений'))
+      .catch((error) => {
+        if (error?.response?.status === 403) {
+          setIsHidden(true);
+          return;
+        }
+        toast.error('Ошибка загрузки растений');
+      })
       .finally(() => setIsLoading(false));
   }, [userId]);
 
@@ -47,6 +54,12 @@ export default function UserPlantsClient() {
             <Leaf className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
             <p className="text-muted-foreground">Загрузка растений...</p>
           </div>
+        </div>
+      ) : isHidden ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
+          <EyeOff className="w-16 h-16 text-muted-foreground/50 mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Коллекция скрыта</h3>
+          <p className="text-muted-foreground">Пользователь скрыл свою коллекцию растений</p>
         </div>
       ) : plants.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
