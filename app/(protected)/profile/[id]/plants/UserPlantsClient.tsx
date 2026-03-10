@@ -8,17 +8,28 @@ import { usersApi, Plant } from '@/lib/api';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { toast } from 'sonner';
 
-export default function UserPlantsClient() {
+interface UserPlantsClientProps {
+  initialPlants?: Plant[];
+  initialHidden?: boolean;
+}
+
+export default function UserPlantsClient({
+  initialPlants = [],
+  initialHidden = false,
+}: UserPlantsClientProps) {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
 
-  const [plants, setPlants] = useState<Plant[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isHidden, setIsHidden] = useState(false);
+  const [plants, setPlants] = useState<Plant[]>(initialPlants);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isHidden, setIsHidden] = useState(initialHidden);
 
   useEffect(() => {
     if (!userId) return;
+    if (initialPlants.length > 0 || initialHidden) return;
+
+    setIsLoading(true);
     usersApi.getUserPlants(userId)
       .then(setPlants)
       .catch((error) => {
@@ -29,7 +40,7 @@ export default function UserPlantsClient() {
         toast.error('Ошибка загрузки растений');
       })
       .finally(() => setIsLoading(false));
-  }, [userId]);
+  }, [initialHidden, initialPlants.length, userId]);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">

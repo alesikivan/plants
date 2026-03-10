@@ -9,18 +9,28 @@ import { usersApi, Shelf, getShelfPhotoUrl, getPlantPhotoUrl } from '@/lib/api';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { toast } from 'sonner';
 
-export default function UserShelfDetailClient() {
+interface UserShelfDetailClientProps {
+  initialShelf?: Shelf | null;
+  initialHidden?: boolean;
+}
+
+export default function UserShelfDetailClient({
+  initialShelf = null,
+  initialHidden = false,
+}: UserShelfDetailClientProps) {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
   const shelfId = params.shelfId as string;
 
-  const [shelf, setShelf] = useState<Shelf | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isHidden, setIsHidden] = useState(false);
+  const [shelf, setShelf] = useState<Shelf | null>(initialShelf);
+  const [isLoading, setIsLoading] = useState(!initialShelf && !initialHidden);
+  const [isHidden, setIsHidden] = useState(initialHidden);
 
   useEffect(() => {
     if (!userId || !shelfId) return;
+    if (initialShelf || initialHidden) return;
+
     usersApi.getUserShelf(userId, shelfId)
       .then(setShelf)
       .catch((error) => {
@@ -32,7 +42,7 @@ export default function UserShelfDetailClient() {
         router.back();
       })
       .finally(() => setIsLoading(false));
-  }, [userId, shelfId]);
+  }, [initialHidden, initialShelf, router, shelfId, userId]);
 
   if (isLoading) {
     return (

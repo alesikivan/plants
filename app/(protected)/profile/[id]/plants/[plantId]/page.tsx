@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import UserPlantDetailClient from './UserPlantDetailClient';
+import { getPublicProfilePlantPageData } from '@/lib/server/public-data';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.braavo.cloud';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 interface Props {
   params: Promise<{ id: string; plantId: string }>;
@@ -16,7 +18,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       fetch(`${API_URL}/users/${id}/profile`, { next: { revalidate: 60 } }),
     ]);
 
-    if (!plantRes.ok) return { title: 'Растение' };
+    if (plantRes.status === 404) {
+      return {
+        title: 'Растение',
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    if (plantRes.status === 403) {
+      return {
+        title: 'Растение',
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    if (!plantRes.ok) {
+      return {
+        title: 'Растение',
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
 
     const plant: {
       genusId?: { nameRu?: string; nameEn?: string; nameLatin?: string };
@@ -58,10 +88,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       alternates: { canonical: `${SITE_URL}/profile/${id}/plants/${plantId}` },
     };
   } catch {
-    return { title: 'Растение' };
+    return {
+      title: 'Растение',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 }
 
-export default function Page() {
-  return <UserPlantDetailClient />;
+export default async function Page({ params }: Props) {
+  const { id, plantId } = await params;
+  const { status, plant, history, plantHidden, historyHidden } = await getPublicProfilePlantPageData(
+    id,
+    plantId
+  );
+
+  if (status === 404) {
+    notFound();
+  }
+
+  return (
+    <UserPlantDetailClient
+      initialPlant={plant}
+      initialHistory={history}
+      initialPlantHidden={plantHidden}
+      initialHistoryHidden={historyHidden}
+    />
+  );
 }

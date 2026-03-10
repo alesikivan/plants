@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import PublicPlantDetailClient from './PublicPlantDetailClient';
+import { getPublicPlantPageData } from '@/lib/server/public-data';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.braavo.cloud';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 interface Props {
   params: Promise<{ plantId: string }>;
@@ -30,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       varietyId?: { nameRu?: string; nameEn?: string; nameLatin?: string };
       description?: string;
       photo?: string;
-      owner?: { name: string };
+      owner?: { _id?: string; name: string };
     } = await res.json();
 
     const genus = plant.genusId;
@@ -44,6 +46,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         .join(' — ') || 'Растение';
 
     const ownerName = plant.owner?.name;
+    const canonicalUrl = plant.owner?._id
+      ? `${SITE_URL}/profile/${plant.owner._id}/plants/${plantId}`
+      : `${SITE_URL}/public/${plantId}`;
     const title = ownerName ? `${plantName} · ${ownerName}` : plantName;
     const description = plant.description
       ? plant.description.slice(0, 160)
@@ -72,7 +77,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${title} — PlantSheep`,
         description,
       },
-      alternates: { canonical: `${SITE_URL}/public/${plantId}` },
+      alternates: { canonical: canonicalUrl },
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   } catch {
     return {
@@ -85,6 +94,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function Page() {
-  return <PublicPlantDetailClient />;
+export default async function Page({ params }: Props) {
+  const { plantId } = await params;
+  const { status, plant, history } = await getPublicPlantPageData(plantId);
+
+  if (status === 404) {
+    notFound();
+  }
+
+  return <PublicPlantDetailClient initialPlant={plant} initialHistory={history} />;
 }

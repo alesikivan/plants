@@ -12,16 +12,22 @@ import { PlantHistoryItem } from './PlantHistoryItem';
 interface PlantHistoryTimelineProps {
   plantId: string;
   isPublic?: boolean;
+  initialHistory?: PlantHistory[];
 }
 
-export function PlantHistoryTimeline({ plantId, isPublic = false }: PlantHistoryTimelineProps) {
-  const [history, setHistory] = useState<PlantHistory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function PlantHistoryTimeline({
+  plantId,
+  isPublic = false,
+  initialHistory = [],
+}: PlantHistoryTimelineProps) {
+  const [history, setHistory] = useState<PlantHistory[]>(initialHistory);
+  const [isLoading, setIsLoading] = useState(initialHistory.length === 0);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
+    if (initialHistory.length > 0) return;
     loadHistory();
-  }, [plantId]);
+  }, [initialHistory.length, plantId]);
 
   const loadHistory = async () => {
     setIsLoading(true);

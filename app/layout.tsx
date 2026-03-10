@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
 
-const APP_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.braavo.cloud';
+const APP_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 const APP_DESCRIPTION =
   'Ведите цифровой дневник своей коллекции растений. Отслеживайте историю, организуйте по полкам и делитесь с сообществом — всё в одном месте.';
@@ -64,7 +64,6 @@ export const metadata: Metadata = {
     canonical: APP_URL,
   },
   manifest: '/manifest.json',
-  // @ts-expect-error viewport is supported in metadata for older Next.js
   viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
   appleWebApp: {
     capable: true,

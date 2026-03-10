@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.braavo.cloud';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
 
 type SitemapItem = {
@@ -21,7 +21,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
     },
@@ -39,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       for (const user of users) {
         routes.push({
           url: `${SITE_URL}/profile/${user.id}`,
-          lastModified: user.updatedAt ? new Date(user.updatedAt) : new Date(),
+          ...(user.updatedAt ? { lastModified: new Date(user.updatedAt) } : {}),
           changeFrequency: 'weekly',
           priority: 0.7,
         });
@@ -47,34 +46,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         if (user.showPlants) {
           routes.push({
             url: `${SITE_URL}/profile/${user.id}/plants`,
-            lastModified: user.updatedAt ? new Date(user.updatedAt) : new Date(),
+            ...(user.updatedAt ? { lastModified: new Date(user.updatedAt) } : {}),
             changeFrequency: 'weekly',
             priority: 0.6,
           });
 
           for (const plant of user.plants) {
-            const lastModified = plant.updatedAt ? new Date(plant.updatedAt) : new Date();
-            routes.push(
-              {
-                url: `${SITE_URL}/profile/${user.id}/plants/${plant.id}`,
-                lastModified,
-                changeFrequency: 'weekly',
-                priority: 0.6,
-              },
-              {
-                url: `${SITE_URL}/public/${plant.id}`,
-                lastModified,
-                changeFrequency: 'weekly',
-                priority: 0.5,
-              },
-            );
+            routes.push({
+              url: `${SITE_URL}/profile/${user.id}/plants/${plant.id}`,
+              ...(plant.updatedAt ? { lastModified: new Date(plant.updatedAt) } : {}),
+              changeFrequency: 'weekly',
+              priority: 0.6,
+            });
           }
         }
 
         if (user.showShelves) {
           routes.push({
             url: `${SITE_URL}/profile/${user.id}/shelves`,
-            lastModified: user.updatedAt ? new Date(user.updatedAt) : new Date(),
+            ...(user.updatedAt ? { lastModified: new Date(user.updatedAt) } : {}),
             changeFrequency: 'weekly',
             priority: 0.6,
           });
@@ -82,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           for (const shelf of user.shelves) {
             routes.push({
               url: `${SITE_URL}/profile/${user.id}/shelves/${shelf.id}`,
-              lastModified: shelf.updatedAt ? new Date(shelf.updatedAt) : new Date(),
+              ...(shelf.updatedAt ? { lastModified: new Date(shelf.updatedAt) } : {}),
               changeFrequency: 'weekly',
               priority: 0.5,
             });

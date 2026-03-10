@@ -8,17 +8,28 @@ import { usersApi, Shelf } from '@/lib/api';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
 import { toast } from 'sonner';
 
-export default function UserShelvesClient() {
+interface UserShelvesClientProps {
+  initialShelves?: Shelf[];
+  initialHidden?: boolean;
+}
+
+export default function UserShelvesClient({
+  initialShelves = [],
+  initialHidden = false,
+}: UserShelvesClientProps) {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
 
-  const [shelves, setShelves] = useState<Shelf[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isHidden, setIsHidden] = useState(false);
+  const [shelves, setShelves] = useState<Shelf[]>(initialShelves);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isHidden, setIsHidden] = useState(initialHidden);
 
   useEffect(() => {
     if (!userId) return;
+    if (initialShelves.length > 0 || initialHidden) return;
+
+    setIsLoading(true);
     usersApi.getUserShelves(userId)
       .then(setShelves)
       .catch((error) => {
@@ -29,7 +40,7 @@ export default function UserShelvesClient() {
         toast.error('Ошибка загрузки полок');
       })
       .finally(() => setIsLoading(false));
-  }, [userId]);
+  }, [initialHidden, initialShelves.length, userId]);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">

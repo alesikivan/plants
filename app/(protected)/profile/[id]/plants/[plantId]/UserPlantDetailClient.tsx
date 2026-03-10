@@ -11,7 +11,19 @@ import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
 
-export default function UserPlantDetailClient() {
+interface UserPlantDetailClientProps {
+  initialPlant?: Plant | null;
+  initialHistory?: PlantHistory[];
+  initialPlantHidden?: boolean;
+  initialHistoryHidden?: boolean;
+}
+
+export default function UserPlantDetailClient({
+  initialPlant = null,
+  initialHistory = [],
+  initialPlantHidden = false,
+  initialHistoryHidden = false,
+}: UserPlantDetailClientProps) {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
@@ -20,16 +32,18 @@ export default function UserPlantDetailClient() {
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
 
-  const [plant, setPlant] = useState<Plant | null>(null);
-  const [history, setHistory] = useState<PlantHistory[]>([]);
-  const [plantHidden, setPlantHidden] = useState(false);
-  const [historyHidden, setHistoryHidden] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [plant, setPlant] = useState<Plant | null>(initialPlant);
+  const [history, setHistory] = useState<PlantHistory[]>(initialHistory);
+  const [plantHidden, setPlantHidden] = useState(initialPlantHidden);
+  const [historyHidden, setHistoryHidden] = useState(initialHistoryHidden);
+  const [isLoading, setIsLoading] = useState(!initialPlant && !initialPlantHidden);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
   const [selectedHistoryPhotos, setSelectedHistoryPhotos] = useState<{ photos: string[]; index: number } | null>(null);
 
   useEffect(() => {
     if (!userId || !plantId) return;
+    if (initialPlant || initialPlantHidden) return;
+
     setIsLoading(true);
     Promise.all([
       usersApi.getUserPlant(userId, plantId).catch((err) => {
@@ -53,7 +67,7 @@ export default function UserPlantDetailClient() {
         router.back();
       })
       .finally(() => setIsLoading(false));
-  }, [userId, plantId]);
+  }, [initialPlant, initialPlantHidden, plantId, router, userId]);
 
   if (isLoading) {
     return (

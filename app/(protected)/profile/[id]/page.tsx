@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import ProfilePageClient from './ProfilePageClient';
+import { getPublicProfilePageData } from '@/lib/server/public-data';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.braavo.cloud';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -15,7 +17,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       next: { revalidate: 60 },
     });
 
-    if (!res.ok) return { title: 'Профиль пользователя' };
+    if (!res.ok) {
+      return {
+        title: 'Профиль пользователя',
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
 
     const profile: { name: string; stats: { totalPlants: number; totalShelves: number }; avatar?: string } = await res.json();
     const description = `Коллекция растений ${profile.name} на PlantSheep: ${profile.stats.totalPlants} растений, ${profile.stats.totalShelves} полок.`;
@@ -43,6 +53,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function Page() {
-  return <ProfilePageClient />;
+export default async function Page({ params }: Props) {
+  const { id } = await params;
+  const { profile, profileStatus, plants, shelves } = await getPublicProfilePageData(id);
+
+  if (profileStatus === 404 || !profile) {
+    notFound();
+  }
+
+  return (
+    <ProfilePageClient
+      initialProfile={profile}
+      initialPlants={plants}
+      initialShelves={shelves}
+    />
+  );
 }

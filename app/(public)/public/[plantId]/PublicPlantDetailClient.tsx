@@ -10,21 +10,34 @@ import { PlantHistoryTimeline } from '@/components/plants/PlantHistoryTimeline';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DiscoverBanner } from '@/components/public/DiscoverBanner';
+import { PlantHistory } from '@/lib/api';
 
-export default function PublicPlantDetailClient() {
+type PublicPlant = Plant & {
+  showPlantHistory: boolean;
+  owner?: { _id: string; name: string };
+};
+
+interface PublicPlantDetailClientProps {
+  initialPlant?: PublicPlant | null;
+  initialHistory?: PlantHistory[];
+}
+
+export default function PublicPlantDetailClient({
+  initialPlant = null,
+  initialHistory = [],
+}: PublicPlantDetailClientProps) {
   const params = useParams();
-  const [plant, setPlant] = useState<
-    (Plant & { showPlantHistory: boolean; owner?: { _id: string; name: string } }) | null
-  >(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [plant, setPlant] = useState<PublicPlant | null>(initialPlant);
+  const [isLoading, setIsLoading] = useState(!initialPlant);
   const [error, setError] = useState<string | null>(null);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
 
   useEffect(() => {
+    if (initialPlant) return;
     if (params.plantId) {
       loadPlant(params.plantId as string);
     }
-  }, [params.plantId]);
+  }, [initialPlant, params.plantId]);
 
   const loadPlant = async (id: string) => {
     setIsLoading(true);
@@ -178,7 +191,7 @@ export default function PublicPlantDetailClient() {
       <DiscoverBanner />
 
       {plant.showPlantHistory ? (
-        <PlantHistoryTimeline plantId={plant._id} isPublic={true} />
+        <PlantHistoryTimeline plantId={plant._id} isPublic={true} initialHistory={initialHistory} />
       ) : (
         <Alert>
           <AlertCircle className="h-4 w-4" />

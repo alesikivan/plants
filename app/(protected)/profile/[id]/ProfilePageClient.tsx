@@ -22,7 +22,17 @@ import { FollowersDialog } from '@/components/follows/FollowersDialog';
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
 
-export default function ProfilePageClient() {
+interface ProfilePageClientProps {
+  initialProfile?: UserProfileWithStats | null;
+  initialPlants?: Plant[];
+  initialShelves?: Shelf[];
+}
+
+export default function ProfilePageClient({
+  initialProfile = null,
+  initialPlants = [],
+  initialShelves = [],
+}: ProfilePageClientProps) {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
@@ -30,11 +40,11 @@ export default function ProfilePageClient() {
   const isAdmin = currentUser?.role === 'admin';
   const isOwnProfile = currentUser?.id === userId;
 
-  const [profile, setProfile] = useState<UserProfileWithStats | null>(null);
-  const [plants, setPlants] = useState<Plant[]>([]);
-  const [shelves, setShelves] = useState<Shelf[]>([]);
+  const [profile, setProfile] = useState<UserProfileWithStats | null>(initialProfile);
+  const [plants, setPlants] = useState<Plant[]>(initialPlants);
+  const [shelves, setShelves] = useState<Shelf[]>(initialShelves);
   const [followStats, setFollowStats] = useState<FollowStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialProfile);
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [loadingShelves, setLoadingShelves] = useState(false);
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
@@ -42,6 +52,10 @@ export default function ProfilePageClient() {
 
   useEffect(() => {
     if (!userId) return;
+    if (initialProfile) {
+      followsApi.getStats(userId).then(setFollowStats).catch(() => {});
+      return;
+    }
     setIsLoading(true);
     usersApi.getUserProfile(userId)
       .then((data) => {
@@ -60,7 +74,7 @@ export default function ProfilePageClient() {
       })
       .catch(() => toast.error('Ошибка загрузки профиля пользователя'))
       .finally(() => setIsLoading(false));
-  }, [userId]);
+  }, [initialProfile, isAdmin, userId]);
 
   if (isLoading) {
     return (
