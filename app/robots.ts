@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: ['/', '/profile/'],
         disallow: [
+          '/public/',
           '/admin/',
           '/dashboard/',
           '/plants/',
