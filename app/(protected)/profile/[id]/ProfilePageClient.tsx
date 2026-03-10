@@ -18,6 +18,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
 import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 import { FollowersDialog } from '@/components/follows/FollowersDialog';
+import { DiscoverBanner } from '@/components/public/DiscoverBanner';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -37,8 +38,10 @@ export default function ProfilePageClient({
   const router = useRouter();
   const userId = params.id as string;
   const currentUser = useAuthStore((s) => s.user);
+  const initialized = useAuthStore((s) => s.initialized);
   const isAdmin = currentUser?.role === 'admin';
   const isOwnProfile = currentUser?.id === userId;
+  const showGuestBanner = initialized && !currentUser;
 
   const [profile, setProfile] = useState<UserProfileWithStats | null>(initialProfile);
   const [plants, setPlants] = useState<Plant[]>(initialPlants);
@@ -195,6 +198,8 @@ export default function ProfilePageClient({
           </CardContent>
         </Card>
       )}
+
+      {showGuestBanner && <DiscoverBanner />}
 
       {/* Plants Preview */}
       <Card>

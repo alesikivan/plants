@@ -3,19 +3,25 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Logo } from '@/components/logo';
 import { LayoutDashboard, Settings, Layers, Users, User, Leaf, Rss } from 'lucide-react';
 import { getAvatarUrl } from '@/lib/api/users';
+import { Button } from '@/components/ui/button';
 
 export default function ProtectedShell({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const initialized = useAuthStore((state) => state.initialized);
+  const isPublicProfilePage = pathname?.startsWith('/profile/');
+  const showGuestCta = isPublicProfilePage && initialized && !user;
+  const logoHref = showGuestCta ? '/' : '/dashboard';
 
   useEffect(() => {
     if (!initialized) {
@@ -29,7 +35,7 @@ export default function ProtectedShell({
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link href="/dashboard" className="flex items-center gap-2 group">
+              <Link href={logoHref} className="flex items-center gap-2 group">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors text-primary">
                   <Logo size="sm" />
                 </div>
@@ -134,6 +140,18 @@ export default function ProtectedShell({
                   )}
                 </Link>
               </>
+            )}
+
+            {showGuestCta && (
+              <Link href="/register" className="cursor-pointer">
+                <Button
+                  size="sm"
+                  className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold"
+                >
+                  <span className="sm:hidden">Попробовать</span>
+                  <span className="hidden sm:inline">Попробовать бесплатно</span>
+                </Button>
+              </Link>
             )}
           </div>
         </div>

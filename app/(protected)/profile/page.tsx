@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2 } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
@@ -44,6 +44,7 @@ export default function ProfilePage() {
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
   const [followStats, setFollowStats] = useState<FollowStats | null>(null);
   const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
+  const [isProfileLinkCopied, setIsProfileLinkCopied] = useState(false);
 
   useEffect(() => {
     plantsApi.getAll().then(setPlants).catch(() => {}).finally(() => setLoadingPlants(false));
@@ -110,6 +111,23 @@ export default function ProfilePage() {
       toast.success('Вы успешно вышли из аккаунта');
     } catch (error) {
       toast.error('Ошибка при выходе из аккаунта');
+    }
+  };
+
+  const handleCopyProfileLink = async () => {
+    if (!user?.id) return;
+
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const profileUrl = `${baseUrl}/profile/${user.id}`;
+
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setIsProfileLinkCopied(true);
+      toast.success('Ссылка на профиль скопирована');
+      setTimeout(() => setIsProfileLinkCopied(false), 2000);
+    } catch (error) {
+      toast.error('Не удалось скопировать ссылку');
+      console.error('Failed to copy profile link:', error);
     }
   };
 
@@ -198,7 +216,22 @@ export default function ProfilePage() {
               />
             </div>
               <div>
-                <CardTitle className="text-3xl">{user.name}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-3xl">{user.name}</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleCopyProfileLink}
+                    className="h-8 w-8 shrink-0"
+                    title="Скопировать ссылку на профиль"
+                  >
+                    {isProfileLinkCopied ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
                 <p className="text-muted-foreground">{user.email}</p>
               </div>
             </div>
