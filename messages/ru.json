@@ -96,5 +96,45 @@
     "startFree": "Начать бесплатно",
     "alreadyHaveAccount": "Уже есть аккаунт",
     "createAccount": "Создать аккаунт"
+  },
+  "RegisterPage": {
+    "backHome": "На главную",
+    "title": "Создать аккаунт",
+    "description": "Начните работу с Растениями уже сегодня",
+    "fields": {
+      "name": {
+        "label": "Имя",
+        "placeholder": "nickname"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "password": {
+        "label": "Пароль",
+        "placeholder": "••••••••"
+      },
+      "confirmPassword": {
+        "label": "Подтвердите пароль",
+        "placeholder": "••••••••"
+      }
+    },
+    "submit": {
+      "default": "Создать аккаунт",
+      "loading": "Создание аккаунта..."
+    },
+    "loginPrompt": "Уже есть аккаунт?",
+    "loginLink": "Войти",
+    "verification": {
+      "title": "Проверьте почту",
+      "description": "Письмо с подтверждением отправлено на <email></email>. Перейдите по ссылке в письме для активации аккаунта.",
+      "hint": "Не получили письмо? Проверьте папку «Спам» или",
+      "loginLink": "войдите",
+      "loginSuffix": ", чтобы запросить повторную отправку."
+    },
+    "errors": {
+      "passwordMismatch": "Пароли не совпадают",
+      "passwordMinLength": "Пароль должен содержать минимум 6 символов"
+    }
   }
 }

@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { handleApiError } from './error-handler';
-import { stripLocaleFromPathname } from '@/lib/locale';
+import { getPathnameLocale, localizeHref, stripLocaleFromPathname } from '@/lib/locale';
+import { defaultLocale, type AppLocale } from '@/i18n/routing';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -21,6 +22,29 @@ let failedQueue: Array<{
   reject: (reason?: unknown) => void;
 }> = [];
 
+function getClientLocale(): AppLocale {
+  if (typeof window === 'undefined') {
+    return defaultLocale;
+  }
+
+  const pathnameLocale = getPathnameLocale(window.location.pathname);
+  if (pathnameLocale) {
+    return pathnameLocale;
+  }
+
+  const localeCookie = document.cookie
+    .split('; ')
+    .find((entry) => entry.startsWith('NEXT_LOCALE='))
+    ?.split('=')[1];
+
+  if (localeCookie === 'ru' || localeCookie === 'en') {
+    return localeCookie;
+  }
+
+  const browserLanguage = window.navigator.language.toLowerCase();
+  return browserLanguage.startsWith('ru') ? 'ru' : defaultLocale;
+}
+
 const processQueue = (error: Error | null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -36,12 +60,18 @@ const processQueue = (error: Error | null) => {
 if (process.env.NODE_ENV === 'development') {
   apiClient.interceptors.request.use(
     (config) => {
+      config.headers.set('Accept-Language', getClientLocale());
       return config;
     },
     (error) => {      
       return Promise.reject(error);
     }
   );
+} else {
+  apiClient.interceptors.request.use((config) => {
+    config.headers.set('Accept-Language', getClientLocale());
+    return config;
+  });
 }
 
 // Paths where forceLogout should not redirect (already public/auth pages)
@@ -64,9 +94,10 @@ async function forceLogout(reason?: string) {
     // If clear-session fails, redirect anyway
   }
 
+  const locale = getClientLocale();
   const url = reason
-    ? `/login?reason=${encodeURIComponent(reason)}`
-    : '/login';
+    ? `${localizeHref('/login', locale)}?reason=${encodeURIComponent(reason)}`
+    : localizeHref('/login', locale);
   window.location.href = url;
 }
 

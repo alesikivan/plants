@@ -2,14 +2,18 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import apiClient from '@/lib/api/client';
+import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
+import { Link } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
+import type { AppLocale } from '@/i18n/routing';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
+  const locale = useLocale() as AppLocale;
   const token = searchParams.get('token');
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
@@ -26,7 +30,8 @@ function VerifyEmailContent() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md space-y-8">
+        <AuthPageHeader locale={locale} backHref="/login" backLabel="Назад к входу" />
         <Card className="backdrop-blur-xl">
           <CardHeader className="text-center space-y-6 pb-6">
             <div className="flex justify-center">

@@ -96,5 +96,45 @@
     "startFree": "Start free",
     "alreadyHaveAccount": "I already have an account",
     "createAccount": "Create account"
+  },
+  "RegisterPage": {
+    "backHome": "Back to home",
+    "title": "Create account",
+    "description": "Enjoy your plants today",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "nickname"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "••••••••"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "••••••••"
+      }
+    },
+    "submit": {
+      "default": "Create account",
+      "loading": "Creating account..."
+    },
+    "loginPrompt": "Already have an account?",
+    "loginLink": "Log in",
+    "verification": {
+      "title": "Check your email",
+      "description": "We sent a verification email to <email></email>. Follow the link in the email to activate your account.",
+      "hint": "Didn't receive the email? Check your spam folder or",
+      "loginLink": "log in",
+      "loginSuffix": " to request another one."
+    },
+    "errors": {
+      "passwordMismatch": "Passwords do not match",
+      "passwordMinLength": "Password must be at least 6 characters long"
+    }
   }
 }

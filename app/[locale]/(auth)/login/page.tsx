@@ -3,7 +3,6 @@
 import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useAuthStore } from '@/lib/store/authStore';
 import { showSuccessToast, showInfoToast } from '@/lib/api/error-handler';
@@ -14,8 +13,12 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, ShieldX, MailWarning } from 'lucide-react';
+import { ShieldX, MailWarning } from 'lucide-react';
 import { AxiosError } from 'axios';
+import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
+import { Link } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
+import type { AppLocale } from '@/i18n/routing';
 
 const REASON_MESSAGES: Record<string, string> = {
   blocked: 'Ваш аккаунт был заблокирован администратором.',
@@ -24,6 +27,7 @@ const REASON_MESSAGES: Record<string, string> = {
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale() as AppLocale;
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -83,14 +87,7 @@ function LoginContent() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Back Button */}
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          На главную
-        </Link>
+        <AuthPageHeader locale={locale} backHref="/" backLabel="На главную" />
 
         {reasonMessage && (
           <Alert className="border-destructive/50 bg-destructive/10 text-destructive">

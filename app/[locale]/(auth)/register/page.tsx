@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { showErrorToast } from '@/lib/api/error-handler';
 import { ErrorType } from '@/lib/api/errors';
@@ -11,9 +11,15 @@ import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
+import { Link } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
+import type { AppLocale } from '@/i18n/routing';
 
 export default function RegisterPage() {
+  const t = useTranslations('RegisterPage');
+  const locale = useLocale() as AppLocale;
   const register = useAuthStore((state) => state.register);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,7 +35,7 @@ export default function RegisterPage() {
     if (password !== confirmPassword) {
       showErrorToast({
         type: ErrorType.VALIDATION,
-        message: 'Пароли не совпадают',
+        message: t('errors.passwordMismatch'),
       });
       return;
     }
@@ -37,7 +43,7 @@ export default function RegisterPage() {
     if (password.length < 6) {
       showErrorToast({
         type: ErrorType.VALIDATION,
-        message: 'Пароль должен содержать минимум 6 символов',
+        message: t('errors.passwordMinLength'),
       });
       return;
     }
@@ -60,37 +66,32 @@ export default function RegisterPage() {
   if (verificationSent) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
-        <div className="w-full max-w-md space-y-8">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            На главную
-          </Link>
+      <div className="w-full max-w-md space-y-8">
+        <AuthPageHeader locale={locale} backHref="/" backLabel={t('backHome')} />
 
-          <Card className="backdrop-blur-xl">
-            <CardHeader className="text-center space-y-6 pb-6">
+        <Card className="backdrop-blur-xl">
+          <CardHeader className="text-center space-y-6 pb-6">
               <div className="flex justify-center">
                 <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20">
                   <Mail className="w-8 h-8 text-primary" />
                 </div>
               </div>
               <div>
-                <CardTitle>Проверьте почту</CardTitle>
+                <CardTitle>{t('verification.title')}</CardTitle>
                 <CardDescription className="pt-2">
-                  Письмо с подтверждением отправлено на <span className="font-medium text-foreground">{sentEmail}</span>.
-                  Перейдите по ссылке в письме для активации аккаунта.
+                  {t.rich('verification.description', {
+                    email: () => <span className="font-medium text-foreground">{sentEmail}</span>,
+                  })}
                 </CardDescription>
               </div>
             </CardHeader>
             <CardFooter className="flex flex-col space-y-3">
               <p className="text-xs text-muted-foreground text-center">
-                Не получили письмо? Проверьте папку «Спам» или{' '}
+                {t('verification.hint')}{' '}
                 <Link href="/login" className="text-primary hover:underline">
-                  войдите
+                  {t('verification.loginLink')}
                 </Link>
-                , чтобы запросить повторную отправку.
+                {t('verification.loginSuffix')}
               </p>
             </CardFooter>
           </Card>
@@ -102,14 +103,7 @@ export default function RegisterPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Back Button */}
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          На главную
-        </Link>
+        <AuthPageHeader locale={locale} backHref="/" backLabel={t('backHome')} />
 
         <Card className="backdrop-blur-xl">
           <CardHeader className="text-center space-y-6 pb-8">
@@ -121,9 +115,9 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <CardTitle>Создать аккаунт</CardTitle>
+              <CardTitle>{t('title')}</CardTitle>
               <CardDescription className="pt-2">
-                Начните работу с Растениями уже сегодня
+                {t('description')}
               </CardDescription>
             </div>
           </CardHeader>
@@ -131,11 +125,11 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-2">
               <div className="space-y-1">
-                <Label htmlFor="name">Имя</Label>
+                <Label htmlFor="name">{t('fields.name.label')}</Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="nickname"
+                  placeholder={t('fields.name.placeholder')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -144,11 +138,11 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('fields.email.label')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder={t('fields.email.placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -157,10 +151,10 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="password">Пароль</Label>
+                <Label htmlFor="password">{t('fields.password.label')}</Label>
                 <PasswordInput
                   id="password"
-                  placeholder="••••••••"
+                  placeholder={t('fields.password.placeholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -169,10 +163,10 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
+                <Label htmlFor="confirmPassword">{t('fields.confirmPassword.label')}</Label>
                 <PasswordInput
                   id="confirmPassword"
-                  placeholder="••••••••"
+                  placeholder={t('fields.confirmPassword.placeholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -183,13 +177,13 @@ export default function RegisterPage() {
 
             <CardFooter className="flex flex-col space-y-4 pt-2">
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                {isLoading ? 'Создание аккаунта...' : 'Создать аккаунт'}
+                {isLoading ? t('submit.loading') : t('submit.default')}
               </Button>
 
               <div className="text-sm text-center text-muted-foreground">
-                Уже есть аккаунт?{' '}
+                {t('loginPrompt')}{' '}
                 <Link href="/login" className="text-primary font-semibold hover:underline">
-                  Войти
+                  {t('loginLink')}
                 </Link>
               </div>
             </CardFooter>

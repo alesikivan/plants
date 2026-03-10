@@ -1,16 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { authApi } from '@/lib/api/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, MailCheck } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
+import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
+import { Link } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
+import type { AppLocale } from '@/i18n/routing';
 
 export default function ForgotPasswordPage() {
+  const locale = useLocale() as AppLocale;
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -31,13 +35,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        <Link
-          href="/login"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Назад к входу
-        </Link>
+        <AuthPageHeader locale={locale} backHref="/login" backLabel="Назад к входу" />
 
         <Card className="backdrop-blur-xl">
           <CardHeader className="text-center space-y-6 pb-8">
