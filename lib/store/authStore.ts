@@ -4,6 +4,17 @@ import { authApi } from '../api/auth';
 import { usersApi } from '../api/users';
 import { LoginDto, RegisterDto } from '../types/auth';
 
+async function revalidatePublicProfileCache(): Promise<void> {
+  try {
+    await fetch('/api/revalidate/profile', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    // Revalidation failure should not block profile updates.
+  }
+}
+
 interface AuthState {
   user: UserResponse | null;
   loading: boolean;
@@ -80,6 +91,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const updatedUser = await usersApi.updateProfile(data);
       set({ user: updatedUser });
+      await revalidatePublicProfileCache();
     } finally {
       set({ loading: false });
     }
@@ -88,10 +100,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   uploadAvatar: async (file: File) => {
     const updatedUser = await usersApi.uploadAvatar(file);
     set({ user: updatedUser });
+    await revalidatePublicProfileCache();
   },
 
   removeAvatar: async () => {
     const updatedUser = await usersApi.removeAvatar();
     set({ user: updatedUser });
+    await revalidatePublicProfileCache();
   },
 }));
