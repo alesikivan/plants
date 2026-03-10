@@ -493,5 +493,223 @@
     "status": {
       "blocked": "Заблокирован"
     }
+  },
+  "PlantsPage": {
+    "header": {
+      "title": "Мои растения",
+      "description": "Управляйте своей коллекцией растений"
+    },
+    "tabs": {
+      "active": "Активные",
+      "archive": "Архив"
+    },
+    "buttons": {
+      "addPlant": "Добавить растение",
+      "reorder": "Изменить порядок",
+      "save": "Сохранить",
+      "saving": "Сохранение...",
+      "cancel": "Отмена",
+      "clearFilters": "Сбросить фильтры",
+      "clearSearch": "Очистить фильтры",
+      "clearSearchMobile": "Очистить поиск"
+    },
+    "search": {
+      "placeholder": "Поиск по названию...",
+      "allGenus": "Все роды",
+      "genusPlaceholder": "Поиск рода...",
+      "allShelves": "Все полки",
+      "shelfPlaceholder": "Поиск полки...",
+      "emptyText": "Ничего не найдено"
+    },
+    "filters": {
+      "title": "Фильтры",
+      "label": "Фильтры"
+    },
+    "messages": {
+      "loading": "Загрузка растений...",
+      "dragging": "Перетащите карточки для изменения порядка",
+      "found": "Найдено: {count}"
+    },
+    "empty": {
+      "noPlants": {
+        "title": "У вас пока нет растений",
+        "description": "Начните отслеживать свою коллекцию, добавив первое растение",
+        "button": "Добавить первое растение"
+      },
+      "emptyArchive": {
+        "title": "Архив пуст",
+        "description": "Здесь будут архивированные растения"
+      },
+      "noResults": {
+        "title": "Ничего не найдено",
+        "description": "Попробуйте изменить фильтры или поисковый запрос",
+        "button": "Сбросить фильтры"
+      }
+    },
+    "toasts": {
+      "orderSaved": "Порядок сохранён",
+      "loadError": "Ошибка загрузки растений",
+      "saveError": "Ошибка сохранения порядка"
+    }
+  },
+  "AddPlantModal": {
+    "title": "Добавить растение",
+    "description": "Заполните информацию о вашем растении",
+    "shelves": "Полки",
+    "shelvesPlaceholder": "Выберите полки...",
+    "shelvesSearchPlaceholder": "Поиск полки...",
+    "shelvesEmpty": "Нет доступных полок",
+    "purchaseDate": "Дата покупки",
+    "purchaseDatePlaceholder": "Выберите дату покупки",
+    "photo": "Фото растения",
+    "description": "Описание",
+    "descriptionPlaceholder": "Добавьте описание вашего растения...",
+    "buttons": {
+      "cancel": "Отмена",
+      "add": "Добавить",
+      "adding": "Добавление..."
+    },
+    "toasts": {
+      "success": "Растение успешно добавлено!",
+      "error": "Ошибка при добавлении растения",
+      "shelvesError": "Ошибка загрузки полок",
+      "dateFound": "Дата покупки обновлена по данным фото: {date}"
+    }
+  },
+  "EditPlantModal": {
+    "title": "Редактировать растение",
+    "description": "Измените информацию о растении",
+    "shelves": "Полки",
+    "shelvesPlaceholder": "Выберите полки...",
+    "shelvesSearchPlaceholder": "Поиск полки...",
+    "shelvesEmpty": "Нет доступных полок",
+    "purchaseDate": "Дата покупки",
+    "purchaseDatePlaceholder": "Выберите дату покупки",
+    "photo": "Фото растения",
+    "description": "Описание",
+    "descriptionPlaceholder": "Добавьте описание вашего растения...",
+    "buttons": {
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "saving": "Сохранение..."
+    },
+    "toasts": {
+      "success": "Растение успешно обновлено!",
+      "error": "Ошибка при обновлении растения",
+      "shelvesError": "Ошибка загрузки полок",
+      "loadError": "Ошибка загрузки растения"
+    }
+  },
+  "DeletePlantModal": {
+    "title": "Удалить растение?",
+    "description": "Вы собираетесь удалить растение <strong>{name}</strong>. Это действие нельзя отменить.",
+    "buttons": {
+      "cancel": "Отмена",
+      "delete": "Удалить",
+      "deleting": "Удаление..."
+    },
+    "toasts": {
+      "success": "Растение успешно удалено",
+      "error": "Ошибка при удалении растения"
+    }
+  },
+  "ProfilePage": {
+    "header": {
+      "title": "Профиль",
+      "description": "Управляйте информацией вашего аккаунта и настройками"
+    },
+    "avatar": {
+      "viewTooltip": "Посмотреть аватар",
+      "changeTooltip": "Изменить аватар",
+      "deleteTooltip": "Удалить аватар",
+      "loading": "Загрузка..."
+    },
+    "copyProfileLink": "Скопировать ссылку на профиль",
+    "follow": {
+      "followers": "Подписчики",
+      "following": "Подписки",
+      "followersMobile": "подписчики",
+      "followingMobile": "подписки"
+    },
+    "profile": {
+      "fullName": "Полное имя",
+      "email": "Email адрес",
+      "memberSince": "Участник с"
+    },
+    "preferences": {
+      "title": "Предпочтения",
+      "description": "Настройте ваш опыт использования приложения",
+      "languageLabel": "Язык названий растений",
+      "languagePlaceholder": "Выберите язык",
+      "languageDescription": "Выберите язык для отображения названий родов и сортов растений",
+      "successToast": "Язык успешно изменен",
+      "errorToast": "Ошибка при изменении языка"
+    },
+    "logout": {
+      "title": "Выход из аккаунта",
+      "description": "Завершите текущий сеанс",
+      "button": "Выйти из аккаунта",
+      "successToast": "Вы успешно вышли из аккаунта",
+      "errorToast": "Ошибка при выходе из аккаунта"
+    },
+    "privacy": {
+      "title": "Настройки приватности",
+      "description": "Управляйте тем, что видят другие пользователи в вашем профиле",
+      "showPlants": {
+        "label": "Показывать мои растения",
+        "description": "Другие пользователи смогут видеть ваши растения"
+      },
+      "showShelves": {
+        "label": "Показывать мои полки",
+        "description": "Другие пользователи смогут видеть ваши полки"
+      },
+      "showPlantHistory": {
+        "label": "Показывать историю растений",
+        "description": "Другие пользователи смогут просматривать историю ваших растений"
+      },
+      "successToast": "Настройки приватности обновлены",
+      "errorToast": "Ошибка при обновлении настроек"
+    },
+    "socialLinks": {
+      "title": "Способы связи",
+      "description": "Добавьте контакты, чтобы другие пользователи могли связаться с вами",
+      "successToast": "Сохранено"
+    },
+    "plants": {
+      "title": "Мои растения",
+      "total": "Всего: {count}",
+      "loading": "Загрузка...",
+      "loadingText": "Загрузка растений...",
+      "empty": {
+        "title": "У вас пока нет растений",
+        "button": "Добавить растение"
+      },
+      "showAll": "Показать все",
+      "showAllCount": "Показать все {count} растений"
+    },
+    "shelves": {
+      "title": "Мои полки",
+      "total": "Всего: {count}",
+      "loading": "Загрузка...",
+      "loadingText": "Загрузка полок...",
+      "empty": {
+        "title": "У вас пока нет полок",
+        "button": "Создать полку"
+      },
+      "showAll": "Показать все",
+      "showAllCount": "Показать все {count} полок"
+    },
+    "avatarUpload": {
+      "successToast": "Аватар успешно обновлён",
+      "errorToast": "Ошибка при загрузке аватара"
+    },
+    "avatarRemove": {
+      "successToast": "Аватар удалён",
+      "errorToast": "Ошибка при удалении аватара"
+    },
+    "copyLink": {
+      "successToast": "Ссылка на профиль скопирована",
+      "errorToast": "Не удалось скопировать ссылку"
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
 
 export default function ProfilePage() {
+  const t = useTranslations('ProfilePage');
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);
@@ -58,9 +60,9 @@ export default function ProfilePage() {
     setIsUpdating(true);
     try {
       await updateProfile({ preferredLanguage: language });
-      toast.success('Язык успешно изменен');
+      toast.success(t('preferences.successToast'));
     } catch (error) {
-      toast.error('Ошибка при изменении языка');
+      toast.error(t('preferences.errorToast'));
     } finally {
       setIsUpdating(false);
     }
@@ -69,9 +71,9 @@ export default function ProfilePage() {
   const handlePrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory', value: boolean) => {
     try {
       await updateProfile({ [field]: value });
-      toast.success('Настройки приватности обновлены');
+      toast.success(t('privacy.successToast'));
     } catch (error) {
-      toast.error('Ошибка при обновлении настроек');
+      toast.error(t('privacy.errorToast'));
     }
   };
 
@@ -83,9 +85,9 @@ export default function ProfilePage() {
       const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
       const compressed = await compressImage(converted);
       await uploadAvatar(compressed);
-      toast.success('Аватар успешно обновлён');
+      toast.success(t('avatarUpload.successToast'));
     } catch {
-      toast.error('Ошибка при загрузке аватара');
+      toast.error(t('avatarUpload.errorToast'));
     } finally {
       setIsAvatarLoading(false);
       if (avatarInputRef.current) avatarInputRef.current.value = '';
@@ -96,9 +98,9 @@ export default function ProfilePage() {
     setIsAvatarLoading(true);
     try {
       await removeAvatar();
-      toast.success('Аватар удалён');
+      toast.success(t('avatarRemove.successToast'));
     } catch {
-      toast.error('Ошибка при удалении аватара');
+      toast.error(t('avatarRemove.errorToast'));
     } finally {
       setIsAvatarLoading(false);
     }
@@ -108,9 +110,9 @@ export default function ProfilePage() {
     try {
       await logout();
       router.push('/login');
-      toast.success('Вы успешно вышли из аккаунта');
+      toast.success(t('logout.successToast'));
     } catch (error) {
-      toast.error('Ошибка при выходе из аккаунта');
+      toast.error(t('logout.errorToast'));
     }
   };
 
@@ -123,10 +125,10 @@ export default function ProfilePage() {
     try {
       await navigator.clipboard.writeText(profileUrl);
       setIsProfileLinkCopied(true);
-      toast.success('Ссылка на профиль скопирована');
+      toast.success(t('copyLink.successToast'));
       setTimeout(() => setIsProfileLinkCopied(false), 2000);
     } catch (error) {
-      toast.error('Не удалось скопировать ссылку');
+      toast.error(t('copyLink.errorToast'));
       console.error('Failed to copy profile link:', error);
     }
   };
@@ -134,7 +136,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted-foreground">Загрузка...</div>
+        <div className="text-muted-foreground">{t('avatar.loading')}</div>
       </div>
     );
   }
@@ -146,9 +148,9 @@ export default function ProfilePage() {
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight hidden sm:block">Профиль</h1>
+        <h1 className="text-4xl font-bold tracking-tight hidden sm:block">{t('header.title')}</h1>
         <p className="text-lg text-muted-foreground hidden sm:block">
-          Управляйте информацией вашего аккаунта и настройками
+          {t('header.description')}
         </p>
       </div>
 
@@ -165,7 +167,7 @@ export default function ProfilePage() {
                 className={`w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center ${
                   user.avatar ? 'cursor-pointer' : ''
                 } transition-all hover:scale-105`}
-                title={user.avatar ? 'Посмотреть аватар' : undefined}
+                title={user.avatar ? t('avatar.viewTooltip') : undefined}
               >
                 {user.avatar ? (
                   <Image
@@ -191,7 +193,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
                   className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                  title="Изменить аватар"
+                  title={t('avatar.changeTooltip')}
                 >
                   <Camera className="w-6 h-6 text-white" />
                 </button>
@@ -202,7 +204,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={handleAvatarRemove}
                   className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                  title="Удалить аватар"
+                  title={t('avatar.deleteTooltip')}
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -223,7 +225,7 @@ export default function ProfilePage() {
                     size="icon"
                     onClick={handleCopyProfileLink}
                     className="h-8 w-8 shrink-0"
-                    title="Скопировать ссылку на профиль"
+                    title={t('copyProfileLink')}
                   >
                     {isProfileLinkCopied ? (
                       <Check className="w-4 h-4 text-green-600" />
@@ -244,14 +246,14 @@ export default function ProfilePage() {
                   className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
                 >
                   <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
-                  <span className="text-xs text-muted-foreground select-none">Подписчики</span>
+                  <span className="text-xs text-muted-foreground select-none">{t('follow.followers')}</span>
                 </button>
                 <button
                   onClick={() => setFollowDialog('following')}
                   className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
                 >
                   <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
-                  <span className="text-xs text-muted-foreground select-none">Подписки</span>
+                  <span className="text-xs text-muted-foreground select-none">{t('follow.following')}</span>
                 </button>
               </div>
             )}
@@ -267,14 +269,14 @@ export default function ProfilePage() {
                 className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
               >
                 <span className="text-lg font-bold leading-tight">{followStats.followersCount}</span>
-                <span className="text-xs text-muted-foreground">подписчики</span>
+                <span className="text-xs text-muted-foreground">{t('follow.followersMobile')}</span>
               </button>
               <button
                 onClick={() => setFollowDialog('following')}
                 className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
               >
                 <span className="text-lg font-bold leading-tight">{followStats.followingCount}</span>
-                <span className="text-xs text-muted-foreground">подписки</span>
+                <span className="text-xs text-muted-foreground">{t('follow.followingMobile')}</span>
               </button>
             </div>
           )}
@@ -283,7 +285,7 @@ export default function ProfilePage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <User className="w-4 h-4" />
-                <span className="text-sm font-semibold">Полное имя</span>
+                <span className="text-sm font-semibold">{t('profile.fullName')}</span>
               </div>
               <p className="font-medium">{user.name}</p>
             </div>
@@ -291,7 +293,7 @@ export default function ProfilePage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
-                <span className="text-sm font-semibold">Email адрес</span>
+                <span className="text-sm font-semibold">{t('profile.email')}</span>
               </div>
               <p className="font-medium">{user.email}</p>
             </div>
@@ -309,7 +311,7 @@ export default function ProfilePage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="w-4 h-4" />
-                <span className="text-sm font-semibold">Участник с</span>
+                <span className="text-sm font-semibold">{t('profile.memberSince')}</span>
               </div>
               <p className="font-medium">
                 {new Date(user.createdAt).toLocaleDateString('ru-RU', {
@@ -328,14 +330,14 @@ export default function ProfilePage() {
         {/* Preferences */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Предпочтения</CardTitle>
-            <CardDescription>Настройте ваш опыт использования приложения</CardDescription>
+            <CardTitle className="text-lg">{t('preferences.title')}</CardTitle>
+            <CardDescription>{t('preferences.description')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Languages className="w-4 h-4" />
-                <span className="text-sm font-semibold">Язык названий растений</span>
+                <span className="text-sm font-semibold">{t('preferences.languageLabel')}</span>
               </div>
               <Select
                 value={user.preferredLanguage || 'ru'}
@@ -343,7 +345,7 @@ export default function ProfilePage() {
                 disabled={isUpdating}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Выберите язык" />
+                  <SelectValue placeholder={t('preferences.languagePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ru">Русский</SelectItem>
@@ -351,7 +353,7 @@ export default function ProfilePage() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Выберите язык для отображения названий родов и сортов растений
+                {t('preferences.languageDescription')}
               </p>
             </div>
           </CardContent>
@@ -360,13 +362,13 @@ export default function ProfilePage() {
         {/* Logout */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Выход из аккаунта</CardTitle>
-            <CardDescription>Завершите текущий сеанс</CardDescription>
+            <CardTitle className="text-lg">{t('logout.title')}</CardTitle>
+            <CardDescription>{t('logout.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={handleLogout} className="w-full gap-2" variant="outline">
               <LogOut className="w-4 h-4" />
-              Выйти из аккаунта
+              {t('logout.button')}
             </Button>
           </CardContent>
         </Card>
@@ -377,10 +379,10 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Lock className="w-5 h-5" />
-            Настройки приватности
+            {t('privacy.title')}
           </CardTitle>
           <CardDescription>
-            Управляйте тем, что видят другие пользователи в вашем профиле
+            {t('privacy.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -392,10 +394,10 @@ export default function ProfilePage() {
                 ) : (
                   <EyeOff className="w-4 h-4 text-muted-foreground" />
                 )}
-                <span className="text-sm font-medium">Показывать мои растения</span>
+                <span className="text-sm font-medium">{t('privacy.showPlants.label')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Другие пользователи смогут видеть ваши растения
+                {t('privacy.showPlants.description')}
               </p>
             </div>
             <Switch
@@ -412,10 +414,10 @@ export default function ProfilePage() {
                 ) : (
                   <EyeOff className="w-4 h-4 text-muted-foreground" />
                 )}
-                <span className="text-sm font-medium">Показывать мои полки</span>
+                <span className="text-sm font-medium">{t('privacy.showShelves.label')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Другие пользователи смогут видеть ваши полки
+                {t('privacy.showShelves.description')}
               </p>
             </div>
             <Switch
@@ -432,10 +434,10 @@ export default function ProfilePage() {
                 ) : (
                   <EyeOff className="w-4 h-4 text-muted-foreground" />
                 )}
-                <span className="text-sm font-medium">Показывать историю растений</span>
+                <span className="text-sm font-medium">{t('privacy.showPlantHistory.label')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Другие пользователи смогут просматривать историю ваших растений
+                {t('privacy.showPlantHistory.description')}
               </p>
             </div>
             <Switch
@@ -449,9 +451,9 @@ export default function ProfilePage() {
       {/* Social Links */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Способы связи</CardTitle>
+          <CardTitle className="text-lg">{t('socialLinks.title')}</CardTitle>
           <CardDescription>
-            Добавьте контакты, чтобы другие пользователи могли связаться с вами
+            {t('socialLinks.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -459,7 +461,7 @@ export default function ProfilePage() {
             socialLinks={user.socialLinks || []}
             onUpdate={async (socialLinks: SocialLink[]) => {
               await updateProfile({ socialLinks });
-              toast.success('Сохранено');
+              toast.success(t('socialLinks.successToast'));
             }}
           />
         </CardContent>
@@ -472,16 +474,16 @@ export default function ProfilePage() {
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Leaf className="w-5 h-5 text-green-600" />
-                Мои растения
+                {t('plants.title')}
               </CardTitle>
               <CardDescription className="mt-1">
-                {loadingPlants ? 'Загрузка...' : `Всего: ${plants.length}`}
+                {loadingPlants ? t('plants.loading') : t('plants.total', { count: plants.length })}
               </CardDescription>
             </div>
             {plants.length > 0 && (
               <Button variant="ghost" size="sm" asChild className="gap-1">
                 <Link href="/plants">
-                  Показать все <ChevronRight className="w-4 h-4" />
+                  {t('plants.showAll')} <ChevronRight className="w-4 h-4" />
                 </Link>
               </Button>
             )}
@@ -489,13 +491,13 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           {loadingPlants ? (
-            <div className="text-center text-muted-foreground py-6">Загрузка растений...</div>
+            <div className="text-center text-muted-foreground py-6">{t('plants.loadingText')}</div>
           ) : plants.length === 0 ? (
             <div className="text-center text-muted-foreground py-6">
               <Leaf className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-              <p>У вас пока нет растений</p>
+              <p>{t('plants.empty.title')}</p>
               <Button variant="outline" size="sm" className="mt-3" asChild>
-                <Link href="/plants">Добавить растение</Link>
+                <Link href="/plants">{t('plants.empty.button')}</Link>
               </Button>
             </div>
           ) : (
@@ -510,7 +512,7 @@ export default function ProfilePage() {
               {plants.length > DESKTOP_PREVIEW && (
                 <div className="mt-4 text-center">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href="/plants">Показать все {plants.length} растений</Link>
+                    <Link href="/plants">{t('plants.showAllCount', { count: plants.length })}</Link>
                   </Button>
                 </div>
               )}
@@ -526,16 +528,16 @@ export default function ProfilePage() {
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Layers className="w-5 h-5 text-blue-600" />
-                Мои полки
+                {t('shelves.title')}
               </CardTitle>
               <CardDescription className="mt-1">
-                {loadingShelves ? 'Загрузка...' : `Всего: ${shelves.length}`}
+                {loadingShelves ? t('shelves.loading') : t('shelves.total', { count: shelves.length })}
               </CardDescription>
             </div>
             {shelves.length > 0 && (
               <Button variant="ghost" size="sm" asChild className="gap-1">
                 <Link href="/shelves">
-                  Показать все <ChevronRight className="w-4 h-4" />
+                  {t('shelves.showAll')} <ChevronRight className="w-4 h-4" />
                 </Link>
               </Button>
             )}
@@ -543,13 +545,13 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           {loadingShelves ? (
-            <div className="text-center text-muted-foreground py-6">Загрузка полок...</div>
+            <div className="text-center text-muted-foreground py-6">{t('shelves.loadingText')}</div>
           ) : shelves.length === 0 ? (
             <div className="text-center text-muted-foreground py-6">
               <Layers className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-              <p>У вас пока нет полок</p>
+              <p>{t('shelves.empty.title')}</p>
               <Button variant="outline" size="sm" className="mt-3" asChild>
-                <Link href="/shelves">Создать полку</Link>
+                <Link href="/shelves">{t('shelves.empty.button')}</Link>
               </Button>
             </div>
           ) : (
@@ -564,7 +566,7 @@ export default function ProfilePage() {
               {shelves.length > DESKTOP_PREVIEW && (
                 <div className="mt-4 text-center">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href="/shelves">Показать все {shelves.length} полок</Link>
+                    <Link href="/shelves">{t('shelves.showAllCount', { count: shelves.length })}</Link>
                   </Button>
                 </div>
               )}

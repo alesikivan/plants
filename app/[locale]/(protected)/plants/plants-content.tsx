@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +28,8 @@ import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortab
 const COMBOBOX_CLASS = 'h-11 rounded-xl border-2 text-base font-normal';
 
 export function PlantsPageContent() {
+  const t = useTranslations('PlantsPage');
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const [plants, setPlants] = useState<Plant[]>([]);
   const [genera, setGenera] = useState<Genus[]>([]);
@@ -78,7 +81,7 @@ export function PlantsPageContent() {
         Array.from(genusMap.values()).sort((a, b) => a.nameRu.localeCompare(b.nameRu))
       );
     } catch (error) {
-      toast.error('Ошибка загрузки растений');
+      toast.error(t('toasts.loadError'));
       console.error('Failed to load plants:', error);
     } finally {
       setIsLoading(false);
@@ -88,6 +91,9 @@ export function PlantsPageContent() {
   // Client-side filtering of dropdown options by search text
   const genusOptions = useMemo(() => {
     const q = genusSearch.toLowerCase();
+    const getDisplayName = (nameRu: string, nameEn: string) => {
+      return locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
+    };
     return genera
       .filter(
         (g) =>
@@ -95,8 +101,8 @@ export function PlantsPageContent() {
           g.nameRu.toLowerCase().includes(q) ||
           g.nameEn.toLowerCase().includes(q)
       )
-      .map((g) => ({ value: g._id, label: `${g.nameRu} / ${g.nameEn}` }));
-  }, [genera, genusSearch]);
+      .map((g) => ({ value: g._id, label: getDisplayName(g.nameRu, g.nameEn) }));
+  }, [genera, genusSearch, locale]);
 
   const shelfOptions = useMemo(() => {
     const q = shelfSearch.toLowerCase();
@@ -121,7 +127,7 @@ export function PlantsPageContent() {
       });
       setPlants(data);
     } catch (error) {
-      toast.error('Ошибка загрузки растений');
+      toast.error(t('toasts.loadError'));
       console.error('Failed to filter plants:', error);
     } finally {
       setIsFiltering(false);
@@ -199,9 +205,9 @@ export function PlantsPageContent() {
     try {
       await plantsApi.reorder(plants.map((p) => p._id));
       setIsReorderMode(false);
-      toast.success('Порядок сохранён');
+      toast.success(t('toasts.orderSaved'));
     } catch {
-      toast.error('Ошибка сохранения порядка');
+      toast.error(t('toasts.saveError'));
     } finally {
       setIsReorderSaving(false);
     }
@@ -233,9 +239,9 @@ export function PlantsPageContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Мои растения</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t('header.title')}</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-            Управляйте своей<br className="sm:hidden" /> коллекцией растений
+            {t('header.description')}
           </p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
@@ -248,7 +254,7 @@ export function PlantsPageContent() {
                 disabled={isReorderSaving}
               >
                 <X className="w-4 h-4" />
-                Отмена
+                {t('buttons.cancel')}
               </Button>
               <Button
                 onClick={handleSaveOrder}
@@ -256,7 +262,7 @@ export function PlantsPageContent() {
                 disabled={isReorderSaving}
               >
                 <Check className="w-4 h-4" />
-                {isReorderSaving ? 'Сохранение...' : 'Сохранить'}
+                {isReorderSaving ? t('buttons.saving') : t('buttons.save')}
               </Button>
             </>
           ) : (
@@ -266,10 +272,10 @@ export function PlantsPageContent() {
                   variant="outline"
                   onClick={() => setIsReorderMode(true)}
                   className="transition-all active:scale-95 shrink-0 h-11 w-11 p-0 sm:w-auto sm:px-4 sm:gap-2 rounded-xl"
-                  title="Изменить порядок"
+                  title={t('buttons.reorder')}
                 >
                   <GripVertical className="w-4 h-4" />
-                  <span className="hidden sm:inline">Изменить порядок</span>
+                  <span className="hidden sm:inline">{t('buttons.reorder')}</span>
                 </Button>
               )}
               <Button
@@ -277,7 +283,7 @@ export function PlantsPageContent() {
                 className="gap-2 transition-all active:scale-95 flex-1 sm:flex-none"
               >
                 <Plus className="w-4 h-4" />
-                Добавить растение
+                {t('buttons.addPlant')}
               </Button>
             </>
           )}
@@ -292,14 +298,14 @@ export function PlantsPageContent() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${!showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <Leaf className="w-4 h-4" />
-            Активные
+            {t('tabs.active')}
           </button>
           <button
             onClick={() => showArchived || handleTabChange(true)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <Archive className="w-4 h-4" />
-            Архив
+            {t('tabs.archive')}
           </button>
         </div>
       )}
@@ -312,7 +318,7 @@ export function PlantsPageContent() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
-                placeholder="Поиск по названию..."
+                placeholder={t('search.placeholder')}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="pl-9"
@@ -323,7 +329,7 @@ export function PlantsPageContent() {
                 variant={hasFilters ? 'default' : 'outline'}
                 onClick={() => setShowFilters((v) => !v)}
                 className="relative shrink-0 h-11 w-11 p-0 rounded-xl"
-                title="Фильтры"
+                title={t('filters.title')}
               >
                 <SlidersHorizontal className="w-4 h-4" />
                 {hasFilters && (
@@ -336,7 +342,7 @@ export function PlantsPageContent() {
                   variant="outline"
                   onClick={clearFilters}
                   className="shrink-0 h-11 w-11 p-0 rounded-xl"
-                  title="Очистить поиск"
+                  title={t('buttons.clearSearchMobile')}
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -353,9 +359,9 @@ export function PlantsPageContent() {
                     options={genusOptions}
                     value={genusFilter}
                     onValueChange={handleGenusChange}
-                    placeholder="Все роды"
-                    searchPlaceholder="Поиск рода..."
-                    emptyText="Ничего не найдено"
+                    placeholder={t('search.allGenus')}
+                    searchPlaceholder={t('search.genusPlaceholder')}
+                    emptyText={t('search.emptyText')}
                     onSearchChange={setGenusSearch}
                     className={COMBOBOX_CLASS}
                   />
@@ -368,9 +374,9 @@ export function PlantsPageContent() {
                     options={shelfOptions}
                     value={shelfFilter}
                     onValueChange={handleShelfChange}
-                    placeholder="Все полки"
-                    searchPlaceholder="Поиск полки..."
-                    emptyText="Ничего не найдено"
+                    placeholder={t('search.allShelves')}
+                    searchPlaceholder={t('search.shelfPlaceholder')}
+                    emptyText={t('search.emptyText')}
                     onSearchChange={setShelfSearch}
                     className={COMBOBOX_CLASS}
                   />
@@ -384,7 +390,7 @@ export function PlantsPageContent() {
                     variant="ghost"
                     onClick={clearFilters}
                     className="shrink-0 h-11 w-11 p-0 rounded-xl hidden sm:flex items-center justify-center"
-                    title="Сбросить фильтры"
+                    title={t('buttons.clearFilters')}
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -395,7 +401,7 @@ export function PlantsPageContent() {
                     className="w-full h-11 gap-2 rounded-xl sm:hidden"
                   >
                     <X className="w-4 h-4" />
-                    Очистить фильтры
+                    {t('buttons.clearSearch')}
                   </Button>
                 </>
               )}
@@ -409,7 +415,7 @@ export function PlantsPageContent() {
         <div className="flex items-center justify-center h-64 animate-in fade-in duration-500">
           <div className="text-center space-y-2">
             <Leaf className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
-            <p className="text-muted-foreground">Загрузка растений...</p>
+            <p className="text-muted-foreground">{t('messages.loading')}</p>
           </div>
         </div>
       ) : plants.length === 0 && !hasFilters ? (
@@ -417,22 +423,22 @@ export function PlantsPageContent() {
           {showArchived ? (
             <>
               <Archive className="w-16 h-16 text-muted-foreground/50 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Архив пуст</h3>
-              <p className="text-muted-foreground">Здесь будут архивированные растения</p>
+              <h3 className="text-xl font-semibold mb-2">{t('empty.emptyArchive.title')}</h3>
+              <p className="text-muted-foreground">{t('empty.emptyArchive.description')}</p>
             </>
           ) : (
             <>
               <Leaf className="w-16 h-16 text-muted-foreground/50 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">У вас пока нет растений</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('empty.noPlants.title')}</h3>
               <p className="text-muted-foreground mb-6">
-                Начните отслеживать свою коллекцию, добавив первое растение
+                {t('empty.noPlants.description')}
               </p>
               <Button
                 onClick={() => setIsModalOpen(true)}
                 className="gap-2 transition-all active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                Добавить первое растение
+                {t('empty.noPlants.button')}
               </Button>
             </>
           )}
@@ -440,23 +446,23 @@ export function PlantsPageContent() {
       ) : plants.length === 0 && hasFilters ? (
         <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
           <Search className="w-16 h-16 text-muted-foreground/50 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Ничего не найдено</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('empty.noResults.title')}</h3>
           <p className="text-muted-foreground mb-4">
-            Попробуйте изменить фильтры или поисковый запрос
+            {t('empty.noResults.description')}
           </p>
           <Button variant="outline" onClick={clearFilters} className="gap-2">
             <X className="w-4 h-4" />
-            Сбросить фильтры
+            {t('empty.noResults.button')}
           </Button>
         </div>
       ) : (
         <div className="space-y-4">
           {hasFilters && !isBusy && (
-            <p className="text-sm text-muted-foreground">Найдено: {plants.length}</p>
+            <p className="text-sm text-muted-foreground">{t('messages.found', { count: plants.length })}</p>
           )}
           {isReorderMode && (
             <p className="text-sm text-muted-foreground animate-in fade-in duration-200">
-              Перетащите карточки для изменения порядка
+              {t('messages.dragging')}
             </p>
           )}
           {isReorderMode ? (

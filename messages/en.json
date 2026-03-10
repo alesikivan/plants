@@ -493,5 +493,223 @@
     "status": {
       "blocked": "Blocked"
     }
+  },
+  "PlantsPage": {
+    "header": {
+      "title": "My plants",
+      "description": "Manage your plant collection"
+    },
+    "tabs": {
+      "active": "Active",
+      "archive": "Archive"
+    },
+    "buttons": {
+      "addPlant": "Add plant",
+      "reorder": "Reorder",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "clearFilters": "Clear filters",
+      "clearSearch": "Clear filters",
+      "clearSearchMobile": "Clear search"
+    },
+    "search": {
+      "placeholder": "Search by name...",
+      "allGenus": "All genus",
+      "genusPlaceholder": "Search genus...",
+      "allShelves": "All shelves",
+      "shelfPlaceholder": "Search shelf...",
+      "emptyText": "Nothing found"
+    },
+    "filters": {
+      "title": "Filters",
+      "label": "Filters"
+    },
+    "messages": {
+      "loading": "Loading plants...",
+      "dragging": "Drag cards to reorder them",
+      "found": "Found: {count}"
+    },
+    "empty": {
+      "noPlants": {
+        "title": "You don't have any plants yet",
+        "description": "Start tracking your collection by adding your first plant",
+        "button": "Add first plant"
+      },
+      "emptyArchive": {
+        "title": "Archive is empty",
+        "description": "Archived plants will appear here"
+      },
+      "noResults": {
+        "title": "Nothing found",
+        "description": "Try changing your filters or search query",
+        "button": "Clear filters"
+      }
+    },
+    "toasts": {
+      "orderSaved": "Order saved",
+      "loadError": "Failed to load plants",
+      "saveError": "Failed to save order"
+    }
+  },
+  "AddPlantModal": {
+    "title": "Add plant",
+    "description": "Fill in information about your plant",
+    "shelves": "Shelves",
+    "shelvesPlaceholder": "Select shelves...",
+    "shelvesSearchPlaceholder": "Search shelf...",
+    "shelvesEmpty": "No available shelves",
+    "purchaseDate": "Purchase date",
+    "purchaseDatePlaceholder": "Select purchase date",
+    "photo": "Plant photo",
+    "description": "Description",
+    "descriptionPlaceholder": "Add a description of your plant...",
+    "buttons": {
+      "cancel": "Cancel",
+      "add": "Add",
+      "adding": "Adding..."
+    },
+    "toasts": {
+      "success": "Plant added successfully!",
+      "error": "Failed to add plant",
+      "shelvesError": "Failed to load shelves",
+      "dateFound": "Purchase date updated from photo data: {date}"
+    }
+  },
+  "EditPlantModal": {
+    "title": "Edit plant",
+    "description": "Change information about the plant",
+    "shelves": "Shelves",
+    "shelvesPlaceholder": "Select shelves...",
+    "shelvesSearchPlaceholder": "Search shelf...",
+    "shelvesEmpty": "No available shelves",
+    "purchaseDate": "Purchase date",
+    "purchaseDatePlaceholder": "Select purchase date",
+    "photo": "Plant photo",
+    "description": "Description",
+    "descriptionPlaceholder": "Add a description of your plant...",
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "toasts": {
+      "success": "Plant updated successfully!",
+      "error": "Failed to update plant",
+      "shelvesError": "Failed to load shelves",
+      "loadError": "Failed to load plant"
+    }
+  },
+  "DeletePlantModal": {
+    "title": "Delete plant?",
+    "description": "You are about to delete the plant <strong>{name}</strong>. This action cannot be undone.",
+    "buttons": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "toasts": {
+      "success": "Plant deleted successfully",
+      "error": "Failed to delete plant"
+    }
+  },
+  "ProfilePage": {
+    "header": {
+      "title": "Profile",
+      "description": "Manage your account information and settings"
+    },
+    "avatar": {
+      "viewTooltip": "View avatar",
+      "changeTooltip": "Change avatar",
+      "deleteTooltip": "Delete avatar",
+      "loading": "Loading..."
+    },
+    "copyProfileLink": "Copy profile link",
+    "follow": {
+      "followers": "Followers",
+      "following": "Following",
+      "followersMobile": "followers",
+      "followingMobile": "following"
+    },
+    "profile": {
+      "fullName": "Full name",
+      "email": "Email address",
+      "memberSince": "Member since"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize your experience",
+      "languageLabel": "Plant name language",
+      "languagePlaceholder": "Select language",
+      "languageDescription": "Choose the language for displaying plant genus and variety names",
+      "successToast": "Language changed successfully",
+      "errorToast": "Error changing language"
+    },
+    "logout": {
+      "title": "Logout",
+      "description": "End your current session",
+      "button": "Sign out",
+      "successToast": "You have been signed out successfully",
+      "errorToast": "Error signing out"
+    },
+    "privacy": {
+      "title": "Privacy settings",
+      "description": "Control what other users see on your profile",
+      "showPlants": {
+        "label": "Show my plants",
+        "description": "Other users can see your plants"
+      },
+      "showShelves": {
+        "label": "Show my shelves",
+        "description": "Other users can see your shelves"
+      },
+      "showPlantHistory": {
+        "label": "Show plant history",
+        "description": "Other users can view your plants' history"
+      },
+      "successToast": "Privacy settings updated",
+      "errorToast": "Error updating settings"
+    },
+    "socialLinks": {
+      "title": "Contact methods",
+      "description": "Add contact information so other users can reach you",
+      "successToast": "Saved"
+    },
+    "plants": {
+      "title": "My plants",
+      "total": "Total: {count}",
+      "loading": "Loading...",
+      "loadingText": "Loading plants...",
+      "empty": {
+        "title": "You don't have any plants yet",
+        "button": "Add plant"
+      },
+      "showAll": "Show all",
+      "showAllCount": "Show all {count} plants"
+    },
+    "shelves": {
+      "title": "My shelves",
+      "total": "Total: {count}",
+      "loading": "Loading...",
+      "loadingText": "Loading shelves...",
+      "empty": {
+        "title": "You don't have any shelves yet",
+        "button": "Create shelf"
+      },
+      "showAll": "Show all",
+      "showAllCount": "Show all {count} shelves"
+    },
+    "avatarUpload": {
+      "successToast": "Avatar updated successfully",
+      "errorToast": "Error uploading avatar"
+    },
+    "avatarRemove": {
+      "successToast": "Avatar deleted",
+      "errorToast": "Error deleting avatar"
+    },
+    "copyLink": {
+      "successToast": "Profile link copied",
+      "errorToast": "Failed to copy profile link"
+    }
   }
 }
