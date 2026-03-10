@@ -4,17 +4,22 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Logo } from '@/components/logo';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { LayoutDashboard, Settings, Layers, Users, User, Leaf, Rss } from 'lucide-react';
 import { getAvatarUrl } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
+import type { AppLocale } from '@/i18n/routing';
 
 export default function ProtectedShell({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations('Navigation');
+  const locale = useLocale() as AppLocale;
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const fetchUser = useAuthStore((state) => state.fetchUser);
@@ -53,35 +58,35 @@ export default function ProtectedShell({
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <LayoutDashboard className="w-4 h-4" />
-                    Панель
+                    {t('dashboard')}
                   </Link>
                   <Link
                     href="/plants"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Leaf className="w-4 h-4" />
-                    Мои растения
+                    {t('myPlants')}
                   </Link>
                   <Link
                     href="/shelves"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Layers className="w-4 h-4" />
-                    Полки
+                    {t('shelves')}
                   </Link>
                   <Link
                     href="/feed"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Rss className="w-4 h-4" />
-                    Лента
+                    {t('feed')}
                   </Link>
                   <Link
                     href="/users"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Users className="w-4 h-4" />
-                    Пользователи
+                    {t('users')}
                   </Link>
                   {user.role === 'admin' && (
                     <Link
@@ -89,7 +94,7 @@ export default function ProtectedShell({
                       className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                     >
                       <Settings className="w-4 h-4" />
-                      Админ
+                      {t('admin')}
                     </Link>
                   )}
                 </nav>
@@ -98,60 +103,67 @@ export default function ProtectedShell({
 
             {user && (
               <>
-                <Link
-                  href="/profile"
-                  className="hidden lg:flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
-                >
-                  <div className="flex flex-col items-end">
-                    <p className="text-sm font-semibold text-foreground">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                  </div>
-                  <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3">
+                  <LanguageSwitcher locale={locale} />
+
+                  <Link
+                    href="/profile"
+                    className="hidden lg:flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+                  >
+                    <div className="flex flex-col items-end">
+                      <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                    <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
+                      {user.avatar ? (
+                        <Image
+                          src={getAvatarUrl(user.avatar)!}
+                          alt={user.name}
+                          width={36}
+                          height={36}
+                          className="w-full h-full object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <User className="w-4 h-4 text-primary" />
+                      )}
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/profile"
+                    className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 hover:opacity-80 transition-opacity shrink-0"
+                  >
                     {user.avatar ? (
                       <Image
                         src={getAvatarUrl(user.avatar)!}
                         alt={user.name}
-                        width={36}
-                        height={36}
+                        width={40}
+                        height={40}
                         className="w-full h-full object-cover"
                         unoptimized
                       />
                     ) : (
-                      <User className="w-4 h-4 text-primary" />
+                      <User className="w-5 h-5 text-primary" />
                     )}
-                  </div>
-                </Link>
-
-                <Link
-                  href="/profile"
-                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 hover:opacity-80 transition-opacity shrink-0"
-                >
-                  {user.avatar ? (
-                    <Image
-                      src={getAvatarUrl(user.avatar)!}
-                      alt={user.name}
-                      width={40}
-                      height={40}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <User className="w-5 h-5 text-primary" />
-                  )}
-                </Link>
+                  </Link>
+                </div>
               </>
             )}
 
             {showGuestCta && (
-              <Link href="/register" className="cursor-pointer">
-                <Button
-                  size="sm"
-                  className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold"
-                >
-                  <span className="sm:hidden">Попробовать</span>
-                  <span className="hidden sm:inline">Попробовать бесплатно</span>
-                </Button>
-              </Link>
+              <div className="flex items-center gap-3">
+                <LanguageSwitcher locale={locale} />
+                <Link href="/register" className="cursor-pointer">
+                  <Button
+                    size="sm"
+                    className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold"
+                  >
+                    <span className="sm:hidden">Попробовать</span>
+                    <span className="hidden sm:inline">Попробовать бесплатно</span>
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -163,13 +175,13 @@ export default function ProtectedShell({
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex h-20 items-center justify-center">
             <p className="text-base text-muted-foreground text-center">
-              Нужна помощь или есть предложение?{' '}
+              {t('help')}{' '}
               <br className="sm:hidden" />
               <a
                 href="mailto:grushevskayyy7@gmail.com"
                 className="font-medium text-primary hover:underline transition-all"
               >
-                Напишите нам – мы всё читаем :)
+                {t('helpEmail')}
               </a>
             </p>
           </div>
@@ -184,35 +196,35 @@ export default function ProtectedShell({
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <LayoutDashboard className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">Панель</span>
+              <span className="text-xs font-medium select-none">{t('dashboard')}</span>
             </Link>
             <Link
               href="/plants"
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Leaf className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">Растения</span>
+              <span className="text-xs font-medium select-none">{t('plants')}</span>
             </Link>
             <Link
               href="/feed"
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Rss className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">Лента</span>
+              <span className="text-xs font-medium select-none">{t('feed')}</span>
             </Link>
             <Link
               href="/shelves"
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Layers className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">Полки</span>
+              <span className="text-xs font-medium select-none">{t('shelves')}</span>
             </Link>
             <Link
               href="/users"
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Users className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">Польз.</span>
+              <span className="text-xs font-medium select-none">{t('users')}</span>
             </Link>
           </div>
         </nav>

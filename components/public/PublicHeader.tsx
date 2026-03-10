@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 
 export function PublicHeader() {
+  const t = useTranslations('PublicHeader');
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 lg:px-8">
@@ -24,7 +26,7 @@ export function PublicHeader() {
           {/* Sign Up Button */}
           <Link href="/register" className='cursor-pointer'>
             <Button size="sm" className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
-              Начать бесплатно!
+              {t('startFree')}
             </Button>
           </Link>
         </div>

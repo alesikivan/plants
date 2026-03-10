@@ -136,5 +136,284 @@
       "passwordMismatch": "Passwords do not match",
       "passwordMinLength": "Password must be at least 6 characters long"
     }
+  },
+  "LoginPage": {
+    "backHome": "Back to home",
+    "title": "Welcome back",
+    "description": "Sign in to your account to continue",
+    "fields": {
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "••••••••"
+      },
+      "forgotPassword": "Forgot password?"
+    },
+    "submit": {
+      "default": "Sign in",
+      "loading": "Signing in..."
+    },
+    "registerPrompt": "Don't have an account?",
+    "registerLink": "Create account",
+    "accountBlocked": "Your account has been blocked by an administrator.",
+    "emailNotVerified": "Email is not verified. Check your inbox or request a new email.",
+    "resendButton": "Resend email",
+    "resendButtonLoading": "Sending...",
+    "resendSuccess": "Email sent!",
+    "successMessage": "Welcome! 🌱",
+    "verificationMessages": {
+      "verified": "Email verified! You can now log in.",
+      "verificationError": "The link is invalid or expired. Request a new one."
+    }
+  },
+  "ForgotPasswordPage": {
+    "backLogin": "Back to sign in",
+    "titleInitial": "Password recovery",
+    "descriptionInitial": "Enter your email and we'll send you a link to reset your password",
+    "titleSent": "Check your email",
+    "descriptionSent": "If an account with this email exists, you will receive an email with a password reset link.",
+    "fields": {
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      }
+    },
+    "submit": {
+      "default": "Send link",
+      "loading": "Sending..."
+    },
+    "backToLogin": "Back to sign in"
+  },
+  "ResetPasswordPage": {
+    "backLogin": "Back to sign in",
+    "titleForm": "New password",
+    "descriptionForm": "Enter a new password for your account",
+    "titleInvalidLink": "Link is invalid",
+    "descriptionInvalidLink": "The link is invalid or expired. Request a new password reset link.",
+    "titleSuccess": "Password changed",
+    "descriptionSuccess": "Your password has been changed successfully. You can now sign in with your new password.",
+    "fields": {
+      "password": {
+        "label": "New password",
+        "placeholder": "••••••••"
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": "••••••••"
+      }
+    },
+    "submit": {
+      "default": "Save password",
+      "loading": "Saving..."
+    },
+    "requestNewLink": "Request new link",
+    "signIn": "Sign in",
+    "validationErrors": {
+      "passwordMinLength": "Password must be at least 6 characters long",
+      "passwordMismatch": "Passwords do not match"
+    }
+  },
+  "VerifyEmailPage": {
+    "backLabel": "Back to sign in",
+    "loading": {
+      "title": "Verifying email...",
+      "description": "Please wait"
+    },
+    "success": {
+      "title": "Email verified!",
+      "description": "Thank you for confirming. Your account is activated and you can now sign in."
+    },
+    "error": {
+      "title": "Invalid link",
+      "description": "The link has expired or has already been used. Sign in and request a new email."
+    },
+    "button": "Go to sign in"
+  },
+  "DashboardPage": {
+    "quickActions": "Quick actions",
+    "addPlant": "Add plant",
+    "startTracking": "Start tracking a new plant",
+    "wishlist": "Wishlist",
+    "addWishlist": "Add",
+    "searchPlaceholder": "Search by name...",
+    "filters": "Filters",
+    "allGenus": "All genus",
+    "genusSearchPlaceholder": "Search genus...",
+    "emptyText": "Nothing found",
+    "clearFilters": "Clear filters",
+    "loading": "Loading...",
+    "emptyWishlist": "Wishlist is empty",
+    "emptyWishlistDescription": "Add plants you want to get",
+    "addPlantButton": "Add plant",
+    "nothingFound": "Nothing found",
+    "tryChangingQuery": "Try changing your search or filters",
+    "clearFiltersButton": "Clear filters",
+    "wishlistLoadError": "Failed to load wishlist"
+  },
+  "AddWishlistModal": {
+    "title": "Add to wishlist",
+    "description": "Select a plant you want to get",
+    "photoLabel": "Plant photo (optional)",
+    "invalidFileType": "Only images are allowed (JPG, JPEG, PNG, GIF, WebP)",
+    "cancel": "Cancel",
+    "submit": "Add",
+    "submitLoading": "Adding...",
+    "success": "Plant added to wishlist!",
+    "error": "Failed to add to wishlist"
+  },
+  "EditWishlistModal": {
+    "title": "Edit wishlist item",
+    "description": "Change information about the plant in your wishlist",
+    "photoLabel": "Plant photo (optional)",
+    "invalidFileType": "Only images are allowed (JPG, JPEG, PNG, GIF, WebP)",
+    "cancel": "Cancel",
+    "submit": "Save",
+    "submitLoading": "Saving...",
+    "success": "Wishlist updated!",
+    "error": "Failed to update wishlist"
+  },
+  "WishlistCard": {
+    "noName": "No name",
+    "deleteTitle": "Delete from wishlist?",
+    "deleteDescription": "Are you sure you want to delete \"{name}\" from your wishlist? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteLoading": "Deleting...",
+    "success": "Plant removed from wishlist",
+    "error": "Failed to delete from wishlist"
+  },
+  "PlantSelector": {
+    "genusLabel": "Plant genus",
+    "genusPlaceholder": "Select a genus",
+    "genusSearchPlaceholder": "Search genus...",
+    "genusError": "This field is required",
+    "genusCreateLabel": "Create genus",
+    "genusLoadError": "Failed to load genuses",
+    "varietyLabel": "Plant variety",
+    "varietyPlaceholder": "First select a genus",
+    "varietySelectedPlaceholder": "Select a variety",
+    "varietySearchPlaceholder": "Search variety...",
+    "varietyNoneAvailable": "No available varieties",
+    "varietyEmptyText": "Nothing found",
+    "varietyCreateLabel": "Create variety",
+    "varietyLoadError": "Failed to load varieties"
+  },
+  "FileInput": {
+    "selectButton": "Select file",
+    "processing": "Processing photo...",
+    "removeButton": "Remove",
+    "helperText": "Max size: {size}. Formats: {formats}"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "myPlants": "My plants",
+    "shelves": "Shelves",
+    "feed": "Feed",
+    "users": "Users",
+    "admin": "Admin",
+    "plants": "Plants",
+    "help": "Need help or have feedback?",
+    "helpEmail": "Write us – we read everything :)"
+  },
+  "PublicHeader": {
+    "startFree": "Start free!"
+  },
+  "UsersPage": {
+    "header": {
+      "title": "Users",
+      "description": "Find and view user profiles"
+    },
+    "search": {
+      "placeholder": "Search by username...",
+      "loading": "Searching...",
+      "submit": "Find"
+    },
+    "empty": {
+      "notFound": "Users not found",
+      "noUsers": "No users",
+      "tryChanging": "Try changing your search parameters"
+    },
+    "error": "Failed to load users"
+  },
+  "AdminUsersPage": {
+    "header": {
+      "title": "User management",
+      "total": "Total: {count} users"
+    },
+    "search": {
+      "placeholder": "Search by name or email..."
+    },
+    "table": {
+      "title": "All users",
+      "found": "Found: {count}",
+      "noUsers": "No users",
+      "loading": "Loading...",
+      "registered": "Registered: {date}"
+    },
+    "create": {
+      "button": "Create user",
+      "dialog": "Create user",
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "password": "Password",
+        "role": "Role"
+      },
+      "placeholders": {
+        "name": "nickname",
+        "email": "user@example.com",
+        "password": "Minimum 6 characters"
+      },
+      "submit": "Create",
+      "submitting": "Creating...",
+      "cancel": "Cancel",
+      "success": "User created",
+      "error": "Failed to create user"
+    },
+    "edit": {
+      "dialog": "Edit user",
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role"
+      },
+      "submit": "Save",
+      "submitting": "Saving...",
+      "cancel": "Cancel",
+      "success": "User updated",
+      "error": "Failed to update user"
+    },
+    "delete": {
+      "title": "Delete user?",
+      "description": "You are about to delete the account <strong>{name}</strong> ({email}). This action cannot be undone.",
+      "submit": "Delete",
+      "submitting": "Deleting...",
+      "cancel": "Cancel",
+      "success": "User deleted",
+      "error": "Failed to delete user"
+    },
+    "block": {
+      "titleBlocked": "Unblock",
+      "titleActive": "Block",
+      "successBlocked": "User unblocked",
+      "successActive": "User blocked",
+      "error": "Failed to change block status"
+    },
+    "actions": {
+      "viewProfile": "View profile",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "user": "User"
+    },
+    "status": {
+      "blocked": "Blocked"
+    }
   }
 }

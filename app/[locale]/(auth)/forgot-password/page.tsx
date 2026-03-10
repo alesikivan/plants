@@ -10,11 +10,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { MailCheck } from 'lucide-react';
 import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
 
 export default function ForgotPasswordPage() {
   const locale = useLocale() as AppLocale;
+  const t = useTranslations('ForgotPasswordPage');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -35,7 +36,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        <AuthPageHeader locale={locale} backHref="/login" backLabel="Назад к входу" />
+        <AuthPageHeader locale={locale} backHref="/login" backLabel={t('backLogin')} />
 
         <Card className="backdrop-blur-xl">
           <CardHeader className="text-center space-y-6 pb-8">
@@ -45,11 +46,9 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
             <div>
-              <CardTitle>{sent ? 'Проверьте почту' : 'Восстановление пароля'}</CardTitle>
+              <CardTitle>{sent ? t('titleSent') : t('titleInitial')}</CardTitle>
               <CardDescription className="pt-2">
-                {sent
-                  ? 'Если аккаунт с такой почтой существует, вы получите письмо со ссылкой для сброса пароля.'
-                  : 'Введите ваш email и мы отправим ссылку для сброса пароля'}
+                {sent ? t('descriptionSent') : t('descriptionInitial')}
               </CardDescription>
             </div>
           </CardHeader>
@@ -57,11 +56,11 @@ export default function ForgotPasswordPage() {
           {!sent ? (
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-3">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('fields.email.label')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder={t('fields.email.placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -70,7 +69,7 @@ export default function ForgotPasswordPage() {
               </CardContent>
               <CardFooter className="flex flex-col space-y-4 pt-2">
                 <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                  {isLoading ? 'Отправка...' : 'Отправить ссылку'}
+                  {isLoading ? t('submit.loading') : t('submit.default')}
                 </Button>
               </CardFooter>
             </form>
@@ -78,7 +77,7 @@ export default function ForgotPasswordPage() {
             <CardFooter className="pt-0">
               <Link href="/login" className="w-full">
                 <Button variant="outline" className="w-full" size="lg">
-                  Вернуться к входу
+                  {t('backToLogin')}
                 </Button>
               </Link>
             </CardFooter>

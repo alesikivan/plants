@@ -136,5 +136,284 @@
       "passwordMismatch": "Пароли не совпадают",
       "passwordMinLength": "Пароль должен содержать минимум 6 символов"
     }
+  },
+  "LoginPage": {
+    "backHome": "На главную",
+    "title": "С возвращением",
+    "description": "Войдите в свой аккаунт для продолжения",
+    "fields": {
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      },
+      "password": {
+        "label": "Пароль",
+        "placeholder": "••••••••"
+      },
+      "forgotPassword": "Забыли пароль?"
+    },
+    "submit": {
+      "default": "Войти",
+      "loading": "Вход..."
+    },
+    "registerPrompt": "Нет аккаунта?",
+    "registerLink": "Создать аккаунт",
+    "accountBlocked": "Ваш аккаунт был заблокирован администратором.",
+    "emailNotVerified": "Email не подтверждён. Проверьте почту или запросите новое письмо.",
+    "resendButton": "Отправить письмо повторно",
+    "resendButtonLoading": "Отправка...",
+    "resendSuccess": "Письмо отправлено!",
+    "successMessage": "Добро пожаловать! 🌱",
+    "verificationMessages": {
+      "verified": "Email подтверждён! Теперь вы можете войти.",
+      "verificationError": "Ссылка недействительна или устарела. Запросите новое письмо."
+    }
+  },
+  "ForgotPasswordPage": {
+    "backLogin": "Назад к входу",
+    "titleInitial": "Восстановление пароля",
+    "descriptionInitial": "Введите ваш email и мы отправим ссылку для сброса пароля",
+    "titleSent": "Проверьте почту",
+    "descriptionSent": "Если аккаунт с такой почтой существует, вы получите письмо со ссылкой для сброса пароля.",
+    "fields": {
+      "email": {
+        "label": "Email",
+        "placeholder": "your@email.com"
+      }
+    },
+    "submit": {
+      "default": "Отправить ссылку",
+      "loading": "Отправка..."
+    },
+    "backToLogin": "Вернуться к входу"
+  },
+  "ResetPasswordPage": {
+    "backLogin": "Назад к входу",
+    "titleForm": "Новый пароль",
+    "descriptionForm": "Введите новый пароль для вашего аккаунта",
+    "titleInvalidLink": "Ссылка недействительна",
+    "descriptionInvalidLink": "Ссылка недействительна или устарела. Запросите новую ссылку для сброса пароля.",
+    "titleSuccess": "Пароль изменён",
+    "descriptionSuccess": "Пароль успешно изменён. Теперь вы можете войти с новым паролем.",
+    "fields": {
+      "password": {
+        "label": "Новый пароль",
+        "placeholder": "••••••••"
+      },
+      "confirmPassword": {
+        "label": "Повторите пароль",
+        "placeholder": "••••••••"
+      }
+    },
+    "submit": {
+      "default": "Сохранить пароль",
+      "loading": "Сохранение..."
+    },
+    "requestNewLink": "Запросить новую ссылку",
+    "signIn": "Войти",
+    "validationErrors": {
+      "passwordMinLength": "Пароль должен содержать не менее 6 символов",
+      "passwordMismatch": "Пароли не совпадают"
+    }
+  },
+  "VerifyEmailPage": {
+    "backLabel": "Назад к входу",
+    "loading": {
+      "title": "Подтверждение email...",
+      "description": "Пожалуйста, подождите"
+    },
+    "success": {
+      "title": "Email подтверждён!",
+      "description": "Спасибо за подтверждение. Ваш аккаунт активирован — теперь вы можете войти."
+    },
+    "error": {
+      "title": "Ссылка недействительна",
+      "description": "Ссылка устарела или уже использована. Войдите и запросите новое письмо."
+    },
+    "button": "Перейти к входу"
+  },
+  "DashboardPage": {
+    "quickActions": "Быстрые действия",
+    "addPlant": "Добавить растение",
+    "startTracking": "Начните отслеживать новое растение",
+    "wishlist": "Список желаний",
+    "addWishlist": "Добавить",
+    "searchPlaceholder": "Поиск по названию...",
+    "filters": "Фильтры",
+    "allGenus": "Все роды",
+    "genusSearchPlaceholder": "Поиск рода...",
+    "emptyText": "Ничего не найдено",
+    "clearFilters": "Сбросить фильтры",
+    "loading": "Загрузка...",
+    "emptyWishlist": "Список желаний пуст",
+    "emptyWishlistDescription": "Добавьте растения, которые хотите приобрести",
+    "addPlantButton": "Добавить растение",
+    "nothingFound": "Ничего не найдено",
+    "tryChangingQuery": "Попробуйте изменить запрос или фильтры",
+    "clearFiltersButton": "Сбросить фильтры",
+    "wishlistLoadError": "Ошибка загрузки списка желаний"
+  },
+  "AddWishlistModal": {
+    "title": "Добавить в список желаний",
+    "description": "Выберите растение, которое хотите приобрести",
+    "photoLabel": "Фото растения (необязательно)",
+    "invalidFileType": "Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)",
+    "cancel": "Отмена",
+    "submit": "Добавить",
+    "submitLoading": "Добавление...",
+    "success": "Растение добавлено в список желаний!",
+    "error": "Ошибка при добавлении в список желаний"
+  },
+  "EditWishlistModal": {
+    "title": "Редактировать список желаний",
+    "description": "Измените информацию о растении в списке желаний",
+    "photoLabel": "Фото растения (необязательно)",
+    "invalidFileType": "Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)",
+    "cancel": "Отмена",
+    "submit": "Сохранить",
+    "submitLoading": "Сохранение...",
+    "success": "Список желаний обновлен!",
+    "error": "Ошибка при обновлении списка желаний"
+  },
+  "WishlistCard": {
+    "noName": "Без названия",
+    "deleteTitle": "Удалить из списка желаний?",
+    "deleteDescription": "Вы уверены, что хотите удалить \"{name}\" из списка желаний? Это действие нельзя отменить.",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "deleteLoading": "Удаление...",
+    "success": "Растение удалено из списка желаний",
+    "error": "Ошибка при удалении из списка желаний"
+  },
+  "PlantSelector": {
+    "genusLabel": "Род растения",
+    "genusPlaceholder": "Выберите род растения",
+    "genusSearchPlaceholder": "Поиск рода...",
+    "genusError": "Это поле обязательно",
+    "genusCreateLabel": "Создать род",
+    "genusLoadError": "Ошибка загрузки родов растений",
+    "varietyLabel": "Сорт растения",
+    "varietyPlaceholder": "Сначала выберите род",
+    "varietySelectedPlaceholder": "Выберите сорт",
+    "varietySearchPlaceholder": "Поиск сорта...",
+    "varietyNoneAvailable": "Нет доступных сортов",
+    "varietyEmptyText": "Ничего не найдено",
+    "varietyCreateLabel": "Создать сорт",
+    "varietyLoadError": "Ошибка загрузки сортов растений"
+  },
+  "FileInput": {
+    "selectButton": "Выберите файл",
+    "processing": "Обработка фото...",
+    "removeButton": "Удалить",
+    "helperText": "Максимальный размер: {size}. Форматы: {formats}"
+  },
+  "Navigation": {
+    "dashboard": "Панель",
+    "myPlants": "Мои растения",
+    "shelves": "Полки",
+    "feed": "Лента",
+    "users": "Пользователи",
+    "admin": "Админ",
+    "plants": "Растения",
+    "help": "Нужна помощь или есть предложение?",
+    "helpEmail": "Напишите нам – мы всё читаем :)"
+  },
+  "PublicHeader": {
+    "startFree": "Начать бесплатно!"
+  },
+  "UsersPage": {
+    "header": {
+      "title": "Пользователи",
+      "description": "Найдите и просмотрите профили пользователей"
+    },
+    "search": {
+      "placeholder": "Поиск по имени пользователя...",
+      "loading": "Поиск...",
+      "submit": "Найти"
+    },
+    "empty": {
+      "notFound": "Пользователи не найдены",
+      "noUsers": "Нет пользователей",
+      "tryChanging": "Попробуйте изменить параметры поиска"
+    },
+    "error": "Ошибка загрузки пользователей"
+  },
+  "AdminUsersPage": {
+    "header": {
+      "title": "Управление пользователями",
+      "total": "Всего: {count} пользователей"
+    },
+    "search": {
+      "placeholder": "Поиск по имени или email..."
+    },
+    "table": {
+      "title": "Все пользователи",
+      "found": "Найдено: {count}",
+      "noUsers": "Нет пользователей",
+      "loading": "Загрузка...",
+      "registered": "Зарегистрирован: {date}"
+    },
+    "create": {
+      "button": "Создать пользователя",
+      "dialog": "Создать пользователя",
+      "fields": {
+        "name": "Имя",
+        "email": "Email",
+        "password": "Пароль",
+        "role": "Роль"
+      },
+      "placeholders": {
+        "name": "nickname",
+        "email": "user@example.com",
+        "password": "Минимум 6 символов"
+      },
+      "submit": "Создать",
+      "submitting": "Создание...",
+      "cancel": "Отмена",
+      "success": "Пользователь создан",
+      "error": "Не удалось создать пользователя"
+    },
+    "edit": {
+      "dialog": "Редактировать пользователя",
+      "fields": {
+        "name": "Имя",
+        "email": "Email",
+        "role": "Роль"
+      },
+      "submit": "Сохранить",
+      "submitting": "Сохранение...",
+      "cancel": "Отмена",
+      "success": "Пользователь обновлён",
+      "error": "Не удалось обновить пользователя"
+    },
+    "delete": {
+      "title": "Удалить пользователя?",
+      "description": "Вы собираетесь удалить аккаунт <strong>{name}</strong> ({email}). Это действие необратимо.",
+      "submit": "Удалить",
+      "submitting": "Удаление...",
+      "cancel": "Отмена",
+      "success": "Пользователь удалён",
+      "error": "Не удалось удалить пользователя"
+    },
+    "block": {
+      "titleBlocked": "Разблокировать",
+      "titleActive": "Заблокировать",
+      "successBlocked": "Пользователь разблокирован",
+      "successActive": "Пользователь заблокирован",
+      "error": "Не удалось изменить статус блокировки"
+    },
+    "actions": {
+      "viewProfile": "Открыть профиль",
+      "edit": "Редактировать",
+      "delete": "Удалить"
+    },
+    "roles": {
+      "admin": "Админ",
+      "manager": "Менеджер",
+      "user": "Пользователь"
+    },
+    "status": {
+      "blocked": "Заблокирован"
+    }
   }
 }

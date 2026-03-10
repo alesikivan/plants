@@ -17,17 +17,14 @@ import { ShieldX, MailWarning } from 'lucide-react';
 import { AxiosError } from 'axios';
 import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
-
-const REASON_MESSAGES: Record<string, string> = {
-  blocked: 'Ваш аккаунт был заблокирован администратором.',
-};
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = useLocale() as AppLocale;
+  const t = useTranslations('LoginPage');
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,15 +35,14 @@ function LoginContent() {
 
   const reason = searchParams.get('reason');
   const verified = searchParams.get('verified');
-  const reasonMessage = reason ? REASON_MESSAGES[reason] : null;
 
   useEffect(() => {
     if (verified === 'true') {
-      showSuccessToast('Email подтверждён! Теперь вы можете войти.');
+      showSuccessToast(t('verificationMessages.verified'));
     } else if (verified === 'error') {
-      showInfoToast('Ссылка недействительна или устарела. Запросите новое письмо.');
+      showInfoToast(t('verificationMessages.verificationError'));
     }
-  }, [verified]);
+  }, [verified, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +51,7 @@ function LoginContent() {
 
     try {
       await login({ email, password });
-      showSuccessToast('Добро пожаловать! 🌱');
+      showSuccessToast(t('successMessage'));
       router.push('/dashboard');
     } catch (err) {
       const axiosError = err as AxiosError<any>;
@@ -76,7 +72,7 @@ function LoginContent() {
     try {
       await authApi.resendVerification(email);
       setResendDone(true);
-      showSuccessToast('Письмо отправлено! Проверьте почту.');
+      showSuccessToast(t('resendSuccess'));
     } catch {
       // silently fail
     } finally {
@@ -87,12 +83,12 @@ function LoginContent() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        <AuthPageHeader locale={locale} backHref="/" backLabel="На главную" />
+        <AuthPageHeader locale={locale} backHref="/" backLabel={t('backHome')} />
 
-        {reasonMessage && (
+        {reason === 'blocked' && (
           <Alert className="border-destructive/50 bg-destructive/10 text-destructive">
             <ShieldX className="h-4 w-4" />
-            <AlertDescription>{reasonMessage}</AlertDescription>
+            <AlertDescription>{t('accountBlocked')}</AlertDescription>
           </Alert>
         )}
 
@@ -100,7 +96,7 @@ function LoginContent() {
           <Alert className="border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400">
             <MailWarning className="h-4 w-4" />
             <AlertDescription className="space-y-2">
-              <p>Email не подтверждён. Проверьте почту или запросите новое письмо.</p>
+              <p>{t('emailNotVerified')}</p>
               {!resendDone ? (
                 <Button
                   variant="outline"
@@ -109,10 +105,10 @@ function LoginContent() {
                   disabled={resendLoading || !email}
                   className="mt-1"
                 >
-                  {resendLoading ? 'Отправка...' : 'Отправить письмо повторно'}
+                  {resendLoading ? t('resendButtonLoading') : t('resendButton')}
                 </Button>
               ) : (
-                <p className="text-sm font-medium">Письмо отправлено!</p>
+                <p className="text-sm font-medium">{t('resendSuccess')}</p>
               )}
             </AlertDescription>
           </Alert>
@@ -128,9 +124,9 @@ function LoginContent() {
             </div>
 
             <div>
-              <CardTitle>С возвращением</CardTitle>
+              <CardTitle>{t('title')}</CardTitle>
               <CardDescription className="pt-2">
-                Войдите в свой аккаунт для продолжения
+                {t('description')}
               </CardDescription>
             </div>
           </CardHeader>
@@ -138,11 +134,11 @@ function LoginContent() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-1">
               <div className="space-y-3">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('fields.email.label')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder={t('fields.email.placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -152,17 +148,17 @@ function LoginContent() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Пароль</Label>
+                  <Label htmlFor="password">{t('fields.password.label')}</Label>
                   <Link
                     href="/forgot-password"
                     className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Забыли пароль?
+                    {t('fields.forgotPassword')}
                   </Link>
                 </div>
                 <PasswordInput
                   id="password"
-                  placeholder="••••••••"
+                  placeholder={t('fields.password.placeholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -173,13 +169,13 @@ function LoginContent() {
 
             <CardFooter className="flex flex-col space-y-4 pt-2">
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                {isLoading ? 'Вход...' : 'Войти'}
+                {isLoading ? t('submit.loading') : t('submit.default')}
               </Button>
 
               <div className="text-sm text-center text-muted-foreground">
-                Нет аккаунта?{' '}
+                {t('registerPrompt')}{' '}
                 <Link href="/register" className="text-primary font-semibold hover:underline">
-                  Создать аккаунт
+                  {t('registerLink')}
                 </Link>
               </div>
             </CardFooter>

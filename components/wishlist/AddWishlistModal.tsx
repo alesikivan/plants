@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ interface WishlistFormData {
 }
 
 export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistModalProps) {
+  const t = useTranslations('AddWishlistModal');
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +48,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
         varietyId: data.varietyId || undefined,
         photo: selectedFile || undefined,
       });
-      toast.success('Растение добавлено в список желаний!');
+      toast.success(t('success'));
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
@@ -55,7 +57,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      toast.error('Ошибка при добавлении в список желаний');
+      toast.error(t('error'));
       console.error('Failed to create wishlist item:', error);
     } finally {
       setIsLoading(false);
@@ -71,7 +73,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
 
     // Check file type
     if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
-      toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
+      toast.error(t('invalidFileType'));
       return;
     }
 
@@ -106,9 +108,9 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Добавить в список желаний</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Выберите растение, которое хотите приобрести
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -126,7 +128,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
 
             {/* Фото растения */}
             <div className="grid gap-2">
-              <Label htmlFor="photo">Фото растения (необязательно)</Label>
+              <Label htmlFor="photo">{t('photoLabel')}</Label>
               <FileInput
                 id="photo"
                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -146,10 +148,10 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Отмена
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={isLoading || !selectedGenusId}>
-              {isLoading ? 'Добавление...' : 'Добавить'}
+              {isLoading ? t('submitLoading') : t('submit')}
             </Button>
           </DialogFooter>
         </form>

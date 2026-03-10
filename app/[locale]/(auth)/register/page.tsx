@@ -51,7 +51,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const result = await register({ name, email, password });
+      const result = await register({ name, email, password, preferredLanguage: locale });
       if (result?.requiresVerification) {
         setSentEmail(email);
         setVerificationSent(true);

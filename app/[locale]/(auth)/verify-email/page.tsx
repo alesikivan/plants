@@ -8,12 +8,13 @@ import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import apiClient from '@/lib/api/client';
 import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const locale = useLocale() as AppLocale;
+  const t = useTranslations('VerifyEmailPage');
   const token = searchParams.get('token');
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
@@ -31,7 +32,7 @@ function VerifyEmailContent() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        <AuthPageHeader locale={locale} backHref="/login" backLabel="Назад к входу" />
+        <AuthPageHeader locale={locale} backHref="/login" backLabel={t('backLabel')} />
         <Card className="backdrop-blur-xl">
           <CardHeader className="text-center space-y-6 pb-6">
             <div className="flex justify-center">
@@ -55,23 +56,23 @@ function VerifyEmailContent() {
             <div>
               {status === 'loading' && (
                 <>
-                  <CardTitle>Подтверждение email...</CardTitle>
-                  <CardDescription className="pt-2">Пожалуйста, подождите</CardDescription>
+                  <CardTitle>{t('loading.title')}</CardTitle>
+                  <CardDescription className="pt-2">{t('loading.description')}</CardDescription>
                 </>
               )}
               {status === 'success' && (
                 <>
-                  <CardTitle>Email подтверждён!</CardTitle>
+                  <CardTitle>{t('success.title')}</CardTitle>
                   <CardDescription className="pt-2">
-                    Спасибо за подтверждение. Ваш аккаунт активирован — теперь вы можете войти.
+                    {t('success.description')}
                   </CardDescription>
                 </>
               )}
               {status === 'error' && (
                 <>
-                  <CardTitle>Ссылка недействительна</CardTitle>
+                  <CardTitle>{t('error.title')}</CardTitle>
                   <CardDescription className="pt-2">
-                    Ссылка устарела или уже использована. Войдите и запросите новое письмо.
+                    {t('error.description')}
                   </CardDescription>
                 </>
               )}
@@ -82,7 +83,7 @@ function VerifyEmailContent() {
             <CardFooter>
               <Button asChild className="w-full" size="lg">
                 <Link href="/login">
-                  Перейти к входу
+                  {t('button')}
                 </Link>
               </Button>
             </CardFooter>

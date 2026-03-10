@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare, Copy, Check } from 'lucide-react';
 import { usersApi, Plant, PlantHistory, Genus, Variety, getPlantPhotoUrl, getPlantHistoryPhotoUrl } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
@@ -39,6 +39,7 @@ export default function UserPlantDetailClient({
   const [isLoading, setIsLoading] = useState(!initialPlant && !initialPlantHidden);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
   const [selectedHistoryPhotos, setSelectedHistoryPhotos] = useState<{ photos: string[]; index: number } | null>(null);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   useEffect(() => {
     if (!userId || !plantId) return;
@@ -68,6 +69,22 @@ export default function UserPlantDetailClient({
       })
       .finally(() => setIsLoading(false));
   }, [initialPlant, initialPlantHidden, plantId, router, userId]);
+
+  const handleCopyPlantLink = async () => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const plantUrl = `${baseUrl}/profile/${userId}/plants/${plantId}`;
+
+    try {
+      await navigator.clipboard.writeText(plantUrl);
+      setIsLinkCopied(true);
+      toast.success('Ссылка скопирована в буфер обмена');
+
+      setTimeout(() => setIsLinkCopied(false), 2000);
+    } catch (error) {
+      toast.error('Не удалось скопировать ссылку');
+      console.error('Failed to copy link:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -149,7 +166,31 @@ export default function UserPlantDetailClient({
 
             <div className="flex-1 space-y-4 min-w-0">
               <div>
-                <h1 className="text-xl sm:text-2xl font-semibold mb-1">{plantName || 'Без названия'}</h1>
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <h1 className="text-xl sm:text-2xl font-semibold">
+                    {plantName || 'Без названия'}
+                  </h1>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyPlantLink}
+                    className="h-8 px-2 gap-1.5 text-muted-foreground hover:text-foreground transition-all active:scale-95"
+                    title="Скопировать ссылку на растение"
+                  >
+                    {isLinkCopied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span className="text-xs">Скопировано</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span className="text-xs">Ссылка</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <p className="text-sm text-muted-foreground">Информация о растении</p>
               </div>
 

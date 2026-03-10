@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { toast } from 'sonner';
 const COMBOBOX_CLASS = 'h-10 rounded-xl border-2 text-sm font-normal';
 
 export default function DashboardPage() {
+  const t = useTranslations('DashboardPage');
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
   const router = useRouter();
@@ -56,7 +58,7 @@ export default function DashboardPage() {
         )
       );
     } catch (error) {
-      toast.error('Ошибка загрузки списка желаний');
+      toast.error(t('wishlistLoadError'));
       console.error('Failed to load wishlist:', error);
     } finally {
       setIsLoading(false);
@@ -79,7 +81,7 @@ export default function DashboardPage() {
       });
       setWishlist(data);
     } catch (error) {
-      toast.error('Ошибка загрузки списка желаний');
+      toast.error(t('wishlistLoadError'));
       console.error('Failed to filter wishlist:', error);
     } finally {
       setIsFiltering(false);
@@ -125,7 +127,7 @@ export default function DashboardPage() {
     <div className="space-y-8 mx-auto animate-in fade-in slide-in-from-bottom-2 duration-700">
       {/* Quick Actions */}
       <div className="animate-in fade-in slide-in-from-top-2 duration-500">
-        <h2 className="text-2xl font-bold mb-4">Быстрые действия</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('quickActions')}</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <button
             onClick={() => router.push('/plants')}
@@ -135,8 +137,8 @@ export default function DashboardPage() {
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <Leaf className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="font-semibold">Добавить растение</h3>
-              <p className="text-sm text-muted-foreground">Начните отслеживать новое растение</p>
+              <h3 className="font-semibold">{t('addPlant')}</h3>
+              <p className="text-sm text-muted-foreground">{t('startTracking')}</p>
             </div>
           </button>
         </div>
@@ -147,11 +149,11 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Heart className="w-6 h-6 text-primary" />
-            <h2 className="text-2xl font-bold">Список желаний</h2>
+            <h2 className="text-2xl font-bold">{t('wishlist')}</h2>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)} size="sm">
             <Plus className="w-4 h-4" />
-            <span className='hidden sm:block'>Добавить</span>
+            <span className='hidden sm:block'>{t('addWishlist')}</span>
           </Button>
         </div>
 
@@ -162,7 +164,7 @@ export default function DashboardPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <Input
-                  placeholder="Поиск по названию..."
+                  placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   className="pl-9 h-10"
@@ -173,7 +175,7 @@ export default function DashboardPage() {
                   variant={hasFilters ? 'default' : 'outline'}
                   onClick={() => setShowFilters((v) => !v)}
                   className="relative shrink-0 h-10 w-10 p-0 rounded-xl"
-                  title="Фильтры"
+                  title={t('filters')}
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                   {hasFilters && (
@@ -191,9 +193,9 @@ export default function DashboardPage() {
                       options={genusOptions}
                       value={genusFilter}
                       onValueChange={handleGenusChange}
-                      placeholder="Все роды"
-                      searchPlaceholder="Поиск рода..."
-                      emptyText="Ничего не найдено"
+                      placeholder={t('allGenus')}
+                      searchPlaceholder={t('genusSearchPlaceholder')}
+                      emptyText={t('emptyText')}
                       onSearchChange={setGenusSearch}
                       className={COMBOBOX_CLASS}
                     />
@@ -205,7 +207,7 @@ export default function DashboardPage() {
                       variant="ghost"
                       onClick={clearFilters}
                       className="shrink-0 h-10 w-10 p-0 rounded-xl hidden sm:flex items-center justify-center"
-                      title="Сбросить фильтры"
+                      title={t('clearFilters')}
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -215,7 +217,7 @@ export default function DashboardPage() {
                       className="w-full h-10 gap-2 rounded-xl sm:hidden"
                     >
                       <X className="w-4 h-4" />
-                      Очистить фильтры
+                      {t('clearFiltersButton')}
                     </Button>
                   </>
                 )}
@@ -226,30 +228,30 @@ export default function DashboardPage() {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Загрузка...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         ) : wishlist.length === 0 && !hasFilters ? (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Heart className="w-12 h-12 text-muted-foreground/20 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Список желаний пуст</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('emptyWishlist')}</h3>
               <p className="text-sm text-muted-foreground mb-4 text-center">
-                Добавьте растения, которые хотите приобрести
+                {t('emptyWishlistDescription')}
               </p>
               <Button onClick={() => setIsAddModalOpen(true)} size="sm">
                 <Plus className="w-4 h-4 mr-2" />
-                Добавить растение
+                {t('addPlantButton')}
               </Button>
             </CardContent>
           </Card>
         ) : wishlist.length === 0 && hasFilters ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Search className="w-12 h-12 text-muted-foreground/30 mb-3" />
-            <p className="font-medium mb-1">Ничего не найдено</p>
-            <p className="text-sm text-muted-foreground mb-4">Попробуйте изменить запрос или фильтры</p>
+            <p className="font-medium mb-1">{t('nothingFound')}</p>
+            <p className="text-sm text-muted-foreground mb-4">{t('tryChangingQuery')}</p>
             <Button variant="outline" size="sm" onClick={clearFilters} className="gap-2">
               <X className="w-4 h-4" />
-              Сбросить фильтры
+              {t('clearFilters')}
             </Button>
           </div>
         ) : (

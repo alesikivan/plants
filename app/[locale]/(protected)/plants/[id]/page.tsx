@@ -112,7 +112,7 @@ export default function PlantDetailPage() {
   const handleCopyPublicLink = async () => {
     if (!plant) return;
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const publicUrl = `${baseUrl}/public/${plant._id}`;
+    const publicUrl = `${baseUrl}/profile/${plant.userId}/plants/${plant._id}`;
     try {
       await navigator.clipboard.writeText(publicUrl);
       setIsLinkCopied(true);
@@ -162,25 +162,6 @@ export default function PlantDetailPage() {
           <span className="hidden sm:inline">Назад к списку</span>
         </Button>
         <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-          <Button
-            variant="outline"
-            onClick={handleCopyPublicLink}
-            className="gap-2 transition-all active:scale-95"
-            title="Скопировать публичную ссылку на растение"
-          >
-            {isLinkCopied ? (
-              <>
-                <Check className="w-4 h-4" />
-                <span className="hidden sm:inline">Скопировано!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <span className="hidden sm:inline">Поделиться</span>
-              </>
-            )}
-          </Button>
-          
           {!plant.isArchived && (
             <Button
               variant="outline"
@@ -305,6 +286,25 @@ export default function PlantDetailPage() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <h1 className="text-xl sm:text-2xl font-semibold">{plantName || 'Без названия'}</h1>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyPublicLink}
+                    className="h-8 px-2 gap-1.5 text-muted-foreground hover:text-foreground transition-all active:scale-95"
+                    title="Скопировать ссылку на растение"
+                  >
+                    {isLinkCopied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span className="text-xs">Скопировано</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span className="text-xs">Ссылка</span>
+                      </>
+                    )}
+                  </Button>
                   {plant.isArchived && (
                     <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground border">
                       <Archive className="w-3 h-3" />

@@ -14,12 +14,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const locale = useLocale() as AppLocale;
+  const t = useTranslations('ResetPasswordPage');
   const token = searchParams.get('token');
 
   const [password, setPassword] = useState('');
@@ -40,11 +41,11 @@ function ResetPasswordContent() {
     setValidationError(null);
 
     if (password.length < 6) {
-      setValidationError('Пароль должен содержать не менее 6 символов');
+      setValidationError(t('validationErrors.passwordMinLength'));
       return;
     }
     if (password !== confirmPassword) {
-      setValidationError('Пароли не совпадают');
+      setValidationError(t('validationErrors.passwordMismatch'));
       return;
     }
 
@@ -63,7 +64,7 @@ function ResetPasswordContent() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
         <div className="w-full max-w-md space-y-8">
-          <AuthPageHeader locale={locale} backHref="/login" backLabel="Назад к входу" />
+          <AuthPageHeader locale={locale} backHref="/login" backLabel={t('backLogin')} />
           <Card className="backdrop-blur-xl">
             <CardHeader className="text-center space-y-6 pb-8">
               <div className="flex justify-center">
@@ -72,16 +73,16 @@ function ResetPasswordContent() {
                 </div>
               </div>
               <div>
-                <CardTitle>Ссылка недействительна</CardTitle>
+                <CardTitle>{t('titleInvalidLink')}</CardTitle>
                 <CardDescription className="pt-2">
-                  Ссылка недействительна или устарела. Запросите новую ссылку для сброса пароля.
+                  {t('descriptionInvalidLink')}
                 </CardDescription>
               </div>
             </CardHeader>
             <CardFooter>
               <Link href="/forgot-password" className="w-full">
                 <Button className="w-full" size="lg">
-                  Запросить новую ссылку
+                  {t('requestNewLink')}
                 </Button>
               </Link>
             </CardFooter>
@@ -103,16 +104,16 @@ function ResetPasswordContent() {
                 </div>
               </div>
               <div>
-                <CardTitle>Пароль изменён</CardTitle>
+                <CardTitle>{t('titleSuccess')}</CardTitle>
                 <CardDescription className="pt-2">
-                  Пароль успешно изменён. Теперь вы можете войти с новым паролем.
+                  {t('descriptionSuccess')}
                 </CardDescription>
               </div>
             </CardHeader>
             <CardFooter>
               <Link href="/login" className="w-full">
                 <Button className="w-full" size="lg">
-                  Войти
+                  {t('signIn')}
                 </Button>
               </Link>
             </CardFooter>
@@ -125,7 +126,7 @@ function ResetPasswordContent() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        <AuthPageHeader locale={locale} backHref="/login" backLabel="Назад к входу" />
+        <AuthPageHeader locale={locale} backHref="/login" backLabel={t('backLogin')} />
 
         <Card className="backdrop-blur-xl">
           <CardHeader className="text-center space-y-6 pb-8">
@@ -135,8 +136,8 @@ function ResetPasswordContent() {
               </div>
             </div>
             <div>
-              <CardTitle>Новый пароль</CardTitle>
-              <CardDescription className="pt-2">Введите новый пароль для вашего аккаунта</CardDescription>
+              <CardTitle>{t('titleForm')}</CardTitle>
+              <CardDescription className="pt-2">{t('descriptionForm')}</CardDescription>
             </div>
           </CardHeader>
 
@@ -148,10 +149,10 @@ function ResetPasswordContent() {
                 </Alert>
               )}
               <div className="space-y-2">
-                <Label htmlFor="password">Новый пароль</Label>
+                <Label htmlFor="password">{t('fields.password.label')}</Label>
                 <PasswordInput
                   id="password"
-                  placeholder="••••••••"
+                  placeholder={t('fields.password.placeholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -160,10 +161,10 @@ function ResetPasswordContent() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Повторите пароль</Label>
+                <Label htmlFor="confirmPassword">{t('fields.confirmPassword.label')}</Label>
                 <PasswordInput
                   id="confirmPassword"
-                  placeholder="••••••••"
+                  placeholder={t('fields.confirmPassword.placeholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -173,7 +174,7 @@ function ResetPasswordContent() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 pt-2">
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                {isLoading ? 'Сохранение...' : 'Сохранить пароль'}
+                {isLoading ? t('submit.loading') : t('submit.default')}
               </Button>
             </CardFooter>
           </form>

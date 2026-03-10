@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/store/authStore';
 import { usersApi } from '@/lib/api/users';
@@ -42,12 +43,6 @@ import Image from 'next/image';
 
 const PAGE_SIZE = 20;
 
-const ROLE_LABELS: Record<Role, string> = {
-  [Role.ADMIN]: 'Админ',
-  [Role.MANAGER]: 'Менеджер',
-  [Role.USER]: 'Пользователь',
-};
-
 const ROLE_BADGE_COLORS: Record<Role, string> = {
   [Role.ADMIN]: 'bg-red-100 text-red-700 border-red-200',
   [Role.MANAGER]: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -56,6 +51,7 @@ const ROLE_BADGE_COLORS: Record<Role, string> = {
 
 export default function AdminUsersPage() {
   const router = useRouter();
+  const t = useTranslations('AdminUsersPage');
   const user = useAuthStore((state) => state.user);
   const initialized = useAuthStore((state) => state.initialized);
   const queryClient = useQueryClient();
@@ -101,10 +97,10 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setCreateOpen(false);
       setCreateForm({ email: '', password: '', name: '', role: Role.USER });
-      toast.success('Пользователь создан');
+      toast.success(t('create.success'));
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || 'Не удалось создать пользователя');
+      toast.error(err?.response?.data?.message || t('create.error'));
     },
   });
 
@@ -114,10 +110,10 @@ export default function AdminUsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setEditUser(null);
-      toast.success('Пользователь обновлён');
+      toast.success(t('edit.success'));
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || 'Не удалось обновить пользователя');
+      toast.error(err?.response?.data?.message || t('edit.error'));
     },
   });
 
@@ -126,10 +122,10 @@ export default function AdminUsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setDeleteUser(null);
-      toast.success('Пользователь удалён');
+      toast.success(t('delete.success'));
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || 'Не удалось удалить пользователя');
+      toast.error(err?.response?.data?.message || t('delete.error'));
     },
   });
 
@@ -138,10 +134,10 @@ export default function AdminUsersPage() {
       usersApi.adminUpdateUser(id, { isBlocked }),
     onSuccess: (_, { isBlocked }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success(isBlocked ? 'Пользователь заблокирован' : 'Пользователь разблокирован');
+      toast.success(isBlocked ? t('block.successActive') : t('block.successBlocked'));
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || 'Не удалось изменить статус блокировки');
+      toast.error(err?.response?.data?.message || t('block.error'));
     },
   });
 
@@ -161,15 +157,15 @@ export default function AdminUsersPage() {
             <Shield className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Управление пользователями</h1>
+            <h1 className="text-2xl font-bold">{t('header.title')}</h1>
             <p className="text-sm text-muted-foreground">
-              Всего: {users.length} пользователей
+              {t('header.total', { count: users.length })}
             </p>
           </div>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2 w-full sm:w-auto">
           <UserPlus className="w-4 h-4" />
-          Создать пользователя
+          {t('create.button')}
         </Button>
       </div>
 
@@ -177,7 +173,7 @@ export default function AdminUsersPage() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Поиск по имени или email..."
+          placeholder={t('search.placeholder')}
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="pl-9"
@@ -188,15 +184,15 @@ export default function AdminUsersPage() {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">
-            {search ? `Найдено: ${filteredUsers.length}` : 'Все пользователи'}
+            {search ? t('table.found', { count: filteredUsers.length }) : t('table.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="py-12 text-center text-muted-foreground">Загрузка...</div>
+            <div className="py-12 text-center text-muted-foreground">{t('table.loading')}</div>
           ) : filteredUsers.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">
-              {search ? 'Пользователи не найдены' : 'Нет пользователей'}
+              {search ? t('table.noUsers') : t('table.noUsers')}
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -233,18 +229,19 @@ export default function AdminUsersPage() {
                             ROLE_BADGE_COLORS[u.role]
                           }`}
                         >
-                          {ROLE_LABELS[u.role]}
+                          {t(`roles.${u.role}`)}
                         </span>
                         {u.isBlocked && (
                           <span className="text-xs px-2 py-0.5 rounded-full border bg-destructive/10 text-destructive border-destructive/20 font-medium">
-                            Заблокирован
+                            {t('status.blocked')}
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{u.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        Зарегистрирован:{' '}
-                        {new Date(u.createdAt).toLocaleDateString('ru-RU')}
+                        {t('table.registered', {
+                          date: new Date(u.createdAt).toLocaleDateString()
+                        })}
                       </p>
                     </div>
                   </div>
@@ -255,7 +252,7 @@ export default function AdminUsersPage() {
                       variant="ghost"
                       size="icon"
                       className="w-full sm:w-9"
-                      title="Открыть профиль"
+                      title={t('actions.viewProfile')}
                       onClick={() => router.push(`/profile/${u.id}`)}
                     >
                       <User className="w-4 h-4" />
@@ -264,7 +261,7 @@ export default function AdminUsersPage() {
                       variant="ghost"
                       size="icon"
                       className="w-full sm:w-9"
-                      title={u.isBlocked ? 'Разблокировать' : 'Заблокировать'}
+                      title={u.isBlocked ? t('block.titleBlocked') : t('block.titleActive')}
                       disabled={u.id === user.id || blockMutation.isPending}
                       onClick={() =>
                         blockMutation.mutate({ id: u.id, isBlocked: !u.isBlocked })
@@ -280,7 +277,7 @@ export default function AdminUsersPage() {
                       variant="ghost"
                       size="icon"
                       className="w-full sm:w-9"
-                      title="Редактировать"
+                      title={t('actions.edit')}
                       onClick={() => openEdit(u)}
                     >
                       <Pencil className="w-4 h-4" />
@@ -289,7 +286,7 @@ export default function AdminUsersPage() {
                       variant="ghost"
                       size="icon"
                       className="w-full sm:w-9"
-                      title="Удалить"
+                      title={t('actions.delete')}
                       disabled={u.id === user.id}
                       onClick={() => setDeleteUser(u)}
                     >
@@ -308,40 +305,40 @@ export default function AdminUsersPage() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Создать пользователя</DialogTitle>
+            <DialogTitle>{t('create.dialog')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="create-name">Имя</Label>
+              <Label htmlFor="create-name">{t('create.fields.name')}</Label>
               <Input
                 id="create-name"
                 value={createForm.name}
                 onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="nickname"
+                placeholder={t('create.placeholders.name')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="create-email">Email</Label>
+              <Label htmlFor="create-email">{t('create.fields.email')}</Label>
               <Input
                 id="create-email"
                 type="email"
                 value={createForm.email}
                 onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
-                placeholder="user@example.com"
+                placeholder={t('create.placeholders.email')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="create-password">Пароль</Label>
+              <Label htmlFor="create-password">{t('create.fields.password')}</Label>
               <Input
                 id="create-password"
                 type="password"
                 value={createForm.password}
                 onChange={(e) => setCreateForm((f) => ({ ...f, password: e.target.value }))}
-                placeholder="Минимум 6 символов"
+                placeholder={t('create.placeholders.password')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Роль</Label>
+              <Label>{t('create.fields.role')}</Label>
               <Select
                 value={createForm.role}
                 onValueChange={(v) => setCreateForm((f) => ({ ...f, role: v as Role }))}
@@ -350,16 +347,16 @@ export default function AdminUsersPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={Role.USER}>Пользователь</SelectItem>
-                  <SelectItem value={Role.MANAGER}>Менеджер</SelectItem>
-                  <SelectItem value={Role.ADMIN}>Админ</SelectItem>
+                  <SelectItem value={Role.USER}>{t('roles.user')}</SelectItem>
+                  <SelectItem value={Role.MANAGER}>{t('roles.manager')}</SelectItem>
+                  <SelectItem value={Role.ADMIN}>{t('roles.admin')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
-              Отмена
+              {t('create.cancel')}
             </Button>
             <Button
               onClick={() => createMutation.mutate(createForm)}
@@ -370,7 +367,7 @@ export default function AdminUsersPage() {
                 !createForm.name
               }
             >
-              {createMutation.isPending ? 'Создание...' : 'Создать'}
+              {createMutation.isPending ? t('create.submitting') : t('create.submit')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -380,11 +377,11 @@ export default function AdminUsersPage() {
       <Dialog open={!!editUser} onOpenChange={(open) => !open && setEditUser(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редактировать пользователя</DialogTitle>
+            <DialogTitle>{t('edit.dialog')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Имя</Label>
+              <Label htmlFor="edit-name">{t('edit.fields.name')}</Label>
               <Input
                 id="edit-name"
                 value={editForm.name ?? ''}
@@ -392,7 +389,7 @@ export default function AdminUsersPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-email">Email</Label>
+              <Label htmlFor="edit-email">{t('edit.fields.email')}</Label>
               <Input
                 id="edit-email"
                 type="email"
@@ -401,7 +398,7 @@ export default function AdminUsersPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Роль</Label>
+              <Label>{t('edit.fields.role')}</Label>
               <Select
                 value={editForm.role}
                 onValueChange={(v) => setEditForm((f) => ({ ...f, role: v as Role }))}
@@ -410,16 +407,16 @@ export default function AdminUsersPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={Role.USER}>Пользователь</SelectItem>
-                  <SelectItem value={Role.MANAGER}>Менеджер</SelectItem>
-                  <SelectItem value={Role.ADMIN}>Админ</SelectItem>
+                  <SelectItem value={Role.USER}>{t('roles.user')}</SelectItem>
+                  <SelectItem value={Role.MANAGER}>{t('roles.manager')}</SelectItem>
+                  <SelectItem value={Role.ADMIN}>{t('roles.admin')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditUser(null)}>
-              Отмена
+              {t('edit.cancel')}
             </Button>
             <Button
               onClick={() =>
@@ -427,7 +424,7 @@ export default function AdminUsersPage() {
               }
               disabled={editMutation.isPending}
             >
-              {editMutation.isPending ? 'Сохранение...' : 'Сохранить'}
+              {editMutation.isPending ? t('edit.submitting') : t('edit.submit')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -437,21 +434,22 @@ export default function AdminUsersPage() {
       <AlertDialog open={!!deleteUser} onOpenChange={(open) => !open && setDeleteUser(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
+            <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы собираетесь удалить аккаунт{' '}
-              <strong>{deleteUser?.name}</strong> ({deleteUser?.email}).
-              Это действие необратимо.
+              {t('delete.description', {
+                name: deleteUser?.name,
+                email: deleteUser?.email
+              }).replace(/<strong>([^<]+)<\/strong>/g, '$1')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogCancel>{t('delete.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => deleteUser && deleteMutation.mutate(deleteUser.id)}
               disabled={deleteMutation.isPending}
             >
-              {deleteMutation.isPending ? 'Удаление...' : 'Удалить'}
+              {deleteMutation.isPending ? t('delete.submitting') : t('delete.submit')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
