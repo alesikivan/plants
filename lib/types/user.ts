@@ -63,5 +63,6 @@ export interface UserProfileWithStats {
   stats: {
     totalPlants: number;
     totalShelves: number;
+    followersCount: number;
   };
 }

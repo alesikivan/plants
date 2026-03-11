@@ -148,7 +148,7 @@ export default function UsersPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Leaf className="w-4 h-4" />
                     <span>{user.stats.totalPlants}</span>
@@ -156,6 +156,10 @@ export default function UsersPage() {
                   <div className="flex items-center gap-1.5">
                     <Layers className="w-4 h-4" />
                     <span>{user.stats.totalShelves}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    <span>{user.stats.followersCount}</span>
                   </div>
                 </div>
               </div>
