@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff, Copy, Check } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
 import { followsApi, FollowStats, PublicFollowStats } from '@/lib/api/follows';
 import { getAvatarUrl } from '@/lib/api/users';
@@ -55,6 +55,18 @@ export default function ProfilePageClient({
   const [loadingShelves, setLoadingShelves] = useState(false);
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
   const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/profile/${userId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      toast.error(t('copyLink.errorToast'));
+    }
+  };
 
   useEffect(() => {
     if (!userId || !initialized) return;
@@ -148,7 +160,18 @@ export default function ProfilePageClient({
               )}
             </button>
               <div>
-                <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
+                <div className="flex items-center gap-1">
+                  <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0"
+                    onClick={handleCopyLink}
+                    title={t('copyLink.tooltip')}
+                  >
+                    {isCopied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  </Button>
+                </div>
                 {!isOwnProfile && currentUser && followStats !== null && (
                   <div className="mt-1.5">
                     <FollowButton
@@ -233,6 +256,18 @@ export default function ProfilePageClient({
           </div>
         </CardHeader>
       </Card>
+
+      {/* Bio */}
+      {profile.bio && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{t('bio.title')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{profile.bio}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Social Links */}
       {profile.socialLinks && profile.socialLinks.length > 0 && (

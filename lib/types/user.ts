@@ -20,6 +20,7 @@ export interface UserResponse {
   showShelves: boolean;
   showPlantHistory: boolean;
   isBlocked: boolean;
+  bio?: string;
   avatar?: string;
   socialLinks?: SocialLink[];
   createdAt: string;
@@ -27,6 +28,7 @@ export interface UserResponse {
 }
 
 export interface UpdateUserDto {
+  bio?: string;
   preferredLanguage?: string;
   showPlants?: boolean;
   showShelves?: boolean;
@@ -56,6 +58,7 @@ export interface UserProfileWithStats {
   showPlants: boolean;
   showShelves: boolean;
   showPlantHistory: boolean;
+  bio?: string;
   avatar?: string;
   socialLinks?: SocialLink[];
   createdAt: string;

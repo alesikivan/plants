@@ -6,8 +6,9 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check, Pencil } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { plantsApi, shelvesApi, Plant, Shelf } from '@/lib/api';
@@ -39,6 +40,9 @@ export default function ProfilePage() {
   const logout = useAuthStore((state) => state.logout);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
+  const [isBioEditing, setIsBioEditing] = useState(false);
+  const [bioInput, setBioInput] = useState('');
+  const [isBioSaving, setIsBioSaving] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -149,6 +153,24 @@ export default function ProfilePage() {
     } catch (error) {
       toast.error(t('copyLink.errorToast'));
       console.error('Failed to copy profile link:', error);
+    }
+  };
+
+  const handleBioEdit = () => {
+    setBioInput(user?.bio || '');
+    setIsBioEditing(true);
+  };
+
+  const handleBioSave = async () => {
+    setIsBioSaving(true);
+    try {
+      await updateProfile({ bio: bioInput.trim() });
+      toast.success(t('bio.successToast'));
+      setIsBioEditing(false);
+    } catch {
+      toast.error(t('bio.errorToast'));
+    } finally {
+      setIsBioSaving(false);
     }
   };
 
@@ -341,6 +363,51 @@ export default function ProfilePage() {
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Bio */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{t('bio.title')}</CardTitle>
+            {!isBioEditing && (
+              <Button variant="ghost" size="sm" className="gap-1" onClick={handleBioEdit}>
+                <Pencil className="w-4 h-4" />
+                {t('bio.edit')}
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isBioEditing ? (
+            <div className="space-y-2">
+              <div className="relative">
+                <Textarea
+                  value={bioInput}
+                  onChange={(e) => setBioInput(e.target.value.slice(0, 80))}
+                  placeholder={t('bio.placeholder')}
+                  className="resize-none"
+                  rows={2}
+                  maxLength={80}
+                  disabled={isBioSaving}
+                />
+                <span className="absolute bottom-2 right-2 text-xs text-muted-foreground">{bioInput.length}/80</span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleBioSave} disabled={isBioSaving}>
+                  {isBioSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : t('bio.save')}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setIsBioEditing(false)} disabled={isBioSaving}>
+                  {t('bio.cancel')}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className={user.bio ? 'text-sm whitespace-pre-wrap' : 'text-sm text-muted-foreground italic'}>
+              {user.bio || t('bio.placeholder')}
+            </p>
+          )}
         </CardContent>
       </Card>
 

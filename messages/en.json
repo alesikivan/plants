@@ -981,6 +981,13 @@
       "followers": "Followers",
       "following": "Following"
     },
+    "bio": {
+      "title": "About"
+    },
+    "copyLink": {
+      "tooltip": "Copy profile link",
+      "errorToast": "Failed to copy link"
+    },
     "sections": {
       "plants": {
         "title": "Plants",
@@ -1173,6 +1180,15 @@
       },
       "successToast": "Privacy settings updated",
       "errorToast": "Error updating settings"
+    },
+    "bio": {
+      "title": "About me",
+      "placeholder": "Tell a little about yourself...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "successToast": "Description updated",
+      "errorToast": "Error saving description"
     },
     "socialLinks": {
       "title": "Contact methods",
