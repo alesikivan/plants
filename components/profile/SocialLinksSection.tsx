@@ -45,7 +45,8 @@ export function SocialLinksSection({
     if (!onUpdate) return;
     setIsSaving(true);
     try {
-      await onUpdate(updatedLinks);
+      const cleanLinks = updatedLinks.map(({ type, value, isPublic }) => ({ type, value, isPublic }));
+      await onUpdate(cleanLinks as SocialLink[]);
     } finally {
       setIsSaving(false);
     }
