@@ -82,15 +82,17 @@ export async function getPublicProfileShelvesPageData(userId: string) {
 }
 
 export async function getPublicProfilePlantPageData(userId: string, plantId: string) {
-  const [plantResult, historyResult] = await Promise.all([
+  const [plantResult, historyResult, profileResult] = await Promise.all([
     fetchJson<Plant>(`/users/${userId}/plants/${plantId}`),
     fetchJson<PlantHistory[]>(`/users/${userId}/plants/${plantId}/history`),
+    fetchJson<UserProfileWithStats>(`/users/${userId}/profile`),
   ]);
 
   return {
     status: plantResult.status,
     plant: plantResult.ok ? plantResult.data : null,
     history: historyResult.ok ? historyResult.data ?? [] : [],
+    profile: profileResult.ok ? profileResult.data : null,
     plantHidden: plantResult.status === 403,
     historyHidden: historyResult.status === 403,
   };

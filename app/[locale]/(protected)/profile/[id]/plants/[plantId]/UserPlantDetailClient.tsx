@@ -16,21 +16,25 @@ import { DiscoverBanner } from '@/components/public/DiscoverBanner';
 interface UserPlantDetailClientProps {
   initialPlant?: Plant | null;
   initialHistory?: PlantHistory[];
+  initialProfile?: any;
   initialPlantHidden?: boolean;
   initialHistoryHidden?: boolean;
+  userId?: string;
 }
 
 export default function UserPlantDetailClient({
   initialPlant = null,
   initialHistory = [],
+  initialProfile = null,
   initialPlantHidden = false,
   initialHistoryHidden = false,
+  userId: propsUserId,
 }: UserPlantDetailClientProps) {
   const t = useTranslations('UserPlantDetailPage');
   const locale = useLocale();
   const params = useParams();
   const router = useRouter();
-  const userId = params.id as string;
+  const userId = (params.id as string) || propsUserId;
   const plantId = params.plantId as string;
 
   const user = useAuthStore((state) => state.user);
@@ -38,6 +42,7 @@ export default function UserPlantDetailClient({
 
   const [plant, setPlant] = useState<Plant | null>(initialPlant);
   const [history, setHistory] = useState<PlantHistory[]>(initialHistory);
+  const [profile, setProfile] = useState(initialProfile);
   const [plantHidden, setPlantHidden] = useState(initialPlantHidden);
   const [historyHidden, setHistoryHidden] = useState(initialHistoryHidden);
   const [isLoading, setIsLoading] = useState(!initialPlant && !initialPlantHidden);
@@ -205,43 +210,68 @@ export default function UserPlantDetailClient({
                 <p className="text-sm text-muted-foreground">{t('plantInfo.title')}</p>
               </div>
 
-              <div className="grid gap-3 sm:gap-4">
-                <div className="flex items-start gap-3">
-                  <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">{t('plantInfo.genus')}</p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {getDisplayName(genus, language) || t('plantInfo.genusEmpty')}
-                    </p>
+              <div className="grid gap-6">
+                {/* Two column layout for genus, variety, owner, and purchase date */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {/* Left column: Genus and Variety */}
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium">{t('plantInfo.genus')}</p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {getDisplayName(genus, language) || t('plantInfo.genusEmpty')}
+                        </p>
+                      </div>
+                    </div>
+
+                    {variety && (
+                      <div className="flex items-start gap-3">
+                        <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium">{t('plantInfo.variety')}</p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {getDisplayName(variety, language)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right column: Owner and Purchase Date */}
+                  <div className="space-y-4">
+                    {profile && (
+                      <div className="flex items-start gap-3">
+                        <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium">{t('plantInfo.owner')}</p>
+                          <button
+                            onClick={() => router.push(`/profile/${userId}`)}
+                            className="text-sm font-medium text-primary hover:underline transition-all active:scale-95"
+                          >
+                            {profile.name}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {plant.purchaseDate && (
+                      <div className="flex items-start gap-3">
+                        <Calendar className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium">{t('plantInfo.purchaseDate')}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(plant.purchaseDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {
+                              year: 'numeric', month: 'long', day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {variety && (
-                  <div className="flex items-start gap-3">
-                    <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{t('plantInfo.variety')}</p>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {getDisplayName(variety, language)}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {plant.purchaseDate && (
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{t('plantInfo.purchaseDate')}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(plant.purchaseDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {
-                          year: 'numeric', month: 'long', day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
+                {/* Description spans full width */}
                 {plant.description && (
                   <div className="flex items-start gap-3">
                     <FileText className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />

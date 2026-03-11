@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { id, plantId } = await params;
-  const { status, plant, history, plantHidden, historyHidden } = await getPublicProfilePlantPageData(
+  const { status, plant, history, profile, plantHidden, historyHidden } = await getPublicProfilePlantPageData(
     id,
     plantId
   );
@@ -93,8 +93,10 @@ export default async function Page({ params }: Props) {
     <UserPlantDetailClient
       initialPlant={plant}
       initialHistory={history}
+      initialProfile={profile}
       initialPlantHidden={plantHidden}
       initialHistoryHidden={historyHidden}
+      userId={id}
     />
   );
 }

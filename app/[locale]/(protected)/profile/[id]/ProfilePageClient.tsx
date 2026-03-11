@@ -167,16 +167,22 @@ export default function ProfilePageClient({
               </div>
             </div>
             <div className="grid grid-cols-4 md:flex gap-2 w-full md:w-auto md:shrink-0">
-              <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-green-50 dark:bg-green-950/20 rounded-lg">
+              <button
+                onClick={() => router.push(`/profile/${userId}/plants`)}
+                className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-green-50 dark:bg-green-950/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-950/40 transition-colors cursor-pointer"
+              >
                 <Leaf className="w-5 h-5 text-green-600 mb-0.5" />
                 <p className="text-lg font-bold text-green-700 dark:text-green-400 leading-tight">{profile.stats.totalPlants}</p>
                 <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{t('stats.plants')}</p>
-              </div>
-              <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+              </button>
+              <button
+                onClick={() => router.push(`/profile/${userId}/shelves`)}
+                className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/40 transition-colors cursor-pointer"
+              >
                 <Layers className="w-5 h-5 text-blue-600 mb-0.5" />
                 <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">{profile.stats.totalShelves}</p>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">{t('stats.shelves')}</p>
-              </div>
+              </button>
               {followStats && (
                 <>
                   {currentUser ? (

@@ -1062,6 +1062,7 @@
     },
     "plantInfo": {
       "title": "Plant information",
+      "owner": "Owner",
       "genus": "Plant genus",
       "genusEmpty": "Not specified",
       "variety": "Plant variety",
