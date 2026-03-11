@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
-import { followsApi, FollowStats } from '@/lib/api/follows';
+import { followsApi, FollowStats, PublicFollowStats } from '@/lib/api/follows';
 import { getAvatarUrl } from '@/lib/api/users';
 import { FollowButton } from '@/components/follows/FollowButton';
 import Image from 'next/image';
@@ -49,7 +49,7 @@ export default function ProfilePageClient({
   const [profile, setProfile] = useState<UserProfileWithStats | null>(initialProfile);
   const [plants, setPlants] = useState<Plant[]>(initialPlants);
   const [shelves, setShelves] = useState<Shelf[]>(initialShelves);
-  const [followStats, setFollowStats] = useState<FollowStats | null>(null);
+  const [followStats, setFollowStats] = useState<FollowStats | PublicFollowStats | null>(null);
   const [isLoading, setIsLoading] = useState(!initialProfile);
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [loadingShelves, setLoadingShelves] = useState(false);
@@ -57,16 +57,22 @@ export default function ProfilePageClient({
   const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !initialized) return;
+    const fetchStats = () => {
+      const statsPromise = currentUser
+        ? followsApi.getStats(userId)
+        : followsApi.getPublicStats(userId);
+      statsPromise.then(setFollowStats).catch(() => {});
+    };
     if (initialProfile) {
-      followsApi.getStats(userId).then(setFollowStats).catch(() => {});
+      fetchStats();
       return;
     }
     setIsLoading(true);
     usersApi.getUserProfile(userId)
       .then((data) => {
         setProfile(data);
-        followsApi.getStats(userId).then(setFollowStats).catch(() => {});
+        fetchStats();
         if (isAdmin || (data.showPlants ?? true)) {
           setLoadingPlants(true);
           usersApi.getUserPlants(userId)
@@ -80,7 +86,7 @@ export default function ProfilePageClient({
       })
       .catch(() => toast.error(t('errors.loadError')))
       .finally(() => setIsLoading(false));
-  }, [initialProfile, isAdmin, userId]);
+  }, [initialProfile, isAdmin, userId, currentUser, initialized]);
 
   if (isLoading) {
     return (
@@ -147,9 +153,13 @@ export default function ProfilePageClient({
                   <div className="mt-1.5">
                     <FollowButton
                       userId={userId}
-                      isFollowing={followStats.isFollowing ?? false}
+                      isFollowing={(followStats as FollowStats).isFollowing ?? false}
                       onToggle={(isFollowing) =>
-                        setFollowStats(prev => prev ? { ...prev, isFollowing } : prev)
+                        setFollowStats(prev => prev ? {
+                          ...prev,
+                          isFollowing,
+                          followersCount: prev.followersCount + (isFollowing ? 1 : -1),
+                        } : prev)
                       }
                     />
                   </div>

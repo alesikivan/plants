@@ -17,6 +17,11 @@ export interface FollowStats {
   isFollowing: boolean | null;
 }
 
+export interface PublicFollowStats {
+  followersCount: number;
+  followingCount: number;
+}
+
 export interface FollowListParams {
   q?: string;
   page?: number;
@@ -34,6 +39,11 @@ export const followsApi = {
 
   getStats: async (userId: string): Promise<FollowStats> => {
     const response = await apiClient.get<FollowStats>(`/follows/${userId}/stats`);
+    return response.data;
+  },
+
+  getPublicStats: async (userId: string): Promise<PublicFollowStats> => {
+    const response = await apiClient.get<PublicFollowStats>(`/follows/${userId}/public-stats`);
     return response.data;
   },
 
