@@ -11,6 +11,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
+import { DiscoverBanner } from '@/components/public/DiscoverBanner';
 
 interface UserPlantDetailClientProps {
   initialPlant?: Plant | null;
@@ -43,6 +44,11 @@ export default function UserPlantDetailClient({
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
   const [selectedHistoryPhotos, setSelectedHistoryPhotos] = useState<{ photos: string[]; index: number } | null>(null);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!userId || !plantId) return;
@@ -252,6 +258,9 @@ export default function UserPlantDetailClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Discover Banner for unregistered users */}
+      {isMounted && !user && <DiscoverBanner />}
 
       {/* History (read-only) */}
       <Card>

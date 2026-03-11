@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, EyeOff, Layers, Leaf } from 'lucide-react';
+import { ArrowLeft, EyeOff, Layers, Leaf, Copy, Check } from 'lucide-react';
 import { usersApi, Shelf, getShelfPhotoUrl, getPlantPhotoUrl } from '@/lib/api';
+import { useAuthStore } from '@/lib/store/authStore';
 import { PlantCard } from '@/components/plants/PlantCard';
+import { ShelfDiscoverBanner } from '@/components/public/ShelfDiscoverBanner';
 import { toast } from 'sonner';
 
 interface UserShelfDetailClientProps {
@@ -18,21 +21,36 @@ export default function UserShelfDetailClient({
   initialShelf = null,
   initialHidden = false,
 }: UserShelfDetailClientProps) {
+  const t = useTranslations('UserShelfDetailPage');
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
   const shelfId = params.shelfId as string;
+  const user = useAuthStore((state) => state.user);
 
   const [shelf, setShelf] = useState<Shelf | null>(initialShelf);
   const [isLoading, setIsLoading] = useState(!initialShelf && !initialHidden);
   const [isHidden, setIsHidden] = useState(initialHidden);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [owner, setOwner] = useState<any>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!userId || !shelfId) return;
     if (initialShelf || initialHidden) return;
 
-    usersApi.getUserShelf(userId, shelfId)
-      .then(setShelf)
+    Promise.all([
+      usersApi.getUserShelf(userId, shelfId),
+      usersApi.getUserProfile(userId),
+    ])
+      .then(([shelfData, userData]) => {
+        setShelf(shelfData);
+        setOwner(userData);
+      })
       .catch((error) => {
         if (error?.response?.status === 403) {
           setIsHidden(true);
@@ -44,12 +62,28 @@ export default function UserShelfDetailClient({
       .finally(() => setIsLoading(false));
   }, [initialHidden, initialShelf, router, shelfId, userId]);
 
+  const handleCopyShelfLink = async () => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const shelfUrl = `${baseUrl}/profile/${userId}/shelves/${shelfId}`;
+
+    try {
+      await navigator.clipboard.writeText(shelfUrl);
+      setIsLinkCopied(true);
+      toast.success(t('copyLinkSuccess'));
+
+      setTimeout(() => setIsLinkCopied(false), 2000);
+    } catch (error) {
+      toast.error(t('copyLinkError'));
+      console.error('Failed to copy link:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64 animate-in fade-in duration-300">
         <div className="text-center space-y-2">
           <Layers className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
-          <p className="text-muted-foreground">Загрузка...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -58,21 +92,23 @@ export default function UserShelfDetailClient({
   if (isHidden) {
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
-        <Button
-          variant="ghost"
-          onClick={() => router.back()}
-          className="gap-2 transition-all active:scale-95"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Назад
-        </Button>
+        {user && (
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="gap-2 transition-all active:scale-95"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {t('back')}
+          </Button>
+        )}
 
         <Card>
           <CardContent className="py-12">
             <div className="flex flex-col items-center justify-center text-center">
               <EyeOff className="w-16 h-16 text-muted-foreground/50 mb-4" />
-              <h1 className="text-xl font-semibold mb-2">Полка скрыта</h1>
-              <p className="text-muted-foreground">Пользователь скрыл свои полки</p>
+              <h1 className="text-xl font-semibold mb-2">{t('shelfHidden.title')}</h1>
+              <p className="text-muted-foreground">{t('shelfHidden.description')}</p>
             </div>
           </CardContent>
         </Card>
@@ -88,14 +124,16 @@ export default function UserShelfDetailClient({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="gap-2 transition-all active:scale-95"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Назад
-      </Button>
+      {user && (
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="gap-2 transition-all active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('back')}
+        </Button>
+      )}
 
       {/* Shelf Info */}
       <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -147,29 +185,62 @@ export default function UserShelfDetailClient({
             <div className="flex-1 space-y-4">
               <div className="flex items-start gap-3">
                 <Layers className="w-5 h-5 text-primary mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium">Название</p>
-                  <p className="text-sm text-muted-foreground">{shelf.name}</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{t('shelfInfo.nameLabel')}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">{shelf.name}</p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyShelfLink}
+                      className="h-6 px-2 gap-1 text-muted-foreground hover:text-foreground transition-all active:scale-95"
+                      title={t('copyLinkTooltip')}
+                    >
+                      {isLinkCopied ? (
+                        <Check className="w-3.5 h-3.5" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Leaf className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium">Количество растений</p>
+                  <p className="text-sm font-medium">{t('shelfInfo.plantsCountLabel')}</p>
                   <p className="text-sm text-muted-foreground">{plants.length}</p>
                 </div>
               </div>
+
+              {owner && (
+                <div className="flex items-start gap-3">
+                  <Layers className="w-5 h-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">{t('shelfInfo.ownerLabel')}</p>
+                    <a
+                      href={`/profile/${userId}`}
+                      className="text-sm text-primary hover:underline transition-colors"
+                    >
+                      {owner.name}
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Discover Banner for unregistered users */}
+      {isMounted && !user && <ShelfDiscoverBanner />}
+
       {/* Plants on Shelf */}
       <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
-          <CardTitle>Растения на полке</CardTitle>
+          <CardTitle>{t('plants.title')}</CardTitle>
           <CardDescription>
-            {plants.length > 0 ? 'Нажмите на растение, чтобы посмотреть детали' : 'На этой полке пока нет растений'}
+            {plants.length > 0 ? t('plants.description') : t('plants.empty')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -187,7 +258,7 @@ export default function UserShelfDetailClient({
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Leaf className="w-16 h-16 text-muted-foreground/50 mb-4" />
-              <p className="text-muted-foreground">На полке пока нет растений</p>
+              <p className="text-muted-foreground">{t('plants.empty')}</p>
             </div>
           )}
         </CardContent>

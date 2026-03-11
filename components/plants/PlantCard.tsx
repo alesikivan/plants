@@ -3,6 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Plant, Genus, Variety, getPlantPhotoUrl } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useLocale } from 'next-intl';
 import { getDisplayName } from '@/lib/utils/language';
 import { Leaf, Archive } from 'lucide-react';
 import Link from 'next/link';
@@ -15,7 +16,8 @@ interface PlantCardProps {
 
 export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
   const user = useAuthStore((state) => state.user);
-  const language = user?.preferredLanguage || 'ru';
+  const locale = useLocale();
+  const language = user?.preferredLanguage || locale;
 
   const genus = typeof plant.genusId === 'object' ? plant.genusId : null;
   const variety = typeof plant.varietyId === 'object' ? plant.varietyId : null;

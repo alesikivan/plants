@@ -941,7 +941,8 @@
     "header": {
       "backButton": "Back",
       "loading": "Loading...",
-      "notFound": "User not found"
+      "notFound": "User not found",
+      "joinedAt": "Member since {date}"
     },
     "stats": {
       "plants": "Plants",
@@ -1028,6 +1029,12 @@
     "title": "Share your collection",
     "description": "Share your rare plant varieties, get inspired by others' finds, and together document the growth history of each plant 🌱",
     "buttonText": "Create your profile"
+  },
+  "ShelfDiscoverBanner": {
+    "joinCommunity": "Join our community",
+    "title": "Organize your shelves and plants",
+    "description": "Create your own profile and systematize your collection. Share shelves and inspire other plant collectors 🌿",
+    "buttonText": "Create an account"
   },
   "PublicPlantDetailPage": {
     "loading": "Loading...",
@@ -1176,5 +1183,27 @@
       "successToast": "Profile link copied",
       "errorToast": "Failed to copy profile link"
     }
+  },
+  "UserShelfDetailPage": {
+    "back": "Back",
+    "loading": "Loading...",
+    "shelfHidden": {
+      "title": "Shelf is hidden",
+      "description": "The user has hidden their shelves"
+    },
+    "shelfInfo": {
+      "title": "Shelf information",
+      "nameLabel": "Name",
+      "plantsCountLabel": "Number of plants",
+      "ownerLabel": "Owner"
+    },
+    "plants": {
+      "title": "Plants on shelf",
+      "description": "Click on a plant to see details",
+      "empty": "No plants on this shelf yet"
+    },
+    "copyLinkTooltip": "Copy shelf link",
+    "copyLinkSuccess": "Link copied to clipboard",
+    "copyLinkError": "Failed to copy link"
   }
 }

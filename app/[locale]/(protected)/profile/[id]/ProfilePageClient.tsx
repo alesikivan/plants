@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
@@ -36,6 +36,7 @@ export default function ProfilePageClient({
   initialShelves = [],
 }: ProfilePageClientProps) {
   const t = useTranslations('PublicProfilePage');
+  const locale = useLocale();
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
@@ -105,14 +106,16 @@ export default function ProfilePageClient({
 
   return (
     <div className="space-y-4 max-w-4xl mx-auto">
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="gap-2 transition-all active:scale-95"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t('header.backButton')}
-      </Button>
+      {currentUser && (
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="gap-2 transition-all active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('header.backButton')}
+        </Button>
+      )}
 
       {/* Profile Card */}
       <Card>
@@ -140,7 +143,7 @@ export default function ProfilePageClient({
             </button>
               <div>
                 <CardTitle className="text-xl leading-tight">{profile.name}</CardTitle>
-                {!isOwnProfile && followStats !== null && (
+                {!isOwnProfile && currentUser && followStats !== null && (
                   <div className="mt-1.5">
                     <FollowButton
                       userId={userId}
@@ -149,6 +152,16 @@ export default function ProfilePageClient({
                         setFollowStats(prev => prev ? { ...prev, isFollowing } : prev)
                       }
                     />
+                  </div>
+                )}
+                {!isOwnProfile && !currentUser && profile.createdAt && (
+                  <div className="mt-1.5 text-sm text-muted-foreground">
+                    {t('header.joinedAt', {
+                      date: new Date(profile.createdAt).toLocaleDateString(
+                        locale === 'ru' ? 'ru-RU' : 'en-US',
+                        { year: 'numeric', month: 'long', day: 'numeric' }
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -166,22 +179,38 @@ export default function ProfilePageClient({
               </div>
               {followStats && (
                 <>
-                  <button
-                    onClick={() => setFollowDialog('followers')}
-                    className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60 hover:bg-muted transition-colors"
-                  >
-                    <Star className="w-5 h-5 mb-0.5 text-muted-foreground" />
-                    <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
-                    <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.followers')}</span>
-                  </button>
-                  <button
-                    onClick={() => setFollowDialog('following')}
-                    className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60 hover:bg-muted transition-colors"
-                  >
-                    <BookOpen className="w-5 h-5 mb-0.5 text-muted-foreground" />
-                    <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
-                    <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.following')}</span>
-                  </button>
+                  {currentUser ? (
+                    <button
+                      onClick={() => setFollowDialog('followers')}
+                      className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60 hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <Star className="w-5 h-5 mb-0.5 text-muted-foreground" />
+                      <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
+                      <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.followers')}</span>
+                    </button>
+                  ) : (
+                    <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60">
+                      <Star className="w-5 h-5 mb-0.5 text-muted-foreground" />
+                      <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
+                      <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.followers')}</span>
+                    </div>
+                  )}
+                  {currentUser ? (
+                    <button
+                      onClick={() => setFollowDialog('following')}
+                      className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60 hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <BookOpen className="w-5 h-5 mb-0.5 text-muted-foreground" />
+                      <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
+                      <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.following')}</span>
+                    </button>
+                  ) : (
+                    <div className="h-[72px] md:w-[88px] md:h-[80px] flex flex-col items-center justify-center rounded-lg bg-muted/60">
+                      <BookOpen className="w-5 h-5 mb-0.5 text-muted-foreground" />
+                      <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>
+                      <span className="text-xs text-muted-foreground select-none mt-0.5">{t('stats.following')}</span>
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -327,7 +356,7 @@ export default function ProfilePageClient({
       )}
 
       {/* Followers / Following Dialog */}
-      {followDialog && (
+      {followDialog && currentUser && (
         <FollowersDialog
           userId={userId}
           type={followDialog}
