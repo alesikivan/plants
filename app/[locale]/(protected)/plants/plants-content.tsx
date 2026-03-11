@@ -292,7 +292,7 @@ export function PlantsPageContent() {
 
       {/* Tabs: active / archived */}
       {!isLoading && (
-        <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300">
+        <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300 !mt-2">
           <button
             onClick={() => !showArchived || handleTabChange(false)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${!showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -312,7 +312,7 @@ export function PlantsPageContent() {
 
       {/* Filters */}
       {!isLoading && (
-        <div className="flex flex-col gap-2 animate-in fade-in duration-500">
+        <div className="flex flex-col gap-2 animate-in fade-in duration-500 !mt-2">
           {/* Row 1: search + filter toggle */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1">

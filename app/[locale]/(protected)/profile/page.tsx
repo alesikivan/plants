@@ -19,6 +19,7 @@ import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
+import { ImageCropModal } from '@/components/ui/image-crop-modal';
 import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 import { SocialLink } from '@/lib/types/user';
 import { followsApi, FollowStats } from '@/lib/api/follows';
@@ -45,6 +46,7 @@ export default function ProfilePage() {
   const [loadingPlants, setLoadingPlants] = useState(true);
   const [loadingShelves, setLoadingShelves] = useState(true);
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [followStats, setFollowStats] = useState<FollowStats | null>(null);
   const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
   const [isProfileLinkCopied, setIsProfileLinkCopied] = useState(false);
@@ -82,17 +84,32 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setIsAvatarLoading(true);
     try {
       const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
-      const compressed = await compressImage(converted);
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(converted);
+      });
+      setCropImageSrc(dataUrl);
+    } catch {
+      toast.error(t('avatarUpload.errorToast'));
+    } finally {
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleAvatarCropComplete = async (croppedFile: File) => {
+    setCropImageSrc(null);
+    setIsAvatarLoading(true);
+    try {
+      const compressed = await compressImage(croppedFile);
       await uploadAvatar(compressed);
       toast.success(t('avatarUpload.successToast'));
     } catch {
       toast.error(t('avatarUpload.errorToast'));
     } finally {
       setIsAvatarLoading(false);
-      if (avatarInputRef.current) avatarInputRef.current.value = '';
     }
   };
 
@@ -577,6 +594,16 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Avatar Crop */}
+      {cropImageSrc && (
+        <ImageCropModal
+          open={true}
+          imageSrc={cropImageSrc}
+          onCropComplete={handleAvatarCropComplete}
+          onCancel={() => setCropImageSrc(null)}
+        />
+      )}
 
       {/* Avatar Viewer */}
       {isAvatarViewerOpen && user.avatar && (
