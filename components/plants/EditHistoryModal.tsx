@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,6 +28,8 @@ export function EditHistoryModal({
   plantId,
   historyItem,
 }: EditHistoryModalProps) {
+  const t = useTranslations('EditHistoryModal');
+  const locale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [comment, setComment] = useState('');
@@ -49,7 +53,7 @@ export function EditHistoryModal({
     // Check file type for each file
     const validFiles = files.filter(file => {
       if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp|heic|heif)/)) {
-        toast.error(`Файл ${file.name} не является изображением`);
+        toast.error(`${t('photosLabel')} ${file.name}`);
         return false;
       }
       return true;
@@ -70,7 +74,7 @@ export function EditHistoryModal({
   const handleDateFound = (date: Date | null) => {
     setDate(date ?? new Date());
     if (date) {
-      toast.info(`Дата обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+      toast.info(t('toasts.dateFound', { date: date.toLocaleDateString(locale) }));
     }
   };
 
@@ -94,7 +98,7 @@ export function EditHistoryModal({
     e.preventDefault();
 
     if (!date) {
-      toast.error('Выберите дату');
+      toast.error(t('dateLabel'));
       return;
     }
 
@@ -102,7 +106,7 @@ export function EditHistoryModal({
     const hasComment = comment.trim().length > 0;
 
     if (!hasComment && !hasPhotos) {
-      toast.error('Добавьте комментарий или фотографии');
+      toast.error(t('commentLabel'));
       return;
     }
 
@@ -114,11 +118,11 @@ export function EditHistoryModal({
         photos: newPhotos.length > 0 ? newPhotos : undefined,
         removePhotos: removePhotos.length > 0 ? removePhotos : undefined,
       });
-      toast.success('Запись обновлена');
+      toast.success(t('toasts.success'));
       onSuccess();
       onOpenChange(false);
     } catch (error) {
-      toast.error('Ошибка при обновлении записи');
+      toast.error(t('toasts.error'));
       console.error('Failed to update history:', error);
     } finally {
       setIsSubmitting(false);
@@ -131,26 +135,26 @@ export function EditHistoryModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
-            Редактировать запись
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="grid gap-2">
-            <Label htmlFor="date">Дата</Label>
+            <Label htmlFor="date">{t('dateLabel')}</Label>
             <DatePicker
               date={date}
               onDateChange={setDate}
-              placeholder="Выберите дату события"
+              placeholder={t('datePlaceholder')}
               disabledMatcher={disableFutureDates}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="comment">Комментарий</Label>
+            <Label htmlFor="comment">{t('commentLabel')}</Label>
             <Textarea
               id="comment"
-              placeholder="Опишите, что произошло с растением..."
+              placeholder={t('commentPlaceholder')}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={4}
@@ -159,7 +163,7 @@ export function EditHistoryModal({
 
           {existingPhotos.length > 0 && (
             <div className="grid gap-2">
-              <Label>Текущие фотографии</Label>
+              <Label>{t('photosLabel')}</Label>
               <div className="grid grid-cols-3 gap-3">
                 {existingPhotos.map((photo) => (
                   <div key={photo} className="relative rounded-xl border-2 border-input overflow-hidden group">
@@ -182,7 +186,7 @@ export function EditHistoryModal({
           )}
 
           <div className="grid gap-2">
-            <Label htmlFor="photos">Добавить новые фотографии</Label>
+            <Label htmlFor="photos">{t('photosLabel')}</Label>
             <MultiFileInput
               id="photos"
               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
@@ -204,13 +208,13 @@ export function EditHistoryModal({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Отмена
+              {t('buttons.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || (!comment.trim() && existingPhotos.length === 0 && newPhotos.length === 0)}
             >
-              {isSubmitting ? 'Сохранение...' : 'Сохранить'}
+              {isSubmitting ? t('buttons.saving') : t('buttons.save')}
             </Button>
           </DialogFooter>
         </form>

@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Users, Leaf, Sparkles } from 'lucide-react';
 
 export function DiscoverBanner() {
+  const t = useTranslations('DiscoverBanner');
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/20 p-6 sm:p-8">
       {/* Animated background elements */}
@@ -27,15 +29,15 @@ export function DiscoverBanner() {
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-4 animate-fade-in" style={{ animationDuration: '0.8s' }}>
           <Users className="w-5 h-5 text-primary" />
-          <p className="text-sm font-semibold text-primary uppercase tracking-wider">Присоединись к сообществу</p>
+          <p className="text-sm font-semibold text-primary uppercase tracking-wider">{t('joinCommunity')}</p>
         </div>
 
         <div className="space-y-3 mb-6 animate-fade-in" style={{ animationDuration: '1s', animationDelay: '0.1s' }}>
           <h3 className="text-xl sm:text-2xl font-bold text-foreground">
-            Делись своей коллекцией
+            {t('title')}
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Делись своими редкими видами, вдохновляйся чужими находками и вместе документируй историю роста каждого растения 🌱
+            {t('description')}
           </p>
         </div>
 
@@ -47,7 +49,7 @@ export function DiscoverBanner() {
           >
             <Link href="/register" className="gap-3 flex items-center justify-center">
               <span className="text-lg">✨</span>
-              <span>Создать свой профиль</span>
+              <span>{t('buttonText')}</span>
               <span className="group-hover:translate-x-2 transition-transform text-lg">→</span>
             </Link>
           </Button>

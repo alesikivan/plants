@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { ComboBox } from '@/components/ui/combobox';
 import { Label } from '@/components/ui/label';
 import { genusApi, varietyApi, Genus, Variety } from '@/lib/api';
@@ -28,6 +29,8 @@ export function PlantSelector({
   required = false,
   genusError = false,
 }: PlantSelectorProps) {
+  const t = useTranslations('PlantSelector');
+  const locale = useLocale();
   const [genuses, setGenuses] = useState<Genus[]>([]);
   const [varieties, setVarieties] = useState<Variety[]>([]);
   const [genusSearch, setGenusSearch] = useState('');
@@ -68,7 +71,7 @@ export function PlantSelector({
       const data = await genusApi.getAll(search);
       setGenuses(data);
     } catch (error) {
-      toast.error('Ошибка загрузки родов растений');
+      toast.error(t('genusLoadError'));
       console.error('Failed to load genuses:', error);
     } finally {
       setIsLoadingGenuses(false);
@@ -81,7 +84,7 @@ export function PlantSelector({
       const data = await varietyApi.getAll(genusId, search);
       setVarieties(data);
     } catch (error) {
-      toast.error('Ошибка загрузки сортов растений');
+      toast.error(t('varietyLoadError'));
       console.error('Failed to load varieties:', error);
     } finally {
       setIsLoadingVarieties(false);
@@ -108,7 +111,9 @@ export function PlantSelector({
     onVarietyChange(variety._id);
   };
 
-  const getDisplayName = (nameRu: string, nameEn: string) => `${nameRu} / ${nameEn}`;
+  const getDisplayName = (nameRu: string, nameEn: string) => {
+    return locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
+  };
 
   const genusOptions = genuses.map((genus) => ({
     value: genus._id,
@@ -141,38 +146,38 @@ export function PlantSelector({
       )}
       <div className="grid gap-2">
         <Label htmlFor="genusId">
-          Род растения {required && <span className="text-destructive">*</span>}
+          {t('genusLabel')} {required && <span className="text-destructive">*</span>}
         </Label>
         <ComboBox
           options={genusOptions}
           value={selectedGenusId}
           onValueChange={onGenusChange}
-          placeholder="Выберите род растения"
-          searchPlaceholder="Поиск рода..."
-          emptyText="Ничего не найдено"
+          placeholder={t('genusPlaceholder')}
+          searchPlaceholder={t('genusSearchPlaceholder')}
+          emptyText={t('varietyEmptyText')}
           isLoading={isLoadingGenuses}
           onSearchChange={setGenusSearch}
           onCreateNew={allowCreate ? handleCreateNewGenus : undefined}
-          createNewLabel="Создать род"
+          createNewLabel={t('genusCreateLabel')}
         />
         {genusError && (
-          <p className="text-sm text-destructive">Это поле обязательно</p>
+          <p className="text-sm text-destructive">{t('genusError')}</p>
         )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="varietyId">Сорт растения</Label>
+        <Label htmlFor="varietyId">{t('varietyLabel')}</Label>
         <ComboBox
           options={varietyOptions}
           value={selectedVarietyId}
           onValueChange={onVarietyChange}
-          placeholder={!selectedGenusId ? 'Сначала выберите род' : 'Выберите сорт'}
-          searchPlaceholder="Поиск сорта..."
-          emptyText={varietySearch ? 'Ничего не найдено' : 'Нет доступных сортов'}
+          placeholder={!selectedGenusId ? t('varietyPlaceholder') : t('varietySelectedPlaceholder')}
+          searchPlaceholder={t('varietySearchPlaceholder')}
+          emptyText={varietySearch ? t('varietyEmptyText') : t('varietyNoneAvailable')}
           isLoading={isLoadingVarieties}
           disabled={!selectedGenusId}
           onSearchChange={setVarietySearch}
           onCreateNew={allowCreate && selectedGenusId ? handleCreateNewVariety : undefined}
-          createNewLabel="Создать сорт"
+          createNewLabel={t('varietyCreateLabel')}
         />
       </div>
     </>

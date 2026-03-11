@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import { useLocale } from 'next-intl';
 import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,14 @@ export function DatePicker({
   disabled = false,
   disabledMatcher,
 }: DatePickerProps) {
+  const locale = useLocale();
+
+  const dateLocale = locale === 'ru' ? ru : enUS;
+  const dateFormat = locale === 'ru' ? 'dd MMMM yyyy' : 'MMMM dd, yyyy';
+
+  const ruWeekDays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const enWeekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -41,7 +50,7 @@ export function DatePicker({
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? (
-            format(date, 'dd MMMM yyyy', { locale: ru })
+            format(date, dateFormat, { locale: dateLocale })
           ) : (
             <span>{placeholder}</span>
           )}
@@ -53,16 +62,16 @@ export function DatePicker({
           selected={date}
           onSelect={onDateChange}
           captionLayout="dropdown"
-          locale={ru}
+          locale={dateLocale}
           weekStartsOn={1}
           disabled={disabledMatcher}
           formatters={{
             formatWeekdayName: (date) => {
-              const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+              const days = locale === 'ru' ? ruWeekDays : enWeekDays;
               return days[date.getDay()];
             },
             formatMonthDropdown: (date) => {
-              return date.toLocaleDateString('ru-RU', { month: 'long' });
+              return date.toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', { month: 'long' });
             },
           }}
         />

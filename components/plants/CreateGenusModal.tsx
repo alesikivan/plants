@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { genusApi, Genus } from '@/lib/api';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
+import { getFullDisplayName } from '@/lib/utils/language';
 
 interface CreateGenusModalProps {
   open: boolean;
@@ -32,6 +34,8 @@ interface Suggestion {
 }
 
 export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCreated }: CreateGenusModalProps) {
+  const t = useTranslations('CreateGenusModal');
+  const locale = useLocale();
   const [query, setQuery] = useState(initialQuery);
   const [step, setStep] = useState<Step>('input');
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
@@ -78,7 +82,7 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
 
       setStep('confirm');
     } catch (error) {
-      toast.error('Не удалось проверить название. Попробуйте ещё раз.');
+      toast.error(t('toasts.validationError'));
     } finally {
       setIsValidating(false);
     }
@@ -88,19 +92,20 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
     if (!suggestion) return;
 
     setIsSaving(true);
+    const displayName = locale === 'ru' ? suggestion.nameRu : suggestion.nameEn;
     try {
       const genus = await genusApi.create({
         nameRu: suggestion.nameRu,
         nameEn: suggestion.nameEn,
       });
-      toast.success(`Род «${suggestion.nameRu}» успешно создан!`);
+      toast.success(t('toasts.createSuccess', { name: displayName }));
       onCreated(genus);
       handleOpenChange(false);
     } catch (error: any) {
       if (error?.response?.status === 409) {
-        toast.error('Такой род уже существует');
+        toast.error(t('toasts.duplicateError'));
       } else {
-        toast.error('Ошибка при создании рода');
+        toast.error(t('toasts.createError'));
       }
     } finally {
       setIsSaving(false);
@@ -124,19 +129,19 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Создать новый род</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Введите название рода на русском или английском языке — мы проверим его через ИИ
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         {step === 'input' && (
           <>
             <div className="grid gap-3 py-4">
-              <Label htmlFor="genus-query">Название рода</Label>
+              <Label htmlFor="genus-query">{t('label')}</Label>
               <Input
                 id="genus-query"
-                placeholder="Например: Монстера или Monstera"
+                placeholder={t('placeholder')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleValidate()}
@@ -145,16 +150,16 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Отмена
+                {t('buttons.cancel')}
               </Button>
               <Button onClick={handleValidate} disabled={!query.trim() || isValidating}>
                 {isValidating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Проверяем...
+                    {t('buttons.verifying')}
                   </>
                 ) : (
-                  'Проверить'
+                  t('buttons.verify')
                 )}
               </Button>
             </DialogFooter>
@@ -167,20 +172,20 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
               <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-destructive">Растение не найдено</p>
+                  <p className="text-sm font-medium text-destructive">{t('alerts.notRecognized.title')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Не удалось распознать «{query}» как название рода растения. Уточните название — возможно, в нём опечатка или оно введено некорректно.
+                    {t('alerts.notRecognized.description', { query })}
                   </p>
                 </div>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Отмена
+                {t('buttons.cancel')}
               </Button>
               <Button onClick={handleRetry}>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Попробовать снова
+                {t('buttons.retry')}
               </Button>
             </DialogFooter>
           </>
@@ -192,9 +197,9 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-amber-800">Род уже существует в базе</p>
+                  <p className="text-sm font-medium text-amber-800">{t('alerts.duplicate.title')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Такой род уже есть. Хотите использовать существующий?
+                    {t('alerts.duplicate.description')}
                   </p>
                 </div>
               </div>
@@ -202,7 +207,7 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                   <span className="text-sm font-medium">
-                    {existingGenus.nameRu} / {existingGenus.nameEn}
+                    {getFullDisplayName(existingGenus, locale)}
                   </span>
                 </div>
               </div>
@@ -210,10 +215,10 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={handleRetry}>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Ввести заново
+                {t('buttons.retryInput')}
               </Button>
               <Button onClick={handleUseExisting}>
-                Использовать этот род
+                {t('buttons.useExisting')}
               </Button>
             </DialogFooter>
           </>
@@ -222,30 +227,30 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
         {step === 'confirm' && suggestion && suggestion.recognized && (
           <>
             <div className="py-4 space-y-4">
-              <p className="text-sm text-muted-foreground">ИИ предлагает следующее название:</p>
+              <p className="text-sm text-muted-foreground">{t('aiSuggestion')}</p>
               <div className="rounded-lg border bg-muted/50 p-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                   <span className="text-sm font-medium">
-                    {suggestion.nameRu} / {suggestion.nameEn}
+                    {getFullDisplayName({ nameRu: suggestion.nameRu, nameEn: suggestion.nameEn } as any, locale)}
                   </span>
                 </div>
               </div>
-              <p className="text-sm">Это именно тот род, который вы искали?</p>
+              <p className="text-sm">{t('confirmText')}</p>
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={handleRetry} disabled={isSaving}>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Нет, ввести заново
+                {t('buttons.retryInput')}
               </Button>
               <Button onClick={handleConfirm} disabled={isSaving}>
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Сохранение...
+                    {t('buttons.saving')}
                   </>
                 ) : (
-                  'Да, создать'
+                  t('buttons.create')
                 )}
               </Button>
             </DialogFooter>

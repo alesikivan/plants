@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import Cropper from 'react-easy-crop';
 import type { Area } from 'react-easy-crop';
 import { ZoomIn, ZoomOut, Maximize2, Minimize2 } from 'lucide-react';
@@ -33,6 +34,7 @@ export function ImageCropModal({
   cancelLabel,
   queueInfo,
 }: ImageCropModalProps) {
+  const t = useTranslations('ImageCropModal');
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -55,8 +57,8 @@ export function ImageCropModal({
   };
 
   const title = queueInfo
-    ? `Обрезать фото — ${queueInfo.current} из ${queueInfo.total}`
-    : 'Обрезать фото';
+    ? t('titleQueue', { current: queueInfo.current, total: queueInfo.total })
+    : t('title');
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onCancel(); }}>
@@ -88,7 +90,7 @@ export function ImageCropModal({
               type="button"
               onClick={() => setAspect(aspect === 1 ? 5 / 8 : 1)}
               className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              aria-label="Переключить формат"
+              aria-label={t('toggleFormat')}
             >
               {aspect === 1 ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
             </button>
@@ -97,7 +99,7 @@ export function ImageCropModal({
               type="button"
               onClick={() => setZoom((z) => Math.max(1, z - 0.2))}
               className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              aria-label="Уменьшить"
+              aria-label={t('zoomOut')}
             >
               <ZoomOut className="h-4 w-4" />
             </button>
@@ -126,7 +128,7 @@ export function ImageCropModal({
               type="button"
               onClick={() => setZoom((z) => Math.min(3, z + 0.2))}
               className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              aria-label="Увеличить"
+              aria-label={t('zoomIn')}
             >
               <ZoomIn className="h-4 w-4" />
             </button>
@@ -139,10 +141,10 @@ export function ImageCropModal({
 
         <DialogFooter className="px-5 pb-5 pt-2 gap-2 sm:gap-2">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isProcessing} className="flex-1">
-            {cancelLabel ?? 'Отмена'}
+            {cancelLabel ?? t('cancel')}
           </Button>
           <Button type="button" onClick={handleConfirm} disabled={isProcessing || !croppedAreaPixels} className="flex-1">
-            {isProcessing ? 'Обработка...' : 'Применить'}
+            {isProcessing ? t('processing') : t('apply')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +28,7 @@ interface WishlistCardProps {
 }
 
 export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
+  const t = useTranslations('WishlistCard');
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
 
@@ -47,10 +49,10 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
     setIsDeleting(true);
     try {
       await wishlistApi.delete(wishlistItem._id);
-      toast.success('Растение удалено из списка желаний');
+      toast.success(t('success'));
       onUpdate();
     } catch (error) {
-      toast.error('Ошибка при удалении из списка желаний');
+      toast.error(t('error'));
       console.error('Failed to delete wishlist item:', error);
     } finally {
       setIsDeleting(false);
@@ -65,7 +67,7 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
           {photoUrl ? (
             <img
               src={photoUrl}
-              alt={genusName || 'Растение'}
+              alt={genusName || t('noName')}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -103,7 +105,7 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
         </div>
         <div className="text-center space-y-1">
           <h3 className="font-medium text-sm text-foreground/90">
-            {genusName || 'Без названия'}
+            {genusName || t('noName')}
           </h3>
           {varietyName && (
             <p className="text-xs text-muted-foreground">
@@ -134,20 +136,19 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить из списка желаний?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите удалить "{genusName}" из списка желаний?
-              Это действие нельзя отменить.
+              {t('deleteDescription', { name: genusName || t('noName') })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? 'Удаление...' : 'Удалить'}
+              {isDeleting ? t('deleteLoading') : t('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

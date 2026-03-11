@@ -85,6 +85,14 @@
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    
+  }
+
+  body[data-scroll-locked][data-locale-select-open='true'] {
+    overflow: auto !important;
+    overscroll-behavior: auto !important;
+    padding-right: 0 !important;
+    margin-right: 0 !important;
   }
 }
 

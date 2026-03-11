@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ImageCropModal } from '@/components/ui/image-crop-modal';
@@ -27,6 +28,7 @@ interface CropQueueItem {
 
 export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputProps>(
   ({ className, onFilesChange, onDateFound, previews = [], onRemove, maxSize, acceptedFormats, maxFiles = 10, disableDateDetection, accept, ...props }, ref) => {
+    const t = useTranslations('MultiFileInput');
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const [cropQueue, setCropQueue] = React.useState<CropQueueItem[]>([]);
@@ -128,7 +130,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
             imageSrc={cropQueue[0].dataUrl}
             onCropComplete={handleCropComplete}
             onCancel={handleSkip}
-            cancelLabel="Пропустить"
+            cancelLabel={t('skipButton')}
             queueInfo={totalInQueue > 1 ? { current: currentInQueue, total: totalInQueue } : undefined}
           />
         )}
@@ -157,7 +159,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
         {isLoading ? (
           <div className="flex h-11 w-full items-center rounded-xl border-2 border-input bg-background px-4 py-3 text-base justify-center">
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Обработка фото...</span>
+            <span className="ml-2 text-sm text-muted-foreground">{t('processing')}</span>
           </div>
         ) : (
           <button
@@ -170,14 +172,18 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
           >
             <Upload className="mr-2 h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">
-              {previews.length > 0 ? `Добавить ещё фото` : 'Выберите фотографии'}
+              {previews.length > 0 ? t('addMore') : t('selectButton')}
             </span>
           </button>
         )}
 
         {maxSize && acceptedFormats && (
           <p className="text-xs text-muted-foreground">
-            Максимальный размер: {formatFileSize(maxSize)} на файл. Форматы: {acceptedFormats.join(', ')}. До {maxFiles} фото
+            {t('helperText', {
+              size: formatFileSize(maxSize),
+              formats: acceptedFormats.join(', '),
+              maxFiles: maxFiles
+            })}
           </p>
         )}
       </div>

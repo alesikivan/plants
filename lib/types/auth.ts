@@ -4,6 +4,7 @@ export interface RegisterDto {
   email: string;
   password: string;
   name: string;
+  preferredLanguage?: string;
 }
 
 export interface LoginDto {

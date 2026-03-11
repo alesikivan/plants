@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,8 @@ interface PlantFormData {
 }
 
 export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalProps) {
+  const t = useTranslations('AddPlantModal');
+  const locale = useLocale();
   const [shelves, setShelves] = useState<Shelf[]>([]);
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
@@ -75,7 +78,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       const data = await shelvesApi.getAll();
       setShelves(data);
     } catch (error) {
-      toast.error('Ошибка загрузки полок');
+      toast.error(t('toasts.shelvesError'));
       console.error('Failed to load shelves:', error);
     } finally {
       setIsLoadingShelves(false);
@@ -93,7 +96,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
         photo: selectedFile || undefined,
         description: data.description || undefined,
       });
-      toast.success('Растение успешно добавлено!');
+      toast.success(t('toasts.success'));
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
@@ -104,7 +107,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      toast.error('Ошибка при добавлении растения');
+      toast.error(t('toasts.error'));
       console.error('Failed to create plant:', error);
     } finally {
       setIsLoading(false);
@@ -114,7 +117,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   const handleDateFound = (date: Date | null) => {
     setPurchaseDate(date ?? new Date());
     if (date) {
-      toast.info(`Дата покупки обновлена по данным фото: ${date.toLocaleDateString('ru-RU')}`);
+      const dateLocale = locale === 'ru' ? 'ru-RU' : 'en-US';
+      toast.info(t('toasts.dateFound', { date: date.toLocaleDateString(dateLocale) }));
     }
   };
 
@@ -163,10 +167,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Добавить растение</DialogTitle>
-          <DialogDescription>
-            Заполните информацию о вашем растении
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
@@ -183,32 +185,32 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
 
             {/* Полки */}
             <div className="grid gap-2">
-              <Label>Полки</Label>
+              <Label>{t('shelves')}</Label>
               <MultiComboBox
                 options={shelves.map((s) => ({ value: s._id, label: s.name }))}
                 values={selectedShelfIds}
                 onValuesChange={setSelectedShelfIds}
-                placeholder="Выберите полки..."
-                searchPlaceholder="Поиск полки..."
-                emptyText="Нет доступных полок"
+                placeholder={t('shelvesPlaceholder')}
+                searchPlaceholder={t('shelvesSearchPlaceholder')}
+                emptyText={t('shelvesEmpty')}
                 isLoading={isLoadingShelves}
               />
             </div>
 
             {/* Дата покупки */}
             <div className="grid gap-2">
-              <Label htmlFor="purchaseDate">Дата покупки</Label>
+              <Label htmlFor="purchaseDate">{t('purchaseDate')}</Label>
               <DatePicker
                 date={purchaseDate}
                 onDateChange={setPurchaseDate}
-                placeholder="Выберите дату покупки"
+                placeholder={t('purchaseDatePlaceholder')}
                 disabledMatcher={disableFutureDates}
               />
             </div>
 
             {/* Фото растения */}
             <div className="grid gap-2">
-              <Label htmlFor="photo">Фото растения</Label>
+              <Label htmlFor="photo">{t('photo')}</Label>
               <FileInput
                 id="photo"
                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
@@ -223,10 +225,10 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
 
             {/* Описание */}
             <div className="grid gap-2">
-              <Label htmlFor="description">Описание</Label>
+              <Label htmlFor="description">{t('description')}</Label>
               <Textarea
                 id="description"
-                placeholder="Добавьте описание вашего растения..."
+                placeholder={t('descriptionPlaceholder')}
                 {...register('description')}
                 rows={3}
               />
@@ -240,10 +242,10 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Отмена
+              {t('buttons.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading || !selectedGenusId}>
-              {isLoading ? 'Добавление...' : 'Добавить'}
+              {isLoading ? t('buttons.adding') : t('buttons.add')}
             </Button>
           </DialogFooter>
         </form>

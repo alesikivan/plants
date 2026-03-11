@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SocialLink } from '@/lib/types/user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,29 +22,30 @@ import {
 } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 
-const SOCIAL_TYPES = [
-  { value: 'telegram', label: 'Telegram' },
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'phone', label: 'Телефон' },
-  { value: 'email', label: 'Почта' },
-];
-
-const SOCIAL_PLACEHOLDERS: Record<string, string> = {
-  telegram: '@username или t.me/username',
-  instagram: '@username',
-  phone: '+7 999 123-45-67',
-  email: 'example@mail.com',
-};
-
 interface AddSocialLinkDialogProps {
   existingTypes: string[];
   onAdd: (link: SocialLink) => void;
 }
 
 export function AddSocialLinkDialog({ existingTypes, onAdd }: AddSocialLinkDialogProps) {
+  const t = useTranslations('AddSocialLinkDialog');
   const [isOpen, setIsOpen] = useState(false);
   const [type, setType] = useState<string>('');
   const [value, setValue] = useState('');
+
+  const SOCIAL_TYPES = [
+    { value: 'telegram', label: t('types.telegram') },
+    { value: 'instagram', label: t('types.instagram') },
+    { value: 'phone', label: t('types.phone') },
+    { value: 'email', label: t('types.email') },
+  ];
+
+  const SOCIAL_PLACEHOLDERS: Record<string, string> = {
+    telegram: t('placeholders.telegram'),
+    instagram: t('placeholders.instagram'),
+    phone: t('placeholders.phone'),
+    email: t('placeholders.email'),
+  };
 
   const availableTypes = SOCIAL_TYPES.filter((t) => !existingTypes.includes(t.value));
 
@@ -65,27 +67,27 @@ export function AddSocialLinkDialog({ existingTypes, onAdd }: AddSocialLinkDialo
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Button onClick={() => setIsOpen(true)} variant="outline" size="sm" className="gap-2 h-9">
         <Plus className="w-4 h-4" />
-        Добавить
+        {t('addButton')}
       </Button>
 
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Добавить способ связи</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 py-4">
           <div>
             <Label htmlFor="type-select" className="text-sm mb-2 block">
-              Тип
+              {t('typeLabel')}
             </Label>
             <Select value={type} onValueChange={setType}>
               <SelectTrigger id="type-select" className="h-10">
-                <SelectValue placeholder="Выберите тип" />
+                <SelectValue placeholder={t('typePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                {availableTypes.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    {t.label}
+                {availableTypes.map((typeOption) => (
+                  <SelectItem key={typeOption.value} value={typeOption.value}>
+                    {typeOption.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -95,7 +97,7 @@ export function AddSocialLinkDialog({ existingTypes, onAdd }: AddSocialLinkDialo
           {type && (
             <div>
               <Label htmlFor="value-input" className="text-sm mb-2 block">
-                Значение
+                {t('valueLabel')}
               </Label>
               <Input
                 id="value-input"
@@ -110,10 +112,10 @@ export function AddSocialLinkDialog({ existingTypes, onAdd }: AddSocialLinkDialo
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => setIsOpen(false)}>
-            Отмена
+            {t('cancelButton')}
           </Button>
           <Button onClick={handleAdd} disabled={!type || !value.trim()}>
-            Добавить
+            {t('addButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

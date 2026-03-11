@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X, Download } from 'lucide-react';
@@ -13,6 +14,7 @@ interface PhotoGalleryProps {
 }
 
 export function PhotoGallery({ photos, initialIndex, onClose }: PhotoGalleryProps) {
+  const t = useTranslations('PhotoGallery');
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
   useEffect(() => {
@@ -45,9 +47,9 @@ export function PhotoGallery({ photos, initialIndex, onClose }: PhotoGalleryProp
       link.click();
       document.body.removeChild(link);
 
-      toast.success('Фото скачивается');
+      toast.success(t('downloadSuccess'));
     } catch (error) {
-      toast.error('Ошибка при скачивании фото');
+      toast.error(t('downloadError'));
       console.error('Failed to download photo:', error);
     }
   };
@@ -77,7 +79,7 @@ export function PhotoGallery({ photos, initialIndex, onClose }: PhotoGalleryProp
               size="icon"
               onClick={handleDownload}
               className="text-white hover:bg-white/20 transition-all hover:scale-110 active:scale-95"
-              title="Скачать фото"
+              title={t('downloadTooltip')}
             >
               <Download className="w-6 h-6" />
             </Button>

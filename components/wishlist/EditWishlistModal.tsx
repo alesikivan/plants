@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ interface WishlistFormData {
 }
 
 export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem }: EditWishlistModalProps) {
+  const t = useTranslations('EditWishlistModal');
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +70,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
         removePhoto: removeCurrentPhoto,
         photo: selectedFile || undefined,
       });
-      toast.success('Список желаний обновлен!');
+      toast.success(t('success'));
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
@@ -78,7 +80,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      toast.error('Ошибка при обновлении списка желаний');
+      toast.error(t('error'));
       console.error('Failed to update wishlist item:', error);
     } finally {
       setIsLoading(false);
@@ -94,7 +96,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
 
     // Check file type
     if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp)/)) {
-      toast.error('Разрешены только изображения (JPG, JPEG, PNG, GIF, WebP)');
+      toast.error(t('invalidFileType'));
       return;
     }
 
@@ -130,9 +132,9 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Редактировать список желаний</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Измените информацию о растении в списке желаний
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -150,7 +152,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
 
             {/* Фото растения */}
             <div className="grid gap-2">
-              <Label htmlFor="photo">Фото растения (необязательно)</Label>
+              <Label htmlFor="photo">{t('photoLabel')}</Label>
               <FileInput
                 id="photo"
                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -170,10 +172,10 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Отмена
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={isLoading || !selectedGenusId}>
-              {isLoading ? 'Сохранение...' : 'Сохранить'}
+              {isLoading ? t('submitLoading') : t('submit')}
             </Button>
           </DialogFooter>
         </form>

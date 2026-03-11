@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SocialLink } from '@/lib/types/user';
 import { SocialLinkItem } from './SocialLinkItem';
 import { AddSocialLinkDialog } from './AddSocialLinkDialog';
@@ -17,6 +18,7 @@ export function SocialLinksSection({
   onUpdate,
   isReadOnly = false,
 }: SocialLinksSectionProps) {
+  const t = useTranslations('SocialLinksSection');
   const [links, setLinks] = useState<SocialLink[]>(socialLinks);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -67,14 +69,14 @@ export function SocialLinksSection({
         {isSaving && (
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            Сохранение...
+            {t('saving')}
           </div>
         )}
       </div>
 
       {links.length === 0 ? (
         <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
-          Способы связи не добавлены
+          {t('empty')}
         </p>
       ) : (
         <div className="divide-y divide-gray-100 dark:divide-gray-700">

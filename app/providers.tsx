@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Toaster } from '@/components/ui/toaster';
+import { stripLocaleFromPathname } from '@/lib/locale';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -20,12 +21,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   const pathname = usePathname();
+  const normalizedPathname = stripLocaleFromPathname(pathname);
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const initialized = useAuthStore((state) => state.initialized);
 
   // Проверяем, находимся ли мы на страницах авторизации или публичных страницах
-  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register');
-  const isPublicPage = pathname?.startsWith('/public') || pathname?.startsWith('/profile/');
+  const isAuthPage =
+    normalizedPathname.startsWith('/login') || normalizedPathname.startsWith('/register');
+  const isPublicPage =
+    normalizedPathname.startsWith('/public') || normalizedPathname.startsWith('/profile/');
 
   useEffect(() => {
     // Не загружаем профиль на страницах авторизации и публичных страницах

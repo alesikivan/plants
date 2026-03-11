@@ -22,17 +22,32 @@ export interface ApiError {
   originalError?: unknown;
 }
 
-// Error messages mapping
+// Default error messages (fallback for non-client code)
 export const ERROR_MESSAGES: Record<ErrorType, string> = {
-  [ErrorType.NETWORK]: 'Проблема с подключением к интернету. Проверьте соединение.',
-  [ErrorType.TIMEOUT]: 'Превышено время ожидания ответа. Попробуйте снова.',
-  [ErrorType.UNAUTHORIZED]: 'Необходима авторизация. Войдите в систему.',
-  [ErrorType.FORBIDDEN]: 'У вас нет доступа к этому ресурсу.',
-  [ErrorType.NOT_FOUND]: 'Запрашиваемый ресурс не найден.',
-  [ErrorType.VALIDATION]: 'Проверьте правильность введенных данных.',
-  [ErrorType.SERVER]: 'Ошибка сервера. Попробуйте позже.',
-  [ErrorType.UNKNOWN]: 'Произошла неизвестная ошибка.',
+  [ErrorType.NETWORK]: 'Network error',
+  [ErrorType.TIMEOUT]: 'Timeout error',
+  [ErrorType.UNAUTHORIZED]: 'Unauthorized',
+  [ErrorType.FORBIDDEN]: 'Forbidden',
+  [ErrorType.NOT_FOUND]: 'Not found',
+  [ErrorType.VALIDATION]: 'Validation error',
+  [ErrorType.SERVER]: 'Server error',
+  [ErrorType.UNKNOWN]: 'Unknown error',
 };
+
+// Get localized error message (use in client components with i18n)
+export function getErrorMessageKey(errorType: ErrorType): string {
+  const keyMap: Record<ErrorType, string> = {
+    [ErrorType.NETWORK]: 'ApiError.network',
+    [ErrorType.TIMEOUT]: 'ApiError.timeout',
+    [ErrorType.UNAUTHORIZED]: 'ApiError.unauthorized',
+    [ErrorType.FORBIDDEN]: 'ApiError.forbidden',
+    [ErrorType.NOT_FOUND]: 'ApiError.notFound',
+    [ErrorType.VALIDATION]: 'ApiError.validation',
+    [ErrorType.SERVER]: 'ApiError.server',
+    [ErrorType.UNKNOWN]: 'ApiError.unknown',
+  };
+  return keyMap[errorType];
+}
 
 // Status code to error type mapping
 export const STATUS_TO_ERROR_TYPE: Record<number, ErrorType> = {
@@ -55,14 +70,14 @@ export function parseAxiosError(error: AxiosError): ApiError {
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       return {
         type: ErrorType.TIMEOUT,
-        message: ERROR_MESSAGES[ErrorType.TIMEOUT],
+        message: getErrorMessageKey(ErrorType.TIMEOUT),
         originalError: error,
       };
     }
 
     return {
       type: ErrorType.NETWORK,
-      message: ERROR_MESSAGES[ErrorType.NETWORK],
+      message: getErrorMessageKey(ErrorType.NETWORK),
       originalError: error,
     };
   }
@@ -73,7 +88,7 @@ export function parseAxiosError(error: AxiosError): ApiError {
 
   // Try to extract error message from response
   const responseData = error.response.data as any;
-  let message = ERROR_MESSAGES[errorType];
+  let message = getErrorMessageKey(errorType);
   let details: Record<string, unknown> | undefined;
 
   // Check for custom error message from backend

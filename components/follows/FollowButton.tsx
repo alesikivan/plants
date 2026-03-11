@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { followsApi } from '@/lib/api/follows';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ interface FollowButtonProps {
 }
 
 export function FollowButton({ userId, isFollowing, onToggle, className }: FollowButtonProps) {
+  const t = useTranslations('FollowButton');
   const [loading, setLoading] = useState(false);
   const [following, setFollowing] = useState(isFollowing);
 
@@ -30,7 +32,7 @@ export function FollowButton({ userId, isFollowing, onToggle, className }: Follo
         onToggle?.(true);
       }
     } catch {
-      toast.error('Ошибка. Попробуйте ещё раз');
+      toast.error(t('error'));
     } finally {
       setLoading(false);
     }
@@ -49,7 +51,7 @@ export function FollowButton({ userId, isFollowing, onToggle, className }: Follo
       )}
     >
       {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-      {following ? 'Подписан(а)' : 'Подписаться'}
+      {following ? t('following') : t('follow')}
     </button>
   );
 }

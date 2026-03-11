@@ -3,6 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Plant, Genus, Variety, getPlantPhotoUrl } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useLocale } from 'next-intl';
 import { getDisplayName } from '@/lib/utils/language';
 import { Leaf, Archive } from 'lucide-react';
 import Link from 'next/link';
@@ -15,7 +16,8 @@ interface PlantCardProps {
 
 export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
   const user = useAuthStore((state) => state.user);
-  const language = user?.preferredLanguage || 'ru';
+  const locale = useLocale();
+  const language = user?.preferredLanguage || locale;
 
   const genus = typeof plant.genusId === 'object' ? plant.genusId : null;
   const variety = typeof plant.varietyId === 'object' ? plant.varietyId : null;
@@ -32,7 +34,7 @@ export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
           {photoUrl ? (
             <img
               src={photoUrl}
-              alt={genusName || 'Растение'}
+              alt={genusName || 'Noname'}
               className={`w-full h-full object-cover${plant.isArchived ? ' opacity-50' : ''}`}
             />
           ) : (
@@ -50,7 +52,7 @@ export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
         </div>
         <div className="text-center space-y-1">
           <h3 className="font-medium text-sm text-foreground/90">
-            {genusName || 'Без названия'}
+            {genusName || 'Noname'}
           </h3>
           {varietyName && (
             <p className="text-xs text-muted-foreground">

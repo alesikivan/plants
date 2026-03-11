@@ -1,10 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
+import type { AppLocale } from '@/i18n/routing';
 
 export function PublicHeader() {
+  const t = useTranslations('PublicHeader');
+  const locale = useLocale() as AppLocale;
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 lg:px-8">
@@ -21,12 +28,16 @@ export function PublicHeader() {
             </h3>
           </Link>
 
-          {/* Sign Up Button */}
-          <Link href="/register" className='cursor-pointer'>
-            <Button size="sm" className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
-              Начать бесплатно!
-            </Button>
-          </Link>
+          {/* Language Selector & Sign Up Button */}
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher locale={locale} />
+
+            {/* <Link href="/register" className='cursor-pointer'>
+              <Button size="sm" className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold">
+                {t('startFree')}
+              </Button>
+            </Link> */}
+          </div>
         </div>
       </div>
     </header>

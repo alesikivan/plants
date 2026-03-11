@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ interface FileInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
 
 export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
   ({ className, onFileChange, onDateFound, preview, onRemove, maxSize, acceptedFormats, disableDateDetection, accept, ...props }, ref) => {
+    const t = useTranslations('FileInput');
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [cropSrc, setCropSrc] = React.useState<string | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -96,7 +98,7 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
         {isLoading ? (
           <div className="flex h-11 w-full items-center rounded-xl border-2 border-input bg-background px-4 py-3 text-base justify-center">
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Обработка фото...</span>
+            <span className="ml-2 text-sm text-muted-foreground">{t('processing')}</span>
           </div>
         ) : preview ? (
           <div className="relative rounded-xl border-2 border-input overflow-hidden">
@@ -113,7 +115,7 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
               onClick={onRemove}
             >
               <X className="h-4 w-4" />
-              Удалить
+              {t('removeButton')}
             </Button>
           </div>
         ) : (
@@ -126,13 +128,16 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
             )}
           >
             <Upload className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Выберите файл</span>
+            <span className="text-muted-foreground">{t('selectButton')}</span>
           </button>
         )}
 
         {maxSize && acceptedFormats && !preview && (
           <p className="mt-2 text-xs text-muted-foreground">
-            Максимальный размер: {formatFileSize(maxSize)}. Форматы: {acceptedFormats.join(', ')}
+            {t('helperText', {
+              size: formatFileSize(maxSize),
+              formats: acceptedFormats.join(', '),
+            })}
           </p>
         )}
       </div>
