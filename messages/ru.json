@@ -935,11 +935,42 @@
       "weeks": "{count} нед.",
       "months": "{count} мес.",
       "years": "{count} г."
+    },
+    "badges": {
+      "new": "Новое"
     }
   },
   "PublicProfilePage": {
     "metadata": {
-      "title": "Профиль пользователя"
+      "title": "Профиль пользователя",
+      "description": "Коллекция растений {name} на PlantSheep: {plants} растений, {shelves} полок."
+    },
+    "plants": {
+      "title": "Растения пользователя",
+      "titleWithName": "Растения {name}",
+      "description": "Коллекция растений пользователя {name} на PlantSheep — {plants} растений."
+    },
+    "shelves": {
+      "title": "Полки пользователя",
+      "titleWithName": "Полки {name}",
+      "description": "Полки пользователя {name} на PlantSheep — {shelves} полок."
+    },
+    "shelf": {
+      "title": "Полка",
+      "titleWithNameAndOwner": "{shelfName} · {ownerName}",
+      "titleWithName": "{shelfName}",
+      "description": "Полка «{shelfName}\"{owner} на PlantSheep — {plants} растений.",
+      "descriptionWithOwner": " пользователя {owner}"
+    },
+    "plant": {
+      "title": "Растение",
+      "descriptionWithoutOwner": "{plantName} на PlantSheep.",
+      "descriptionWithOwner": "{plantName} из коллекции {ownerName} на PlantSheep."
+    },
+    "userPlant": {
+      "title": "Растение",
+      "descriptionWithoutOwner": "{plantName} на PlantSheep.",
+      "descriptionWithOwner": "{plantName} из коллекции {ownerName} на PlantSheep."
     },
     "header": {
       "backButton": "Назад",
@@ -1191,6 +1222,7 @@
   "UserShelfDetailPage": {
     "back": "Назад",
     "loading": "Загрузка...",
+    "loadError": "Ошибка загрузки полки",
     "shelfHidden": {
       "title": "Полка скрыта",
       "description": "Пользователь скрыл свои полки"

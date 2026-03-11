@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import PublicPlantDetailClient from './PublicPlantDetailClient';
 import { getPublicPlantPageData } from '@/lib/server/public-data';
 
@@ -7,19 +8,20 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 interface Props {
-  params: Promise<{ plantId: string }>;
+  params: Promise<{ plantId: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { plantId } = await params;
+    const { plantId, locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'PublicProfilePage.plant' });
     const res = await fetch(`${API_URL}/plants/public/${plantId}`, {
       next: { revalidate: 60 },
     });
 
     if (!res.ok) {
       return {
-        title: 'Растение',
+        title: t('title'),
         robots: {
           index: false,
           follow: false,
@@ -43,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         variety?.nameRu || variety?.nameEn || variety?.nameLatin,
       ]
         .filter(Boolean)
-        .join(' — ') || 'Растение';
+        .join(' — ') || t('title');
 
     const ownerName = plant.owner?.name;
     const canonicalUrl = plant.owner?._id
@@ -52,7 +54,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = ownerName ? `${plantName} · ${ownerName}` : plantName;
     const description = plant.description
       ? plant.description.slice(0, 160)
-      : `${plantName}${ownerName ? ` из коллекции ${ownerName}` : ''} на PlantSheep.`;
+      : ownerName
+        ? t('descriptionWithOwner', { plantName, ownerName })
+        : t('descriptionWithoutOwner', { plantName });
 
     return {
       title,
@@ -84,8 +88,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     };
   } catch {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'PublicProfilePage.plant' });
     return {
-      title: 'Растение',
+      title: t('title'),
       robots: {
         index: false,
         follow: false,
@@ -95,7 +101,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { plantId } = await params;
+  const { plantId, locale } = await params;
   const { status, plant, history } = await getPublicPlantPageData(plantId);
 
   if (status === 404) {

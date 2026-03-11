@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import UserPlantsClient from './UserPlantsClient';
 import { getPublicProfilePlantsPageData } from '@/lib/server/public-data';
 
@@ -7,12 +8,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { id } = await params;
+    const { id, locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'PublicProfilePage.plants' });
     const [profileRes, plantsRes] = await Promise.all([
       fetch(`${API_URL}/users/${id}/profile`, {
         next: { revalidate: 60 },
@@ -24,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (profileRes.status === 404) {
       return {
-        title: 'Растения пользователя',
+        title: t('title'),
         robots: {
           index: false,
           follow: false,
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (plantsRes.status === 403) {
       return {
-        title: 'Растения пользователя',
+        title: t('title'),
         robots: {
           index: false,
           follow: false,
@@ -44,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (!profileRes.ok || !plantsRes.ok) {
       return {
-        title: 'Растения пользователя',
+        title: t('title'),
         robots: {
           index: false,
           follow: false,
@@ -55,17 +57,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const profile: { name: string; stats: { totalPlants: number } } = await profileRes.json();
 
     return {
-      title: `Растения ${profile.name}`,
-      description: `Коллекция растений пользователя ${profile.name} на PlantSheep — ${profile.stats.totalPlants} растений.`,
+      title: t('titleWithName', { name: profile.name }),
+      description: t('description', { name: profile.name, plants: profile.stats.totalPlants }),
       openGraph: {
-        title: `Растения ${profile.name} — PlantSheep`,
+        title: `${t('titleWithName', { name: profile.name })} — PlantSheep`,
         url: `${SITE_URL}/profile/${id}/plants`,
       },
       alternates: { canonical: `${SITE_URL}/profile/${id}/plants` },
     };
   } catch {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'PublicProfilePage.plants' });
     return {
-      title: 'Растения пользователя',
+      title: t('title'),
       robots: {
         index: false,
         follow: false,
@@ -75,7 +79,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { id } = await params;
+  const { id, locale } = await params;
   const { status, plants, isHidden } = await getPublicProfilePlantsPageData(id);
 
   if (status === 404) {

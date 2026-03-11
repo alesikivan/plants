@@ -918,9 +918,6 @@
     },
     "emptyGlobal": {
       "title": "Feed is empty"
-    },
-    "badges": {
-      "new": "New"
     }
   },
   "FeedCard": {
@@ -935,11 +932,42 @@
       "weeks": "{count} weeks ago",
       "months": "{count} months ago",
       "years": "{count} years ago"
+    },
+    "badges": {
+      "new": "New"
     }
   },
   "PublicProfilePage": {
     "metadata": {
-      "title": "User profile"
+      "title": "User profile",
+      "description": "{name}'s plant collection on PlantSheep: {plants} plants, {shelves} shelves."
+    },
+    "plants": {
+      "title": "User plants",
+      "titleWithName": "{name}'s plants",
+      "description": "{name}'s plant collection on PlantSheep — {plants} plants."
+    },
+    "shelves": {
+      "title": "User shelves",
+      "titleWithName": "{name}'s shelves",
+      "description": "{name}'s shelves on PlantSheep — {shelves} shelves."
+    },
+    "shelf": {
+      "title": "Shelf",
+      "titleWithNameAndOwner": "{shelfName} · {ownerName}",
+      "titleWithName": "{shelfName}",
+      "description": "Shelf \"{shelfName}\"{owner} on PlantSheep — {plants} plants.",
+      "descriptionWithOwner": " by {owner}"
+    },
+    "plant": {
+      "title": "Plant",
+      "descriptionWithoutOwner": "{plantName} on PlantSheep.",
+      "descriptionWithOwner": "{plantName} from {ownerName}'s collection on PlantSheep."
+    },
+    "userPlant": {
+      "title": "Plant",
+      "descriptionWithoutOwner": "{plantName} on PlantSheep.",
+      "descriptionWithOwner": "{plantName} from {ownerName}'s collection on PlantSheep."
     },
     "header": {
       "backButton": "Back",
@@ -1191,6 +1219,7 @@
   "UserShelfDetailPage": {
     "back": "Back",
     "loading": "Loading...",
+    "loadError": "Error loading shelf",
     "shelfHidden": {
       "title": "Shelf is hidden",
       "description": "The user has hidden their shelves"

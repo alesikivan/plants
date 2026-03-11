@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import ProfilePageClient from './ProfilePageClient';
 import { getPublicProfilePageData } from '@/lib/server/public-data';
 
@@ -7,19 +8,20 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plantsheep.com';
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { id } = await params;
+    const { id, locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'PublicProfilePage.metadata' });
     const res = await fetch(`${API_URL}/users/${id}/profile`, {
       next: { revalidate: 60 },
     });
 
     if (!res.ok) {
       return {
-        title: 'Профиль пользователя',
+        title: t('title'),
         robots: {
           index: false,
           follow: false,
@@ -28,7 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const profile: { name: string; stats: { totalPlants: number; totalShelves: number }; avatar?: string } = await res.json();
-    const description = `Коллекция растений ${profile.name} на PlantSheep: ${profile.stats.totalPlants} растений, ${profile.stats.totalShelves} полок.`;
+    const description = t('description', {
+      name: profile.name,
+      plants: profile.stats.totalPlants,
+      shelves: profile.stats.totalShelves,
+    });
 
     return {
       title: profile.name,
@@ -49,12 +55,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       alternates: { canonical: `${SITE_URL}/profile/${id}` },
     };
   } catch {
-    return { title: 'Профиль пользователя' };
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'PublicProfilePage.metadata' });
+    return { title: t('title') };
   }
 }
 
 export default async function Page({ params }: Props) {
-  const { id } = await params;
+  const { id, locale } = await params;
   const { profile, profileStatus, plants, shelves } = await getPublicProfilePageData(id);
 
   if (profileStatus === 404 || !profile) {

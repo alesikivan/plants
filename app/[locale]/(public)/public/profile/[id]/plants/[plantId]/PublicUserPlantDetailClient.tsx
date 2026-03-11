@@ -170,7 +170,7 @@ export default function PublicUserPlantDetailClient({
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <h1 className="text-xl sm:text-2xl font-semibold">
-                    {plantName || 'Без названия'}
+                    {plantName || 'Noname'}
                   </h1>
 
                   <Button
@@ -309,7 +309,7 @@ export default function PublicUserPlantDetailClient({
                             >
                               <img
                                 src={getPlantHistoryPhotoUrl(photo)}
-                                alt={`Фото ${photoIdx + 1}`}
+                                alt={`Photo ${photoIdx + 1}`}
                                 className="w-full h-full object-cover"
                               />
                             </button>

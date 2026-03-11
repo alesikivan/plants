@@ -42,12 +42,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const plantName = [
       genus?.nameRu || genus?.nameEn || genus?.nameLatin,
       variety?.nameRu || variety?.nameEn || variety?.nameLatin,
-    ].filter(Boolean).join(' — ') || 'Растение';
+    ].filter(Boolean).join(' — ') || 'Noname';
 
     const title = profileName ? `${plantName} · ${profileName}` : plantName;
     const description = plant.description
       ? plant.description.slice(0, 160)
-      : `${plantName} из коллекции${profileName ? ` ${profileName}` : ''} на PlantSheep.`;
+      : '';
 
     return {
       title,

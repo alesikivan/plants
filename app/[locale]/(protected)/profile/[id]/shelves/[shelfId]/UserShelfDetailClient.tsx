@@ -56,7 +56,7 @@ export default function UserShelfDetailClient({
           setIsHidden(true);
           return;
         }
-        toast.error('Ошибка загрузки полки');
+        toast.error(t('loadError'));
         router.back();
       })
       .finally(() => setIsLoading(false));

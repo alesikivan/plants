@@ -184,7 +184,7 @@ export default function UserPlantDetailClient({
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <h1 className="text-xl sm:text-2xl font-semibold">
-                    {plantName || 'Без названия'}
+                    {plantName || 'Noname'}
                   </h1>
 
                   <Button
@@ -213,33 +213,7 @@ export default function UserPlantDetailClient({
               <div className="grid gap-6">
                 {/* Two column layout for genus, variety, owner, and purchase date */}
                 <div className="flex items-center flex-wrap gap-4">
-                  {/* Left column: Genus and Variety */}
                   <div className="space-y-4 mr-10">
-                    <div className="flex items-start gap-3">
-                      <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{t('plantInfo.genus')}</p>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {getDisplayName(genus, language) || t('plantInfo.genusEmpty')}
-                        </p>
-                      </div>
-                    </div>
-
-                    {variety && (
-                      <div className="flex items-start gap-3">
-                        <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{t('plantInfo.variety')}</p>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {getDisplayName(variety, language)}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Right column: Owner and Purchase Date */}
-                  <div className="space-y-4">
                     {profile && (
                       <div className="flex items-start gap-3">
                         <User className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
@@ -264,6 +238,30 @@ export default function UserPlantDetailClient({
                             {new Date(plant.purchaseDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {
                               year: 'numeric', month: 'long', day: 'numeric',
                             })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 mr-10 flex flex-col h-full">
+                    <div className="flex items-start gap-3">
+                      <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{t('plantInfo.genus')}</p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {getDisplayName(genus, language) || t('plantInfo.genusEmpty')}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {variety && (
+                      <div className="flex items-start gap-3">
+                        <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{t('plantInfo.variety')}</p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {getDisplayName(variety, language)}
                           </p>
                         </div>
                       </div>
@@ -351,7 +349,7 @@ export default function UserPlantDetailClient({
                             >
                               <img
                                 src={getPlantHistoryPhotoUrl(photo)}
-                                alt={`Фото ${photoIdx + 1}`}
+                                alt={`PlantPhoto ${photoIdx + 1}`}
                                 className="w-full h-full object-cover"
                               />
                             </button>
