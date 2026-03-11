@@ -62,6 +62,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public files (public folder)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|svg|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|.*\\.(?:png|svg|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 };
