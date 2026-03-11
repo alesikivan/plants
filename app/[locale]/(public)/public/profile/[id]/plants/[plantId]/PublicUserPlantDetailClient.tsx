@@ -86,20 +86,6 @@ export default function PublicUserPlantDetailClient({
     }
   };
 
-  const handleCopyPlantLink = async () => {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const plantUrl = `${baseUrl}/profile/${userId}/plants/${plantId}`;
-    try {
-      await navigator.clipboard.writeText(plantUrl);
-      setIsLinkCopied(true);
-      toast.success('Ссылка скопирована в буфер обмена');
-      setTimeout(() => setIsLinkCopied(false), 2000);
-    } catch (error) {
-      toast.error('Не удалось скопировать ссылку');
-      console.error('Failed to copy link:', error);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64 fade-in duration-300">
