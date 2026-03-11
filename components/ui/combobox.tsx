@@ -93,7 +93,7 @@ export function ComboBox({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" avoidCollisions={false}>
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" avoidCollisions={false} onOpenAutoFocus={(e) => e.preventDefault()}>
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={searchPlaceholder}

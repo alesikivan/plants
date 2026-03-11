@@ -76,7 +76,7 @@ export function FollowersDialog({ userId, type, isOpen, onClose }: FollowersDial
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md flex flex-col max-h-[80vh]">
+      <DialogContent className="max-w-md flex flex-col max-h-[80vh]" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>
             {title}
