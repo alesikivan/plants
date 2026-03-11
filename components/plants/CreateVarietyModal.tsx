@@ -97,13 +97,14 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
     if (!suggestion) return;
 
     setIsSaving(true);
+    const displayName = locale === 'ru' ? suggestion.nameRu : suggestion.nameEn;
     try {
       const variety = await varietyApi.create({
         nameRu: suggestion.nameRu,
         nameEn: suggestion.nameEn,
         genusId,
       });
-      toast.success(t('toasts.createSuccess', { name: suggestion.nameRu }));
+      toast.success(t('toasts.createSuccess', { name: displayName }));
       onCreated(variety);
       handleOpenChange(false);
     } catch (error: any) {

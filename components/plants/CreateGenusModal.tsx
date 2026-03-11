@@ -92,12 +92,13 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
     if (!suggestion) return;
 
     setIsSaving(true);
+    const displayName = locale === 'ru' ? suggestion.nameRu : suggestion.nameEn;
     try {
       const genus = await genusApi.create({
         nameRu: suggestion.nameRu,
         nameEn: suggestion.nameEn,
       });
-      toast.success(t('toasts.createSuccess', { name: suggestion.nameRu }));
+      toast.success(t('toasts.createSuccess', { name: displayName }));
       onCreated(genus);
       handleOpenChange(false);
     } catch (error: any) {
