@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare, Copy, Check, User } from 'lucide-react';
 import { usersApi, Plant, PlantHistory, Genus, Variety, getPlantPhotoUrl, getPlantHistoryPhotoUrl } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
@@ -212,12 +212,12 @@ export default function UserPlantDetailClient({
 
               <div className="grid gap-6">
                 {/* Two column layout for genus, variety, owner, and purchase date */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="flex items-center flex-wrap gap-4">
                   {/* Left column: Genus and Variety */}
-                  <div className="space-y-4">
+                  <div className="space-y-4 mr-10">
                     <div className="flex items-start gap-3">
                       <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
+                      <div className="flex-1">
                         <p className="text-sm font-medium">{t('plantInfo.genus')}</p>
                         <p className="text-sm text-muted-foreground truncate">
                           {getDisplayName(genus, language) || t('plantInfo.genusEmpty')}
@@ -228,7 +228,7 @@ export default function UserPlantDetailClient({
                     {variety && (
                       <div className="flex items-start gap-3">
                         <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
+                        <div className="flex-1">
                           <p className="text-sm font-medium">{t('plantInfo.variety')}</p>
                           <p className="text-sm text-muted-foreground truncate">
                             {getDisplayName(variety, language)}
@@ -242,8 +242,8 @@ export default function UserPlantDetailClient({
                   <div className="space-y-4">
                     {profile && (
                       <div className="flex items-start gap-3">
-                        <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
+                        <User className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
                           <p className="text-sm font-medium">{t('plantInfo.owner')}</p>
                           <button
                             onClick={() => router.push(`/profile/${userId}`)}
@@ -258,7 +258,7 @@ export default function UserPlantDetailClient({
                     {plant.purchaseDate && (
                       <div className="flex items-start gap-3">
                         <Calendar className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
+                        <div className="flex-1">
                           <p className="text-sm font-medium">{t('plantInfo.purchaseDate')}</p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(plant.purchaseDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {

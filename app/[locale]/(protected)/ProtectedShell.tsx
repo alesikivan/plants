@@ -213,7 +213,7 @@ export default function ProtectedShell({
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Users className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">{t('users')}</span>
+              <span className="text-xs font-medium select-none">{t('mobile.users')}</span>
             </Link>
           </div>
         </nav>

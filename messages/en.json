@@ -401,7 +401,10 @@
     "admin": "Admin",
     "plants": "Plants",
     "help": "Need help or have feedback?",
-    "helpEmail": "Write us – we read everything :)"
+    "helpEmail": "Write us – we read everything :)",
+    "mobile": {
+      "users": "Users"
+    }
   },
   "PublicHeader": {
     "startFree": "Start free!"

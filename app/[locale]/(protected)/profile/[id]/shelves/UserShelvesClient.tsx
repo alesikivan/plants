@@ -46,11 +46,11 @@ export default function UserShelvesClient({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
-      <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+      <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="gap-2 transition-all active:scale-95"
+          className="gap-2 transition-all active:scale-95 w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           {t('header.backButton')}
