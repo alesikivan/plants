@@ -33,7 +33,7 @@ export default function UserPlantDetailClient({
   const plantId = params.plantId as string;
 
   const user = useAuthStore((state) => state.user);
-  const language = user?.preferredLanguage || 'ru';
+  const language = user?.preferredLanguage || locale;
 
   const [plant, setPlant] = useState<Plant | null>(initialPlant);
   const [history, setHistory] = useState<PlantHistory[]>(initialHistory);
@@ -136,14 +136,16 @@ export default function UserPlantDetailClient({
 
   return (
     <div className="space-y-6 fade-in slide-in-from-bottom-2 duration-700">
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="gap-2 transition-all active:scale-95"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t('back')}
-      </Button>
+      {user && (
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="gap-2 transition-all active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('back')}
+        </Button>
+      )}
 
       {/* Plant Info */}
       <Card>

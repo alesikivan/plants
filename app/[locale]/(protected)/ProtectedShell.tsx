@@ -24,9 +24,9 @@ export default function ProtectedShell({
   const user = useAuthStore((state) => state.user);
   const fetchUser = useAuthStore((state) => state.fetchUser);
   const initialized = useAuthStore((state) => state.initialized);
-  const isPublicProfilePage = pathname?.startsWith('/profile/');
-  const showGuestCta = isPublicProfilePage && initialized && !user;
-  const logoHref = showGuestCta ? '/' : '/dashboard';
+  const isPublicProfilePage = pathname?.startsWith('/profile/') || pathname?.includes('/profile/');
+  const showGuestLanguageSwitcher = isPublicProfilePage && !user;
+  const logoHref = isPublicProfilePage && !user ? '/' : '/dashboard';
 
   useEffect(() => {
     if (!initialized) {
@@ -151,19 +151,8 @@ export default function ProtectedShell({
               </>
             )}
 
-            {showGuestCta && (
-              <div className="flex items-center gap-3">
-                <LanguageSwitcher locale={locale} />
-                <Link href="/register" className="cursor-pointer">
-                  <Button
-                    size="sm"
-                    className="px-4 gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary font-semibold"
-                  >
-                    <span className="sm:hidden">Попробовать</span>
-                    <span className="hidden sm:inline">Попробовать бесплатно</span>
-                  </Button>
-                </Link>
-              </div>
+            {showGuestLanguageSwitcher && (
+              <LanguageSwitcher locale={locale} />
             )}
           </div>
         </div>

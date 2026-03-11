@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Calendar, FileText, Leaf, Trash2, Pencil, Layers, Archive, ArchiveRestore, Copy, Check } from 'lucide-react';
@@ -27,6 +27,7 @@ import {
 
 export default function PlantDetailPage() {
   const t = useTranslations('PlantDetailPage');
+  const locale = useLocale();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -342,7 +343,7 @@ export default function PlantDetailPage() {
                     <div className="min-w-0">
                       <p className="text-sm font-medium">{t('info.purchaseDate')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(plant.purchaseDate).toLocaleDateString('ru-RU', {
+                        {new Date(plant.purchaseDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
