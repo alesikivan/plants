@@ -131,7 +131,7 @@ export function PlantHistoryItem({
                 >
                   <img
                     src={getPlantHistoryPhotoUrl(photo)}
-                    alt={`Фото ${index + 1}`}
+                    alt={`Photo ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>

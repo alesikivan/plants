@@ -1216,6 +1216,21 @@
       "errorToast": "Failed to copy profile link"
     }
   },
+  "ApiError": {
+    "network": "Network connectivity issue. Please check your connection.",
+    "timeout": "Request timeout. Please try again.",
+    "unauthorized": "Authentication required. Please sign in.",
+    "forbidden": "You do not have access to this resource.",
+    "notFound": "The requested resource was not found.",
+    "validation": "Please check your input and try again.",
+    "server": "Server error. Please try again later.",
+    "unknown": "An unknown error occurred."
+  },
+  "PhotoGallery": {
+    "downloadSuccess": "Photo downloading",
+    "downloadError": "Failed to download photo",
+    "downloadTooltip": "Download photo"
+  },
   "UserShelfDetailPage": {
     "back": "Back",
     "loading": "Loading...",

@@ -122,7 +122,7 @@ export function ManagePlantsModal({ open, onOpenChange, onSuccess, shelf }: Mana
     const genusName = getDisplayName(genus, language);
     const varietyName = getDisplayName(variety, language);
 
-    return [genusName, varietyName].filter(Boolean).join(' - ') || 'Без названия';
+    return [genusName, varietyName].filter(Boolean).join(' - ') || 'Noname';
   };
 
   // Фильтрация растений по поисковому запросу

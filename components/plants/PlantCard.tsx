@@ -34,7 +34,7 @@ export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
           {photoUrl ? (
             <img
               src={photoUrl}
-              alt={genusName || 'Растение'}
+              alt={genusName || 'Noname'}
               className={`w-full h-full object-cover${plant.isArchived ? ' opacity-50' : ''}`}
             />
           ) : (
@@ -52,7 +52,7 @@ export function PlantCard({ plant, index = 0, href }: PlantCardProps) {
         </div>
         <div className="text-center space-y-1">
           <h3 className="font-medium text-sm text-foreground/90">
-            {genusName || 'Без названия'}
+            {genusName || 'Noname'}
           </h3>
           {varietyName && (
             <p className="text-xs text-muted-foreground">

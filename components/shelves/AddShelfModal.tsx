@@ -208,7 +208,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
     const genusName = getDisplayName(genus, language);
     const varietyName = getDisplayName(variety, language);
 
-    return [genusName, varietyName].filter(Boolean).join(' - ') || 'Без названия';
+    return [genusName, varietyName].filter(Boolean).join(' - ') || 'Noname';
   };
 
   // Фильтрация растений по поисковому запросу
