@@ -68,7 +68,7 @@ export function ImageCropModal({
         </DialogHeader>
 
         {/* Crop area — edge-to-edge */}
-        <div className="relative w-full bg-black" style={{ aspectRatio: aspect === 1 ? '1' : '5/8', maxHeight: '60svh' }}>
+        <div className="relative w-full bg-black" style={{ aspectRatio: aspect === 1 ? '1' : '5/7', maxHeight: '60svh' }}>
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -88,7 +88,7 @@ export function ImageCropModal({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setAspect(aspect === 1 ? 5 / 8 : 1)}
+              onClick={() => setAspect(aspect === 1 ? 5 / 7 : 1)}
               className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
               aria-label={t('toggleFormat')}
             >
