@@ -97,6 +97,7 @@
       "badgePlant": "Новое растение",
       "badgeHistory": "Запись ухода",
       "signInHint": "Войдите, чтобы видеть живую ленту",
+      "feedImage": "/images/ru/feed.jpg",
       "mockItems": [
         { "type": "plant", "user": "maria_plants", "text": "Добавила Monstera deliciosa в коллекцию", "time": "2 мин назад" },
         { "type": "history", "user": "green_corner", "text": "Пересадила Ficus lyrata — новый грунт, горшок побольше", "time": "15 мин назад" },

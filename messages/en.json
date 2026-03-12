@@ -97,6 +97,7 @@
       "badgePlant": "New plant",
       "badgeHistory": "Care entry",
       "signInHint": "Sign in to see the live feed",
+      "feedImage": "/images/en/feed.jpg",
       "mockItems": [
         { "type": "plant", "user": "maria_plants", "text": "Added Monstera deliciosa to collection", "time": "2 min ago" },
         { "type": "history", "user": "green_corner", "text": "Repotted Ficus lyrata — new soil, bigger pot", "time": "15 min ago" },

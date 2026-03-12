@@ -3,8 +3,9 @@ import { Logo } from '@/components/logo';
 import {
   Leaf, BarChart3, BookOpen, Share2, Layers, Camera,
   Globe, Eye, Link2, ArrowRight, Sprout, CheckCircle2,
-  Lock, Flower2, Zap, Activity, Heart, Users, Clock, Rss,
+  Flower2, Activity, Heart, Users,
 } from 'lucide-react';
+import Image from 'next/image';
 import { HomeAuthButtons } from '@/components/home/HomeAuthButtons';
 import { LocaleSwitcher } from '@/components/home/LocaleSwitcher';
 import { Link } from '@/i18n/navigation';
@@ -19,7 +20,6 @@ type StatItem = { emoji: string; text: string };
 const trustStatIcons = [Leaf, Activity, BookOpen, Camera];
 
 type TrustStatItem = { value: string; label: string };
-type FeedMockItem = { type: 'plant' | 'history'; user: string; text: string; time: string };
 
 export default async function HomePage({
   params,
@@ -33,7 +33,7 @@ export default async function HomePage({
   const steps = t.raw('steps.items') as StepItem[];
   const communityItems = t.raw('community.items') as string[];
   const trustStats = t.raw('trustStats') as TrustStatItem[];
-  const feedMockItems = t.raw('feed.mockItems') as FeedMockItem[];
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -405,80 +405,14 @@ export default async function HomePage({
               </div>
             </div>
 
-            {/* Right: feed mockup */}
-            <div className="relative">
-              {/* Glow behind card */}
-              <div className="absolute -inset-4 bg-primary/5 rounded-3xl blur-2xl pointer-events-none" />
-
-              <div className="relative rounded-2xl border border-border bg-card shadow-lg overflow-hidden">
-                {/* Tab bar */}
-                <div className="flex items-center gap-1 px-4 pt-4 pb-0 border-b border-border">
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-t-lg bg-background border border-border border-b-background -mb-px text-sm font-medium text-foreground">
-                    <Globe className="w-3.5 h-3.5 text-primary" />
-                    {t('feed.tabGlobal')}
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-t-lg text-sm text-muted-foreground hover:text-foreground transition-colors cursor-default">
-                    <Users className="w-3.5 h-3.5" />
-                    {t('feed.tabFollowing')}
-                  </div>
-                  <div className="ml-auto pb-2">
-                    <Rss className="w-3.5 h-3.5 text-primary/50" />
-                  </div>
-                </div>
-
-                {/* Feed items */}
-                <div className="divide-y divide-border">
-                  {feedMockItems.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3 px-4 py-3.5 hover:bg-secondary/40 transition-colors"
-                    >
-                      {/* Avatar */}
-                      <div
-                        className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-primary-foreground"
-                        style={{ background: `hsl(${75 + i * 25} 35% ${45 + i * 3}%)` }}
-                      >
-                        {item.user[0].toUpperCase()}
-                      </div>
-
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs font-semibold text-foreground">
-                            @{item.user}
-                          </span>
-                          <span
-                            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${
-                              item.type === 'plant'
-                                ? 'bg-primary/10 text-primary'
-                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                            }`}
-                          >
-                            {item.type === 'plant'
-                              ? <Leaf className="w-2.5 h-2.5" />
-                              : <Clock className="w-2.5 h-2.5" />
-                            }
-                            {item.type === 'plant' ? t('feed.badgePlant') : t('feed.badgeHistory')}
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
-                          {item.text}
-                        </p>
-                      </div>
-
-                      <span className="text-[10px] text-muted-foreground/50 flex-shrink-0 mt-0.5">
-                        {item.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Footer hint */}
-                <div className="px-4 py-3 border-t border-border bg-secondary/30 flex items-center justify-center gap-1.5 text-xs text-muted-foreground/60">
-                  <ArrowRight className="w-3 h-3" />
-                  {t('feed.signInHint')}
-                </div>
-              </div>
-            </div>
+            {/* Right: feed image */}
+            <Image
+              src={t('feed.feedImage')}
+              alt={t('feed.title')}
+              width={600}
+              height={440}
+              className="w-2/3 max-w-[280px] mx-auto lg:max-w-none lg:mx-0 h-auto lg:h-[440px] lg:w-auto lg:justify-self-center object-contain"
+            />
 
           </div>
         </div>
