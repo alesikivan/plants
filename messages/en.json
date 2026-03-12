@@ -80,6 +80,30 @@
         "A profile link you can share anywhere"
       ]
     },
+    "trustStats": [
+      { "value": "∞", "label": "Plants per account" },
+      { "value": "100%", "label": "Full history coverage" },
+      { "value": "2000+", "label": "Genera and varieties" },
+      { "value": "Photos", "label": "Attached to every entry" }
+    ],
+    "feed": {
+      "eyebrow": "Community feed",
+      "title": "See what other collectors are growing",
+      "description": "A live stream of new plants and care entries from the community. Switch between everyone's updates or just the people you follow.",
+      "tabGlobal": "Global",
+      "tabGlobalDesc": "All public updates from collectors across the whole community",
+      "tabFollowing": "Following",
+      "tabFollowingDesc": "Only from people you follow — no noise, just updates you care about",
+      "badgePlant": "New plant",
+      "badgeHistory": "Care entry",
+      "signInHint": "Sign in to see the live feed",
+      "mockItems": [
+        { "type": "plant", "user": "maria_plants", "text": "Added Monstera deliciosa to collection", "time": "2 min ago" },
+        { "type": "history", "user": "green_corner", "text": "Repotted Ficus lyrata — new soil, bigger pot", "time": "15 min ago" },
+        { "type": "plant", "user": "cactus_fan", "text": "Added Cereus peruvianus to collection", "time": "1 h ago" },
+        { "type": "history", "user": "leaflover", "text": "First bloom on Anthurium andraeanum!", "time": "3 h ago" }
+      ]
+    },
     "cta": {
       "title": "Start documenting your collection today",
       "description": "Free. No limits. Your plants deserve attention and care."
