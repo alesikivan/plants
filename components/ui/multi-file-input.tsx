@@ -35,8 +35,37 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
     // Files that have been processed (cropped or skipped) but not yet compressed+submitted
     const pendingRef = React.useRef<File[]>([]);
     const [isLoading, setIsLoading] = React.useState(false);
+    // Key to force-remount the input element (Android fix)
+    const [inputKey, setInputKey] = React.useState(0);
+    const visibilityListenerRef = React.useRef<(() => void) | null>(null);
+
+    React.useEffect(() => {
+      return () => {
+        if (visibilityListenerRef.current) {
+          document.removeEventListener('visibilitychange', visibilityListenerRef.current);
+        }
+      };
+    }, []);
 
     const handleClick = () => {
+      // On Android the file picker launches a separate activity — the page becomes hidden,
+      // then visible again when the picker closes. We use visibilitychange (not window.focus,
+      // which fires erratically on desktop) to detect this and remount the <input> so the
+      // next tap always works with a fresh element.
+      if (visibilityListenerRef.current) {
+        document.removeEventListener('visibilitychange', visibilityListenerRef.current);
+      }
+      const onVisibilityChange = () => {
+        if (!document.hidden) {
+          // Page became visible: picker closed. Wait briefly so onChange fires first.
+          setTimeout(() => setInputKey((k) => k + 1), 300);
+          document.removeEventListener('visibilitychange', onVisibilityChange);
+          visibilityListenerRef.current = null;
+        }
+      };
+      visibilityListenerRef.current = onVisibilityChange;
+      document.addEventListener('visibilitychange', onVisibilityChange);
+
       inputRef.current?.click();
     };
 
@@ -114,6 +143,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
     return (
       <div className="w-full space-y-3">
         <input
+          key={inputKey}
           ref={inputRef}
           type="file"
           className="hidden"

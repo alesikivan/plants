@@ -140,7 +140,7 @@ export function AddHistoryModal({
             <Label htmlFor="photos">{t('photosLabel')}</Label>
             <MultiFileInput
               id="photos"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
+              accept="image/*"
               onFilesChange={handlePhotosChange}
               onDateFound={handleDateFound}
               previews={photoPreviews}

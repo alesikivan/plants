@@ -52,7 +52,7 @@ export function EditHistoryModal({
   const handleNewPhotosChange = (files: File[]) => {
     // Check file type for each file
     const validFiles = files.filter(file => {
-      if (!file.type.match(/image\/(jpg|jpeg|png|gif|webp|heic|heif)/)) {
+      if (!file.type.startsWith('image/')) {
         toast.error(`${t('photosLabel')} ${file.name}`);
         return false;
       }
@@ -189,7 +189,7 @@ export function EditHistoryModal({
             <Label htmlFor="photos">{t('photosLabel')}</Label>
             <MultiFileInput
               id="photos"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
+              accept="image/*"
               onFilesChange={handleNewPhotosChange}
               onDateFound={handleDateFound}
               previews={newPhotoPreviews}
