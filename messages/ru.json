@@ -822,6 +822,7 @@
     }
   },
   "ShelfDetailPage": {
+    "loading": "Загрузка...",
     "header": {
       "backButton": "Назад к списку"
     },
