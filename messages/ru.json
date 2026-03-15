@@ -81,10 +81,22 @@
       ]
     },
     "trustStats": [
-      { "value": "∞", "label": "Растений в аккаунте" },
-      { "value": "100%", "label": "История без пропусков" },
-      { "value": "2000+", "label": "Сортов и родов" },
-      { "value": "Фото", "label": "Фотографии к каждой записи" }
+      {
+        "value": "∞",
+        "label": "Растений в аккаунте"
+      },
+      {
+        "value": "100%",
+        "label": "История без пропусков"
+      },
+      {
+        "value": "2000+",
+        "label": "Сортов и родов"
+      },
+      {
+        "value": "Фото",
+        "label": "Фотографии к каждой записи"
+      }
     ],
     "feed": {
       "eyebrow": "Лента сообщества",
@@ -99,10 +111,30 @@
       "signInHint": "Войдите, чтобы видеть живую ленту",
       "feedImage": "/images/ru/feed.jpg",
       "mockItems": [
-        { "type": "plant", "user": "maria_plants", "text": "Добавила Monstera deliciosa в коллекцию", "time": "2 мин назад" },
-        { "type": "history", "user": "green_corner", "text": "Пересадила Ficus lyrata — новый грунт, горшок побольше", "time": "15 мин назад" },
-        { "type": "plant", "user": "cactus_fan", "text": "Добавил Cereus peruvianus в коллекцию", "time": "1 ч назад" },
-        { "type": "history", "user": "leaflover", "text": "Первое цветение Anthurium andraeanum!", "time": "3 ч назад" }
+        {
+          "type": "plant",
+          "user": "maria_plants",
+          "text": "Добавила Monstera deliciosa в коллекцию",
+          "time": "2 мин назад"
+        },
+        {
+          "type": "history",
+          "user": "green_corner",
+          "text": "Пересадила Ficus lyrata — новый грунт, горшок побольше",
+          "time": "15 мин назад"
+        },
+        {
+          "type": "plant",
+          "user": "cactus_fan",
+          "text": "Добавил Cereus peruvianus в коллекцию",
+          "time": "1 ч назад"
+        },
+        {
+          "type": "history",
+          "user": "leaflover",
+          "text": "Первое цветение Anthurium andraeanum!",
+          "time": "3 ч назад"
+        }
       ]
     },
     "cta": {
@@ -589,7 +621,7 @@
   },
   "AddPlantModal": {
     "title": "Добавить растение",
-    "description": "Заполните информацию о вашем растении",
+    "description": "Описание",
     "shelves": "Полки",
     "shelvesPlaceholder": "Выберите полки...",
     "shelvesSearchPlaceholder": "Поиск полки...",
@@ -597,7 +629,6 @@
     "purchaseDate": "Дата покупки",
     "purchaseDatePlaceholder": "Выберите дату покупки",
     "photo": "Фото растения",
-    "description": "Описание",
     "descriptionPlaceholder": "Добавьте описание вашего растения...",
     "buttons": {
       "cancel": "Отмена",
@@ -613,7 +644,7 @@
   },
   "EditPlantModal": {
     "title": "Редактировать растение",
-    "description": "Измените информацию о растении",
+    "description": "Описание",
     "shelves": "Полки",
     "shelvesPlaceholder": "Выберите полки...",
     "shelvesSearchPlaceholder": "Поиск полки...",
@@ -621,7 +652,6 @@
     "purchaseDate": "Дата покупки",
     "purchaseDatePlaceholder": "Выберите дату покупки",
     "photo": "Фото растения",
-    "description": "Описание",
     "descriptionPlaceholder": "Добавьте описание вашего растения...",
     "buttons": {
       "cancel": "Отмена",
@@ -933,7 +963,8 @@
     },
     "tabs": {
       "global": "Глобальная",
-      "following": "Подписки"
+      "following": "Подписки",
+      "saved": "Сохранённые"
     },
     "loading": "Загрузка...",
     "endOfFeed": "Вы дошли до конца ленты",
@@ -947,6 +978,9 @@
     },
     "badges": {
       "new": "Новое"
+    },
+    "emptySaved": {
+      "title": "Нет сохранённых записей"
     }
   },
   "FeedCard": {
@@ -964,6 +998,10 @@
     },
     "badges": {
       "new": "Новое"
+    },
+    "bookmark": {
+      "add": "Сохранить",
+      "remove": "Убрать из сохранённых"
     }
   },
   "PublicProfilePage": {

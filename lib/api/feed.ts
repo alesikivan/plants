@@ -24,6 +24,8 @@ export interface FeedPlantItem {
   type: 'plant';
   _id: string;
   createdAt: string;
+  isOwnItem: boolean;
+  isBookmarked: boolean;
   plant: {
     _id: string;
     photo?: string;
@@ -38,6 +40,8 @@ export interface FeedHistoryItem {
   type: 'plant_history';
   _id: string;
   createdAt: string;
+  isOwnItem: boolean;
+  isBookmarked: boolean;
   historyEntry: {
     _id: string;
     date: string;

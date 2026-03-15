@@ -4,11 +4,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { feedApi, FeedItem } from '@/lib/api/feed';
+import { bookmarksApi } from '@/lib/api/bookmarks';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { useAuthStore } from '@/lib/store/authStore';
-import { Globe, Users, Rss, RefreshCw } from 'lucide-react';
+import { Globe, Users, Rss, RefreshCw, Bookmark } from 'lucide-react';
 
-type FeedMode = 'global' | 'following';
+type FeedMode = 'global' | 'following' | 'saved';
 
 const STORAGE_KEY = (mode: FeedMode) => `feedLastSeen_${mode}`;
 
@@ -48,6 +49,7 @@ export default function FeedPage() {
 
   // Update last-seen timestamp 3 seconds after landing on the page
   useEffect(() => {
+    if (mode === 'saved') return;
     const timer = setTimeout(() => {
       localStorage.setItem(STORAGE_KEY(mode), new Date().toISOString());
     }, 3000);
@@ -63,7 +65,9 @@ export default function FeedPage() {
       const result =
         mode === 'global'
           ? await feedApi.getGlobal(cursor)
-          : await feedApi.getFollowing(cursor);
+          : mode === 'following'
+            ? await feedApi.getFollowing(cursor)
+            : await bookmarksApi.getFeed(cursor);
 
       setItems((prev) => (cursor ? [...prev, ...result.items] : result.items));
       cursorRef.current = result.nextCursor ?? undefined;
@@ -91,16 +95,21 @@ export default function FeedPage() {
     setHasMore(true);
     loadingRef.current = true;
     try {
-      const result = mode === 'global'
-        ? await feedApi.getGlobal(undefined)
-        : await feedApi.getFollowing(undefined);
+      const result =
+        mode === 'global'
+          ? await feedApi.getGlobal(undefined)
+          : mode === 'following'
+            ? await feedApi.getFollowing(undefined)
+            : await bookmarksApi.getFeed(undefined);
       setItems(result.items);
       cursorRef.current = result.nextCursor ?? undefined;
       hasMoreRef.current = result.hasMore;
       setHasMore(result.hasMore);
-      const now = new Date();
-      localStorage.setItem(STORAGE_KEY(mode), now.toISOString());
-      setLastSeenDate(now);
+      if (mode !== 'saved') {
+        const now = new Date();
+        localStorage.setItem(STORAGE_KEY(mode), now.toISOString());
+        setLastSeenDate(now);
+      }
     } catch {
       // handled by global error handler
     } finally {
@@ -156,6 +165,35 @@ export default function FeedPage() {
     if (!lastSeenDate) return false;
     return new Date(item.createdAt) > lastSeenDate;
   };
+
+  const handleBookmarkToggle = useCallback(
+    async (itemId: string, itemType: 'plant' | 'plant_history') => {
+      // Optimistic update
+      setItems((prev) =>
+        prev.map((item) => {
+          if (item._id !== itemId || item.type !== itemType) return item;
+          return { ...item, isBookmarked: !item.isBookmarked } as FeedItem;
+        }),
+      );
+
+      try {
+        await bookmarksApi.toggle(itemType, itemId);
+        // If we're in saved mode and unbookmarked, remove from list
+        if (mode === 'saved') {
+          setItems((prev) => prev.filter((item) => !(item._id === itemId && item.type === itemType)));
+        }
+      } catch {
+        // Revert optimistic update on error
+        setItems((prev) =>
+          prev.map((item) => {
+            if (item._id !== itemId || item.type !== itemType) return item;
+            return { ...item, isBookmarked: !item.isBookmarked } as FeedItem;
+          }),
+        );
+      }
+    },
+    [mode],
+  );
 
   return (
     <div
@@ -217,9 +255,18 @@ export default function FeedPage() {
           <Users className="w-4 h-4" />
           {t('tabs.following')}
         </button>
+        <button
+          onClick={() => setMode('saved')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            mode === 'saved'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Bookmark className="w-4 h-4" />
+          {t('tabs.saved')}
+        </button>
       </div>
-
-      
 
       {/* Feed */}
       <div className="space-y-4">
@@ -229,6 +276,7 @@ export default function FeedPage() {
             item={item}
             isNew={isNew(item)}
             language={language}
+            onBookmarkToggle={() => handleBookmarkToggle(item._id, item.type as 'plant' | 'plant_history')}
           />
         ))}
       </div>
@@ -260,6 +308,12 @@ export default function FeedPage() {
           <div className="text-center py-8">
             <Rss className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
             <p className="text-muted-foreground">{t('emptyGlobal.title')}</p>
+          </div>
+        )}
+        {!loading && !hasMore && items.length === 0 && mode === 'saved' && (
+          <div className="text-center py-8">
+            <Bookmark className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-muted-foreground">{t('emptySaved.title')}</p>
           </div>
         )}
       </div>

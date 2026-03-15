@@ -81,10 +81,22 @@
       ]
     },
     "trustStats": [
-      { "value": "∞", "label": "Plants per account" },
-      { "value": "100%", "label": "Full history coverage" },
-      { "value": "2000+", "label": "Genera and varieties" },
-      { "value": "Photos", "label": "Attached to every entry" }
+      {
+        "value": "∞",
+        "label": "Plants per account"
+      },
+      {
+        "value": "100%",
+        "label": "Full history coverage"
+      },
+      {
+        "value": "2000+",
+        "label": "Genera and varieties"
+      },
+      {
+        "value": "Photos",
+        "label": "Attached to every entry"
+      }
     ],
     "feed": {
       "eyebrow": "Community feed",
@@ -99,10 +111,30 @@
       "signInHint": "Sign in to see the live feed",
       "feedImage": "/images/en/feed.jpg",
       "mockItems": [
-        { "type": "plant", "user": "maria_plants", "text": "Added Monstera deliciosa to collection", "time": "2 min ago" },
-        { "type": "history", "user": "green_corner", "text": "Repotted Ficus lyrata — new soil, bigger pot", "time": "15 min ago" },
-        { "type": "plant", "user": "cactus_fan", "text": "Added Cereus peruvianus to collection", "time": "1 h ago" },
-        { "type": "history", "user": "leaflover", "text": "First bloom on Anthurium andraeanum!", "time": "3 h ago" }
+        {
+          "type": "plant",
+          "user": "maria_plants",
+          "text": "Added Monstera deliciosa to collection",
+          "time": "2 min ago"
+        },
+        {
+          "type": "history",
+          "user": "green_corner",
+          "text": "Repotted Ficus lyrata — new soil, bigger pot",
+          "time": "15 min ago"
+        },
+        {
+          "type": "plant",
+          "user": "cactus_fan",
+          "text": "Added Cereus peruvianus to collection",
+          "time": "1 h ago"
+        },
+        {
+          "type": "history",
+          "user": "leaflover",
+          "text": "First bloom on Anthurium andraeanum!",
+          "time": "3 h ago"
+        }
       ]
     },
     "cta": {
@@ -589,7 +621,7 @@
   },
   "AddPlantModal": {
     "title": "Add plant",
-    "description": "Fill in information about your plant",
+    "description": "Description",
     "shelves": "Shelves",
     "shelvesPlaceholder": "Select shelves...",
     "shelvesSearchPlaceholder": "Search shelf...",
@@ -597,7 +629,6 @@
     "purchaseDate": "Purchase date",
     "purchaseDatePlaceholder": "Select purchase date",
     "photo": "Plant photo",
-    "description": "Description",
     "descriptionPlaceholder": "Add a description of your plant...",
     "buttons": {
       "cancel": "Cancel",
@@ -613,7 +644,7 @@
   },
   "EditPlantModal": {
     "title": "Edit plant",
-    "description": "Change information about the plant",
+    "description": "Description",
     "shelves": "Shelves",
     "shelvesPlaceholder": "Select shelves...",
     "shelvesSearchPlaceholder": "Search shelf...",
@@ -621,7 +652,6 @@
     "purchaseDate": "Purchase date",
     "purchaseDatePlaceholder": "Select purchase date",
     "photo": "Plant photo",
-    "description": "Description",
     "descriptionPlaceholder": "Add a description of your plant...",
     "buttons": {
       "cancel": "Cancel",
@@ -933,7 +963,8 @@
     },
     "tabs": {
       "global": "Global",
-      "following": "Following"
+      "following": "Following",
+      "saved": "Saved"
     },
     "loading": "Loading...",
     "endOfFeed": "You've reached the end of the feed",
@@ -944,6 +975,9 @@
     },
     "emptyGlobal": {
       "title": "Feed is empty"
+    },
+    "emptySaved": {
+      "title": "No saved posts yet"
     }
   },
   "FeedCard": {
@@ -961,6 +995,10 @@
     },
     "badges": {
       "new": "New"
+    },
+    "bookmark": {
+      "add": "Save",
+      "remove": "Remove from saved"
     }
   },
   "PublicProfilePage": {

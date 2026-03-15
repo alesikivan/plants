@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { User } from 'lucide-react';
+import { User, Bookmark } from 'lucide-react';
 import {
   FeedItem,
   FeedPlantItem,
@@ -71,16 +71,45 @@ function Avatar({
   );
 }
 
+function BookmarkButton({
+  isBookmarked,
+  onToggle,
+  t,
+}: {
+  isBookmarked: boolean;
+  onToggle: () => void;
+  t: any;
+}) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
+      className="flex-shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+      aria-label={isBookmarked ? t('bookmark.remove') : t('bookmark.add')}
+    >
+      {isBookmarked ? (
+        <Bookmark className="w-4 h-4 fill-primary text-primary" />
+      ) : (
+        <Bookmark className="w-4 h-4" />
+      )}
+    </button>
+  );
+}
+
 function PlantFeedCard({
   item,
   isNew,
   language,
   t,
+  onBookmarkToggle,
 }: {
   item: FeedPlantItem;
   isNew: boolean;
   language: string;
   t: any;
+  onBookmarkToggle?: () => void;
 }) {
   const tCard = t as any;
   const photoUrl = getFeedPlantPhotoUrl(item.plant.photo);
@@ -109,6 +138,9 @@ function PlantFeedCard({
         <span className="text-xs text-muted-foreground flex-shrink-0">
           {formatTimeAgo(item.createdAt, tCard)}
         </span>
+        {!item.isOwnItem && onBookmarkToggle && (
+          <BookmarkButton isBookmarked={item.isBookmarked} onToggle={onBookmarkToggle} t={tCard} />
+        )}
       </div>
 
       <Link href={`/profile/${item.user._id}/plants/${item.plant._id}`} className="block">
@@ -148,11 +180,13 @@ function HistoryFeedCard({
   isNew,
   language,
   t,
+  onBookmarkToggle,
 }: {
   item: FeedHistoryItem;
   isNew: boolean;
   language: string;
   t: any;
+  onBookmarkToggle?: () => void;
 }) {
   const tCard = t as any;
   const { genusName, varietyName } = getNames(
@@ -194,6 +228,9 @@ function HistoryFeedCard({
         <span className="text-xs text-muted-foreground flex-shrink-0">
           {formatTimeAgo(item.createdAt, tCard)}
         </span>
+        {!item.isOwnItem && onBookmarkToggle && (
+          <BookmarkButton isBookmarked={item.isBookmarked} onToggle={onBookmarkToggle} t={tCard} />
+        )}
       </div>
 
       {/* Plant badge */}
@@ -247,13 +284,30 @@ interface FeedCardProps {
   item: FeedItem;
   isNew: boolean;
   language: string;
+  onBookmarkToggle?: () => void;
 }
 
-export function FeedCard({ item, isNew, language }: FeedCardProps) {
+export function FeedCard({ item, isNew, language, onBookmarkToggle }: FeedCardProps) {
   const t = useTranslations('FeedCard');
 
   if (item.type === 'plant') {
-    return <PlantFeedCard item={item} isNew={isNew} language={language} t={t} />;
+    return (
+      <PlantFeedCard
+        item={item}
+        isNew={isNew}
+        language={language}
+        t={t}
+        onBookmarkToggle={onBookmarkToggle}
+      />
+    );
   }
-  return <HistoryFeedCard item={item} isNew={isNew} language={language} t={t} />;
+  return (
+    <HistoryFeedCard
+      item={item}
+      isNew={isNew}
+      language={language}
+      t={t}
+      onBookmarkToggle={onBookmarkToggle}
+    />
+  );
 }
