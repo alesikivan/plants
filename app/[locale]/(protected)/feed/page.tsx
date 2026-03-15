@@ -242,7 +242,7 @@ export default function FeedPage() {
           }`}
         >
           <Globe className="w-4 h-4 shrink-0" />
-          <span className={mode === 'global' ? undefined : 'hidden sm:inline'}>{t('tabs.global')}</span>
+          <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'global' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.global')}</span>
         </button>
         <button
           onClick={() => setMode('following')}
@@ -253,7 +253,7 @@ export default function FeedPage() {
           }`}
         >
           <Users className="w-4 h-4 shrink-0" />
-          <span className={mode === 'following' ? undefined : 'hidden sm:inline'}>{t('tabs.following')}</span>
+          <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'following' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.following')}</span>
         </button>
         <button
           onClick={() => setMode('saved')}
@@ -264,7 +264,7 @@ export default function FeedPage() {
           }`}
         >
           <Bookmark className="w-4 h-4 shrink-0" />
-          <span className={mode === 'saved' ? undefined : 'hidden sm:inline'}>{t('tabs.saved')}</span>
+          <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'saved' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.saved')}</span>
         </button>
       </div>
 
