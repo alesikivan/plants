@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check, Pencil } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check, Pencil, Settings } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -503,6 +503,23 @@ export default function ProfilePage() {
           />
         </CardContent>
       </Card>
+
+      {/* Admin panel link — mobile only */}
+      {user.role === 'admin' && (
+        <Link href="/admin/info" className="md:hidden block">
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
+            <CardContent className="flex items-center justify-between py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-medium">{t('admin.link')}</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       {/* Settings Row */}
       <div className="grid gap-6 md:grid-cols-2">

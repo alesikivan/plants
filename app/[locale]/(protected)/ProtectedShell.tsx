@@ -104,14 +104,6 @@ export default function ProtectedShell({
             {user && (
               <>
                 <div className="flex items-center gap-3">
-                  {user.role === 'admin' && (
-                    <Link
-                      href="/admin/info"
-                      className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-border/40 bg-accent/30 hover:bg-accent/60 transition-colors text-muted-foreground hover:text-foreground shrink-0"
-                    >
-                      <Settings className="w-4 h-4" />
-                    </Link>
-                  )}
                   <LanguageSwitcher locale={locale} />
 
                   <Link

@@ -1220,6 +1220,9 @@
       "successToast": "Language changed successfully",
       "errorToast": "Error changing language"
     },
+    "admin": {
+      "link": "Go to admin panel"
+    },
     "logout": {
       "title": "Logout",
       "description": "End your current session",
