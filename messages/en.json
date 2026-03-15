@@ -149,8 +149,8 @@
   "HomeAuthButtons": {
     "openDashboard": "Open dashboard",
     "login": "Log in",
-    "headerStartFree": "Start free",
-    "startFree": "Start free",
+    "headerStartFree": "Start now",
+    "startFree": "Start now",
     "alreadyHaveAccount": "I already have an account",
     "createAccount": "Create account"
   },
@@ -464,7 +464,7 @@
     }
   },
   "PublicHeader": {
-    "startFree": "Start free!"
+    "startFree": "Start now!"
   },
   "UsersPage": {
     "header": {

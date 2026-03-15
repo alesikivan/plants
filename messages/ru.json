@@ -150,7 +150,7 @@
     "openDashboard": "Открыть панель",
     "login": "Войти",
     "headerStartFree": "Попробовать!",
-    "startFree": "Начать бесплатно",
+    "startFree": "Начать сейчас",
     "alreadyHaveAccount": "Уже есть аккаунт",
     "createAccount": "Создать аккаунт"
   },
@@ -464,7 +464,7 @@
     }
   },
   "PublicHeader": {
-    "startFree": "Начать бесплатно!"
+    "startFree": "Начать сейчас!"
   },
   "UsersPage": {
     "header": {
