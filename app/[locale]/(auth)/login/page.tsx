@@ -52,7 +52,7 @@ function LoginContent() {
     try {
       await login({ email, password });
       showSuccessToast(t('successMessage'));
-      router.push('/dashboard');
+      router.push('/feed');
     } catch (err) {
       const axiosError = err as AxiosError<any>;
       const responseData = axiosError?.response?.data;
