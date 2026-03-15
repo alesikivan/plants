@@ -16,7 +16,7 @@ export function HomeAuthButtons({ variant }: { variant: Variant }) {
     if (user) {
       return (
         <Button asChild size="sm">
-          <Link href="/dashboard">{t('openDashboard')}</Link>
+          <Link href="/feed">{t('openDashboard')}</Link>
         </Button>
       );
     }
@@ -30,7 +30,7 @@ export function HomeAuthButtons({ variant }: { variant: Variant }) {
   if (user) {
     return (
       <Button asChild size="lg" className={variant === 'hero' ? 'px-10 gap-2' : 'px-12 gap-2'}>
-        <Link href="/dashboard">
+        <Link href="/feed">
           {t('openDashboard')} <ArrowRight className="w-4 h-4" />
         </Link>
       </Button>
