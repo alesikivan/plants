@@ -241,8 +241,8 @@ export default function FeedPage() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Globe className="w-4 h-4" />
-          {t('tabs.global')}
+          <Globe className="w-4 h-4 shrink-0" />
+          <span className={mode === 'global' ? undefined : 'hidden sm:inline'}>{t('tabs.global')}</span>
         </button>
         <button
           onClick={() => setMode('following')}
@@ -252,8 +252,8 @@ export default function FeedPage() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Users className="w-4 h-4" />
-          {t('tabs.following')}
+          <Users className="w-4 h-4 shrink-0" />
+          <span className={mode === 'following' ? undefined : 'hidden sm:inline'}>{t('tabs.following')}</span>
         </button>
         <button
           onClick={() => setMode('saved')}
@@ -263,8 +263,8 @@ export default function FeedPage() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Bookmark className="w-4 h-4" />
-          {t('tabs.saved')}
+          <Bookmark className="w-4 h-4 shrink-0" />
+          <span className={mode === 'saved' ? undefined : 'hidden sm:inline'}>{t('tabs.saved')}</span>
         </button>
       </div>
 
