@@ -38,6 +38,8 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
     // Key to force-remount the input element (Android fix)
     const [inputKey, setInputKey] = React.useState(0);
     const visibilityListenerRef = React.useRef<(() => void) | null>(null);
+    // Track if onChange fired so we don't remount input prematurely (Android cloud file race)
+    const onChangeFiredRef = React.useRef(false);
 
     React.useEffect(() => {
       return () => {
@@ -52,13 +54,20 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
       // then visible again when the picker closes. We use visibilitychange (not window.focus,
       // which fires erratically on desktop) to detect this and remount the <input> so the
       // next tap always works with a fresh element.
+      onChangeFiredRef.current = false;
       if (visibilityListenerRef.current) {
         document.removeEventListener('visibilitychange', visibilityListenerRef.current);
       }
       const onVisibilityChange = () => {
         if (!document.hidden) {
-          // Page became visible: picker closed. Wait briefly so onChange fires first.
-          setTimeout(() => setInputKey((k) => k + 1), 300);
+          // Page became visible: picker closed. Wait long enough for onChange to fire first.
+          // On Android, onChange can be delayed (especially for cloud files from Google Photos).
+          // Only remount the input if onChange hasn't fired — i.e. user cancelled the picker.
+          setTimeout(() => {
+            if (!onChangeFiredRef.current) {
+              setInputKey((k) => k + 1);
+            }
+          }, 800);
           document.removeEventListener('visibilitychange', onVisibilityChange);
           visibilityListenerRef.current = null;
         }
@@ -70,6 +79,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
     };
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeFiredRef.current = true;
       const files = e.target.files ? Array.from(e.target.files) : [];
       e.target.value = '';
 
@@ -88,9 +98,10 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
 
         // Build queue with data URLs for the crop modal
         const queue: CropQueueItem[] = await Promise.all(
-          converted.map((file) => new Promise<CropQueueItem>((resolve) => {
+          converted.map((file) => new Promise<CropQueueItem>((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve({ file, dataUrl: reader.result as string });
+            reader.onerror = () => reject(new Error(`FileReader error: ${reader.error?.message ?? 'unknown'}`));
             reader.readAsDataURL(file);
           }))
         );
