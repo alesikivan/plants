@@ -14,13 +14,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { ComboBox } from '@/components/ui/combobox';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import {
@@ -49,26 +42,37 @@ export default function AdminVarietyPage() {
   const [editVariety, setEditVariety] = useState<Variety | null>(null);
   const [deleteVariety, setDeleteVariety] = useState<Variety | null>(null);
   const [genusSearch, setGenusSearch] = useState('');
+  const [genusFilterSearch, setGenusFilterSearch] = useState('');
   const [form, setForm] = useState<CreateVarietyDto>({ nameRu: '', nameEn: '', genusId: '', description: '' });
 
   const debouncedGenusSearch = useDebounce(genusSearch, 300);
+  const debouncedGenusFilterSearch = useDebounce(genusFilterSearch, 300);
+  const debouncedSearch = useDebounce(search, 300);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const { data: items = [], isLoading } = useQuery({
-    queryKey: ['admin-variety', genusFilter],
-    queryFn: () => varietyApi.getAll(genusFilter === 'all' ? undefined : genusFilter || undefined),
+    queryKey: ['admin-variety', genusFilter, debouncedSearch],
+    queryFn: () =>
+      varietyApi.getAll(
+        genusFilter === 'all' ? undefined : genusFilter || undefined,
+        debouncedSearch || undefined,
+      ),
   });
 
   const { data: genera = [], isLoading: isGenusLoading } = useQuery({
     queryKey: ['admin-genus', debouncedGenusSearch],
     queryFn: () => genusApi.getAll(debouncedGenusSearch),
-    enabled: true,
   });
 
-  const filtered = items.filter(
-    (v) =>
-      v.nameRu.toLowerCase().includes(search.toLowerCase()) ||
-      v.nameEn.toLowerCase().includes(search.toLowerCase()),
-  );
+  const { data: filterGenera = [], isLoading: isFilterGenusLoading } = useQuery({
+    queryKey: ['admin-genus-filter', debouncedGenusFilterSearch],
+    queryFn: () => genusApi.getAll(debouncedGenusFilterSearch),
+  });
+
+  const filtered = items;
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const getGenusName = (genusId: string | Genus) => {
@@ -151,23 +155,24 @@ export default function AdminVarietyPage() {
           <Input
             placeholder="Поиск по названию..."
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
-        <Select value={genusFilter || 'all'} onValueChange={(v) => { setGenusFilter(v === 'all' ? '' : v); setPage(1); }}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Все роды" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Все роды</SelectItem>
-            {genera.map((g) => (
-              <SelectItem key={g._id} value={g._id}>
-                {g.nameRu}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ComboBox
+          options={[
+            { value: 'all', label: 'Все роды' },
+            ...filterGenera.map((g) => ({ value: g._id, label: `${g.nameRu} / ${g.nameEn}` })),
+          ]}
+          value={genusFilter || 'all'}
+          onValueChange={(v) => { setGenusFilter(v === 'all' ? '' : v); setPage(1); }}
+          placeholder="Все роды"
+          searchPlaceholder="Поиск рода..."
+          emptyText="Роды не найдены"
+          isLoading={isFilterGenusLoading}
+          onSearchChange={setGenusFilterSearch}
+          className="w-48"
+        />
       </div>
 
       <Card>
