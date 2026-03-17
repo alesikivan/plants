@@ -418,6 +418,7 @@
   "CreateVarietyModal": {
     "title": "Create new variety",
     "description": "Enter the variety name in Russian or English — we will verify it via AI",
+    "descriptionWithGenus": "Genus: {genus}. Enter the variety name in Russian or English — we will verify it via AI",
     "label": "Variety name",
     "placeholder": "For example: Amazonian",
     "buttons": {

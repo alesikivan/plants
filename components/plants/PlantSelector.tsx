@@ -140,6 +140,7 @@ export function PlantSelector({
             onOpenChange={setCreateVarietyOpen}
             initialQuery={createVarietyQuery}
             genusId={selectedGenusId}
+            genus={genuses.find((g) => g._id === selectedGenusId)}
             onCreated={handleVarietyCreated}
           />
         </>

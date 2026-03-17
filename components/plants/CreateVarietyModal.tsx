@@ -23,6 +23,7 @@ interface CreateVarietyModalProps {
   onOpenChange: (open: boolean) => void;
   initialQuery?: string;
   genusId: string;
+  genus?: { nameRu: string; nameEn: string };
   onCreated: (variety: Variety) => void;
 }
 
@@ -34,7 +35,7 @@ interface Suggestion {
   nameEn: string;
 }
 
-export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genusId, onCreated }: CreateVarietyModalProps) {
+export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genusId, genus, onCreated }: CreateVarietyModalProps) {
   const t = useTranslations('CreateVarietyModal');
   const locale = useLocale();
   const [query, setQuery] = useState(initialQuery);
@@ -137,7 +138,9 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
         <DialogHeader>
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            {t('description')}
+            {genus
+              ? t('descriptionWithGenus', { genus: locale === 'ru' ? `${genus.nameRu} / ${genus.nameEn}` : genus.nameEn })
+              : t('description')}
           </DialogDescription>
         </DialogHeader>
 
