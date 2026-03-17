@@ -8,6 +8,7 @@ import { bookmarksApi } from '@/lib/api/bookmarks';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Globe, Users, Rss, RefreshCw, Bookmark } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics';
 
 type FeedMode = 'global' | 'following' | 'saved';
 
@@ -105,6 +106,7 @@ export default function FeedPage() {
       cursorRef.current = result.nextCursor ?? undefined;
       hasMoreRef.current = result.hasMore;
       setHasMore(result.hasMore);
+      trackEvent('feed_refreshed', { mode });
       if (mode !== 'saved') {
         const now = new Date();
         localStorage.setItem(STORAGE_KEY(mode), now.toISOString());
@@ -168,6 +170,10 @@ export default function FeedPage() {
 
   const handleBookmarkToggle = useCallback(
     async (itemId: string, itemType: 'plant' | 'plant_history') => {
+      const current = items.find((i) => i._id === itemId && i.type === itemType);
+      if (current) {
+        trackEvent(current.isBookmarked ? 'feed_item_unbookmarked' : 'feed_item_bookmarked', { type: itemType });
+      }
       // Optimistic update
       setItems((prev) =>
         prev.map((item) => {
@@ -234,7 +240,7 @@ export default function FeedPage() {
       {/* Mode tabs */}
       <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300 mb-2">
         <button
-          onClick={() => setMode('global')}
+          onClick={() => { setMode('global'); trackEvent('feed_tab_switched', { tab: 'global' }); }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             mode === 'global'
               ? 'bg-background text-foreground shadow-sm'
@@ -245,7 +251,7 @@ export default function FeedPage() {
           <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'global' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.global')}</span>
         </button>
         <button
-          onClick={() => setMode('following')}
+          onClick={() => { setMode('following'); trackEvent('feed_tab_switched', { tab: 'following' }); }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             mode === 'following'
               ? 'bg-background text-foreground shadow-sm'
@@ -256,7 +262,7 @@ export default function FeedPage() {
           <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'following' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.following')}</span>
         </button>
         <button
-          onClick={() => setMode('saved')}
+          onClick={() => { setMode('saved'); trackEvent('feed_tab_switched', { tab: 'saved' }); }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             mode === 'saved'
               ? 'bg-background text-foreground shadow-sm'

@@ -19,6 +19,7 @@ import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
+import { trackEvent } from '@/lib/analytics';
 
 function LoginContent() {
   const router = useRouter();
@@ -51,6 +52,7 @@ function LoginContent() {
 
     try {
       await login({ email, password });
+      trackEvent('user_login_success');
       showSuccessToast(t('successMessage'));
       router.push('/feed');
     } catch (err) {
@@ -60,6 +62,9 @@ function LoginContent() {
         (typeof responseData?.message === 'object' ? responseData?.message?.code : undefined);
       if (code === 'EMAIL_NOT_VERIFIED') {
         setEmailNotVerified(true);
+        trackEvent('user_login_failed', { reason: 'email_not_verified' });
+      } else {
+        trackEvent('user_login_failed', { reason: 'invalid_credentials' });
       }
       // Other errors handled automatically via axios interceptor
     } finally {
@@ -72,6 +77,7 @@ function LoginContent() {
     try {
       await authApi.resendVerification(email);
       setResendDone(true);
+      trackEvent('email_verification_resent');
       showSuccessToast(t('resendSuccess'));
     } catch {
       // silently fail

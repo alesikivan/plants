@@ -11,6 +11,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
 import { EditPlantModal } from '@/components/plants/EditPlantModal';
+import { trackEvent } from '@/lib/analytics';
 import { PlantHistoryTimeline } from '@/components/plants/PlantHistoryTimeline';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import {
@@ -68,6 +69,7 @@ export default function PlantDetailPage() {
     setIsDeleting(true);
     try {
       await plantsApi.delete(plant._id);
+      trackEvent('plant_deleted', { source: 'detail' });
       toast.success(t('deleteSuccess'));
       router.push(backUrl);
     } catch (error) {
@@ -84,6 +86,7 @@ export default function PlantDetailPage() {
     try {
       const updated = await plantsApi.archive(plant._id);
       setPlant(updated);
+      trackEvent('plant_archived');
       toast.success(t('archiveSuccess'));
     } catch (error) {
       toast.error(t('archiveError'));
@@ -98,6 +101,7 @@ export default function PlantDetailPage() {
     try {
       const updated = await plantsApi.unarchive(plant._id);
       setPlant(updated);
+      trackEvent('plant_unarchived');
       toast.success(t('unarchiveSuccess'));
     } catch (error) {
       toast.error(t('unarchiveError'));
@@ -119,6 +123,7 @@ export default function PlantDetailPage() {
     try {
       await navigator.clipboard.writeText(publicUrl);
       setIsLinkCopied(true);
+      trackEvent('plant_link_copied');
       toast.success(t('linkCopied'));
       setTimeout(() => setIsLinkCopied(false), 2000);
     } catch (error) {

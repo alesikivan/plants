@@ -17,6 +17,7 @@ import { varietyApi, Variety } from '@/lib/api';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
 import { getFullDisplayName } from '@/lib/utils/language';
+import { trackEvent } from '@/lib/analytics';
 
 interface CreateVarietyModalProps {
   open: boolean;
@@ -66,12 +67,14 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
 
     if (overrideQuery) setQuery(overrideQuery);
 
+    trackEvent('plant_variety_ai_recognize_clicked', { query: trimmed });
     setIsValidating(true);
     try {
       const result = await varietyApi.validate(trimmed, genusId);
       setSuggestion(result.suggestion);
 
       if (result.suggestion.recognized) {
+        trackEvent('plant_variety_ai_recognized', { query: trimmed, nameRu: result.suggestion.nameRu, nameEn: result.suggestion.nameEn });
         const [ruResults, enResults] = await Promise.all([
           varietyApi.getAll(genusId, result.suggestion.nameRu),
           varietyApi.getAll(genusId, result.suggestion.nameEn),
@@ -87,6 +90,9 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
       }
 
       setStep('confirm');
+      if (!result.suggestion.recognized) {
+        trackEvent('plant_variety_ai_not_recognized', { query: trimmed });
+      }
     } catch (error) {
       toast.error(t('toasts.validationError'));
     } finally {
@@ -105,6 +111,7 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
         nameEn: suggestion.nameEn,
         genusId,
       });
+      trackEvent('plant_variety_created', { nameRu: suggestion.nameRu, nameEn: suggestion.nameEn });
       toast.success(t('toasts.createSuccess', { name: displayName }));
       onCreated(variety);
       handleOpenChange(false);
@@ -121,6 +128,7 @@ export function CreateVarietyModal({ open, onOpenChange, initialQuery = '', genu
 
   const handleUseExisting = () => {
     if (existingVariety) {
+      trackEvent('plant_variety_duplicate_used', { nameRu: existingVariety.nameRu, nameEn: existingVariety.nameEn });
       onCreated(existingVariety);
       handleOpenChange(false);
     }

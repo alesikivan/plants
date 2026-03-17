@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import {
@@ -17,6 +17,7 @@ import { FileInput } from '@/components/ui/file-input';
 import { wishlistApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { PlantSelector } from '@/components/plants/PlantSelector';
+import { trackEvent } from '@/lib/analytics';
 
 interface AddWishlistModalProps {
   open: boolean;
@@ -40,6 +41,10 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
 
   const { handleSubmit, reset, setValue, formState: { errors } } = useForm<WishlistFormData>();
 
+  useEffect(() => {
+    if (open) trackEvent('wishlist_add_modal_opened');
+  }, [open]);
+
   const onSubmit = async (data: WishlistFormData) => {
     setIsLoading(true);
     try {
@@ -48,6 +53,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
         varietyId: data.varietyId || undefined,
         photo: selectedFile || undefined,
       });
+      trackEvent('wishlist_item_created', { has_photo: !!selectedFile, has_variety: !!data.varietyId });
       toast.success(t('success'));
       reset();
       setSelectedGenusId('');
@@ -77,6 +83,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
       return;
     }
 
+    trackEvent('wishlist_photo_selected');
     setSelectedFile(file);
 
     // Create preview
@@ -88,6 +95,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
   };
 
   const handleRemovePhoto = () => {
+    trackEvent('wishlist_photo_removed');
     setSelectedFile(null);
     setPhotoPreview(null);
   };

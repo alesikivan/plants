@@ -16,6 +16,7 @@ import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
 import { useLocale } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
+import { trackEvent } from '@/lib/analytics';
 
 export default function RegisterPage() {
   const t = useTranslations('RegisterPage');
@@ -55,6 +56,7 @@ export default function RegisterPage() {
       if (result?.requiresVerification) {
         setSentEmail(email);
         setVerificationSent(true);
+        trackEvent('user_registered', { locale });
       }
     } catch (err) {
       // Ошибки обрабатываются автоматически через axios interceptor

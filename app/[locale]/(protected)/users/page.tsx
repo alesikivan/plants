@@ -10,6 +10,7 @@ import { usersApi, UserProfileWithStats } from '@/lib/api';
 import { getAvatarUrl } from '@/lib/api/users';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { trackEvent } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 
 export default function UsersPage() {
@@ -40,11 +41,13 @@ export default function UsersPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (searchQuery) trackEvent('users_searched', { query_length: searchQuery.length });
     setIsSearching(true);
     loadUsers(searchQuery);
   };
 
   const handleClearSearch = () => {
+    trackEvent('users_search_cleared');
     setSearchQuery('');
     setIsSearching(true);
     loadUsers();
@@ -120,7 +123,7 @@ export default function UsersPage() {
             <Card
               key={user.id}
               className="transition-all hover:border-primary/50 cursor-pointer p-3"
-              onClick={() => router.push(`/profile/${user.id}`)}
+              onClick={() => { trackEvent('user_profile_visited', { from: 'users_page' }); router.push(`/profile/${user.id}`); }}
             >
               <div className="flex items-center justify-between space-x-3">
                 {/* User Info */}

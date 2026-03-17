@@ -16,6 +16,7 @@ import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { Link } from '@/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import type { AppLocale } from '@/i18n/routing';
+import { trackEvent } from '@/lib/analytics';
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
@@ -53,8 +54,10 @@ function ResetPasswordContent() {
     try {
       await authApi.resetPassword(token!, password);
       setSuccess(true);
+      trackEvent('password_reset_success');
     } catch {
       setError('invalid-token');
+      trackEvent('password_reset_failed', { reason: 'invalid_token' });
     } finally {
       setIsLoading(false);
     }

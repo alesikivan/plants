@@ -14,6 +14,7 @@ import {
   getFeedHistoryPhotoUrl,
   getFeedAvatarUrl,
 } from '@/lib/api/feed';
+import { trackEvent } from '@/lib/analytics';
 
 function formatTimeAgo(dateStr: string, t: any): string {
   const date = new Date(dateStr);
@@ -143,7 +144,7 @@ function PlantFeedCard({
         )}
       </div>
 
-      <Link href={`/profile/${item.user._id}/plants/${item.plant._id}`} className="block">
+      <Link href={`/profile/${item.user._id}/plants/${item.plant._id}`} className="block" onClick={() => trackEvent('feed_card_clicked', { type: 'plant' })}>
         {/* Plant name badge above image */}
         <div className="px-4 pb-2">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
@@ -237,7 +238,7 @@ function HistoryFeedCard({
       <div className="px-4 pb-2">
         <Link
           href={`/profile/${item.user._id}/plants/${item.plantMeta._id}`}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); trackEvent('feed_card_clicked', { type: 'plant_history' }); }}
           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
         >
           <span>{genusName}{varietyName ? ` · ${varietyName}` : ''}</span>

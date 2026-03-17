@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { plantsApi, Plant } from '@/lib/api';
 import { toast } from 'sonner';
+import { trackEvent } from '@/lib/analytics';
 
 interface DeletePlantModalProps {
   open: boolean;
@@ -25,12 +26,19 @@ export function DeletePlantModal({ open, onOpenChange, plant, onSuccess }: Delet
   const t = useTranslations('DeletePlantModal');
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (open) {
+      trackEvent('plant_delete_modal_opened');
+    }
+  }, [open]);
+
   const onSubmit = async () => {
     if (!plant) return;
 
     setIsLoading(true);
     try {
       await plantsApi.delete(plant._id);
+      trackEvent('plant_deleted', { source: 'list' });
       toast.success(t('toasts.success'));
       onOpenChange(false);
       onSuccess();

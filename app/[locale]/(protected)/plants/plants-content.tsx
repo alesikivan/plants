@@ -9,6 +9,7 @@ import { ComboBox } from '@/components/ui/combobox';
 import { Plus, Leaf, Search, X, SlidersHorizontal, Archive, GripVertical, Check } from 'lucide-react';
 import { plantsApi, Plant, shelvesApi, Shelf, Genus } from '@/lib/api';
 import { AddPlantModal } from '@/components/plants/AddPlantModal';
+import { trackEvent } from '@/lib/analytics';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { SortablePlantCard } from '@/components/plants/SortablePlantCard';
 import { toast } from 'sonner';
@@ -142,6 +143,7 @@ export function PlantsPageContent() {
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     searchDebounceRef.current = setTimeout(() => {
       const { search, genusId, shelfId } = filtersRef.current;
+      if (search) trackEvent('plants_searched', { query_length: search.length });
       applyFilters(search, genusId, shelfId);
     }, 400);
   };
@@ -150,6 +152,7 @@ export function PlantsPageContent() {
     setGenusFilter(value);
     setGenusSearch('');
     filtersRef.current.genusId = value;
+    if (value) trackEvent('plants_filtered_genus');
     applyFilters(filtersRef.current.search, value, filtersRef.current.shelfId);
   };
 
@@ -157,6 +160,7 @@ export function PlantsPageContent() {
     setShelfFilter(value);
     setShelfSearch('');
     filtersRef.current.shelfId = value;
+    if (value) trackEvent('plants_filtered_shelf');
     applyFilters(
       filtersRef.current.search,
       filtersRef.current.genusId,
@@ -165,6 +169,7 @@ export function PlantsPageContent() {
   };
 
   const handleTabChange = (archived: boolean) => {
+    trackEvent('plants_tab_switched', { tab: archived ? 'archive' : 'active' });
     setShowArchived(archived);
     setSearchQuery('');
     setGenusFilter('');
@@ -205,6 +210,7 @@ export function PlantsPageContent() {
     try {
       await plantsApi.reorder(plants.map((p) => p._id));
       setIsReorderMode(false);
+      trackEvent('plants_reorder_saved', { count: plants.length });
       toast.success(t('toasts.orderSaved'));
     } catch {
       toast.error(t('toasts.saveError'));
@@ -270,7 +276,7 @@ export function PlantsPageContent() {
               {!showArchived && !hasFilters && plants.length > 1 && (
                 <Button
                   variant="outline"
-                  onClick={() => setIsReorderMode(true)}
+                  onClick={() => { setIsReorderMode(true); trackEvent('plants_reorder_started'); }}
                   className="transition-all active:scale-95 shrink-0 h-11 w-11 p-0 sm:w-auto sm:px-4 sm:gap-2 rounded-xl"
                   title={t('buttons.reorder')}
                 >
@@ -279,7 +285,7 @@ export function PlantsPageContent() {
                 </Button>
               )}
               <Button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => { setIsModalOpen(true); trackEvent('plant_add_modal_opened', { source: 'list' }); }}
                 className="gap-2 transition-all active:scale-95 flex-1 sm:flex-none"
               >
                 <Plus className="w-4 h-4" />

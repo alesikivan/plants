@@ -21,6 +21,7 @@ import { MultiComboBox } from '@/components/ui/multi-combobox';
 import { plantsApi, shelvesApi, Shelf } from '@/lib/api';
 import { toast } from 'sonner';
 import { PlantSelector } from './PlantSelector';
+import { trackEvent } from '@/lib/analytics';
 
 interface AddPlantModalProps {
   open: boolean;
@@ -51,6 +52,12 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<PlantFormData>();
+
+  useEffect(() => {
+    if (open) {
+      trackEvent('plant_add_modal_opened');
+    }
+  }, [open]);
 
   // Сброс состояния при закрытии модального окна
   useEffect(() => {
@@ -96,6 +103,12 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
         photo: selectedFile || undefined,
         description: data.description || undefined,
       });
+      trackEvent('plant_created', {
+        has_photo: !!selectedFile,
+        has_variety: !!data.varietyId,
+        has_shelves: selectedShelfIds.length > 0,
+        has_description: !!(data.description),
+      });
       toast.success(t('toasts.success'));
       reset();
       setSelectedGenusId('');
@@ -129,6 +142,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       return;
     }
 
+    trackEvent('plant_photo_selected', { modal: 'add' });
     setSelectedFile(file);
 
     // Create preview
@@ -140,6 +154,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   };
 
   const handleRemovePhoto = () => {
+    trackEvent('plant_photo_removed', { modal: 'add' });
     setSelectedFile(null);
     setPhotoPreview(null);
   };

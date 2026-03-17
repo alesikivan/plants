@@ -17,6 +17,7 @@ import { FileInput } from '@/components/ui/file-input';
 import { wishlistApi, Wishlist, getWishlistPhotoUrl } from '@/lib/api';
 import { toast } from 'sonner';
 import { PlantSelector } from '@/components/plants/PlantSelector';
+import { trackEvent } from '@/lib/analytics';
 
 interface EditWishlistModalProps {
   open: boolean;
@@ -44,6 +45,10 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
 
   // Initialize form with wishlist item data
   useEffect(() => {
+    if (open) trackEvent('wishlist_edit_modal_opened');
+  }, [open]);
+
+  useEffect(() => {
     if (open && wishlistItem) {
       const genusId = typeof wishlistItem.genusId === 'object' ? wishlistItem.genusId._id : wishlistItem.genusId;
       const varietyId = typeof wishlistItem.varietyId === 'object' ? wishlistItem.varietyId?._id : wishlistItem.varietyId;
@@ -70,6 +75,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
         removePhoto: removeCurrentPhoto,
         photo: selectedFile || undefined,
       });
+      trackEvent('wishlist_item_updated', { has_photo: !!selectedFile, has_variety: !!selectedVarietyId });
       toast.success(t('success'));
       reset();
       setSelectedGenusId('');
@@ -100,6 +106,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
       return;
     }
 
+    trackEvent('wishlist_photo_selected');
     setSelectedFile(file);
 
     // Create preview
@@ -111,6 +118,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
   };
 
   const handleRemovePhoto = () => {
+    trackEvent('wishlist_photo_removed');
     setSelectedFile(null);
     setPhotoPreview(null);
     setRemoveCurrentPhoto(true);

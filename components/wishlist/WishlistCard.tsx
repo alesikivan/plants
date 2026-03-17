@@ -21,6 +21,7 @@ import { Leaf, Edit, Trash2, Eye } from 'lucide-react';
 import { EditWishlistModal } from './EditWishlistModal';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import { toast } from 'sonner';
+import { trackEvent } from '@/lib/analytics';
 
 interface WishlistCardProps {
   wishlistItem: Wishlist;
@@ -49,6 +50,7 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
     setIsDeleting(true);
     try {
       await wishlistApi.delete(wishlistItem._id);
+      trackEvent('wishlist_item_deleted');
       toast.success(t('success'));
       onUpdate();
     } catch (error) {
@@ -89,14 +91,14 @@ export function WishlistCard({ wishlistItem, onUpdate }: WishlistCardProps) {
             )}
             <Button
               size="icon"
-              onClick={() => setIsEditModalOpen(true)}
+              onClick={() => { setIsEditModalOpen(true); trackEvent('wishlist_edit_modal_opened'); }}
               className="w-12 h-12 rounded-full bg-white text-black hover:bg-white/90 transition-all hover:scale-110 active:scale-95"
             >
               <Edit className="w-6 h-6" />
             </Button>
             <Button
               size="icon"
-              onClick={() => setIsDeleteDialogOpen(true)}
+              onClick={() => { setIsDeleteDialogOpen(true); trackEvent('wishlist_delete_dialog_opened'); }}
               className="w-12 h-12 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all hover:scale-110 active:scale-95"
             >
               <Trash2 className="w-6 h-6" />

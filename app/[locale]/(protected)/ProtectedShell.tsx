@@ -12,6 +12,7 @@ import { LayoutDashboard, Settings, Layers, Users, User, Leaf, Rss } from 'lucid
 import { getAvatarUrl } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
 import type { AppLocale } from '@/i18n/routing';
+import { trackEvent } from '@/lib/analytics';
 
 export default function ProtectedShell({
   children,
@@ -55,6 +56,7 @@ export default function ProtectedShell({
                 <nav className="hidden md:flex items-center gap-1">
                   <Link
                     href="/dashboard"
+                    onClick={() => trackEvent('nav_clicked', { item: 'dashboard', device: 'desktop' })}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <LayoutDashboard className="w-4 h-4" />
@@ -62,6 +64,7 @@ export default function ProtectedShell({
                   </Link>
                   <Link
                     href="/plants"
+                    onClick={() => trackEvent('nav_clicked', { item: 'plants', device: 'desktop' })}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Leaf className="w-4 h-4" />
@@ -69,6 +72,7 @@ export default function ProtectedShell({
                   </Link>
                   <Link
                     href="/shelves"
+                    onClick={() => trackEvent('nav_clicked', { item: 'shelves', device: 'desktop' })}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Layers className="w-4 h-4" />
@@ -76,6 +80,7 @@ export default function ProtectedShell({
                   </Link>
                   <Link
                     href="/feed"
+                    onClick={() => trackEvent('nav_clicked', { item: 'feed', device: 'desktop' })}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Rss className="w-4 h-4" />
@@ -83,6 +88,7 @@ export default function ProtectedShell({
                   </Link>
                   <Link
                     href="/users"
+                    onClick={() => trackEvent('nav_clicked', { item: 'users', device: 'desktop' })}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <Users className="w-4 h-4" />
@@ -91,6 +97,7 @@ export default function ProtectedShell({
                   {user.role === 'admin' && (
                     <Link
                       href="/admin/info"
+                      onClick={() => trackEvent('nav_clicked', { item: 'admin', device: 'desktop' })}
                       className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
                     >
                       <Settings className="w-4 h-4" />
@@ -108,6 +115,7 @@ export default function ProtectedShell({
 
                   <Link
                     href="/profile"
+                    onClick={() => trackEvent('nav_clicked', { item: 'profile', device: 'desktop' })}
                     className="hidden lg:flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
                   >
                     <div className="flex flex-col items-end">
@@ -132,6 +140,7 @@ export default function ProtectedShell({
 
                   <Link
                     href="/profile"
+                    onClick={() => trackEvent('nav_clicked', { item: 'profile', device: 'mobile' })}
                     className="lg:hidden flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-primary/20 bg-primary/10 hover:opacity-80 transition-opacity shrink-0"
                   >
                     {user.avatar ? (
@@ -182,6 +191,7 @@ export default function ProtectedShell({
           <div className="flex items-center justify-around px-4 py-2">
             <Link
               href="/dashboard"
+              onClick={() => trackEvent('nav_clicked', { item: 'dashboard', device: 'mobile' })}
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <LayoutDashboard className="w-5 h-5" />
@@ -189,6 +199,7 @@ export default function ProtectedShell({
             </Link>
             <Link
               href="/plants"
+              onClick={() => trackEvent('nav_clicked', { item: 'plants', device: 'mobile' })}
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Leaf className="w-5 h-5" />
@@ -196,6 +207,7 @@ export default function ProtectedShell({
             </Link>
             <Link
               href="/feed"
+              onClick={() => trackEvent('nav_clicked', { item: 'feed', device: 'mobile' })}
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Rss className="w-5 h-5" />
@@ -203,6 +215,7 @@ export default function ProtectedShell({
             </Link>
             <Link
               href="/shelves"
+              onClick={() => trackEvent('nav_clicked', { item: 'shelves', device: 'mobile' })}
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Layers className="w-5 h-5" />
@@ -210,6 +223,7 @@ export default function ProtectedShell({
             </Link>
             <Link
               href="/users"
+              onClick={() => trackEvent('nav_clicked', { item: 'users', device: 'mobile' })}
               className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
             >
               <Users className="w-5 h-5" />

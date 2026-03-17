@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { FileInput } from '@/components/ui/file-input';
 import { shelvesApi, plantsApi, Plant, getPlantPhotoUrl } from '@/lib/api';
 import { toast } from 'sonner';
+import { trackEvent } from '@/lib/analytics';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Leaf, Search } from 'lucide-react';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -62,6 +63,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
   // Загрузка растений при открытии модального окна
   useEffect(() => {
     if (open) {
+      trackEvent(editShelf ? 'shelf_edit_modal_opened' : 'shelf_create_modal_opened');
       loadPlants();
       // Если редактирование - устанавливаем уже добавленные растения
       if (editShelf?.plants) {
@@ -127,6 +129,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
           );
         }
 
+        trackEvent('shelf_updated', { has_photo: !!selectedFile, plants_count: selectedPlantIds.length });
         toast.success(t('toasts.editSuccess'));
       } else {
         const shelf = await shelvesApi.create({
@@ -144,6 +147,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
           );
         }
 
+        trackEvent('shelf_created', { has_photo: !!selectedFile, plants_count: selectedPlantIds.length });
         toast.success(t('toasts.createSuccess'));
       }
 
@@ -175,6 +179,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
       return;
     }
 
+    trackEvent('shelf_photo_selected');
     setSelectedFile(file);
     setRemovePhoto(false);
 
@@ -186,6 +191,7 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
   };
 
   const handleRemovePhoto = () => {
+    trackEvent('shelf_photo_removed');
     setSelectedFile(null);
     setPhotoPreview(null);
     if (editShelf?.photo) {

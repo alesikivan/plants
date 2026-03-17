@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { plantsApi, shelvesApi, Plant, Shelf } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
 import { getAvatarUrl } from '@/lib/api/users';
 import { compressImage } from '@/lib/utils/image-compression';
 import { isHeic, convertHeicToJpeg } from '@/lib/utils/heic';
@@ -68,6 +69,7 @@ export default function ProfilePage() {
     try {
       const targetLanguage = language === 'ru' ? 'ru' : 'en';
       await updateProfile({ preferredLanguage: targetLanguage });
+      trackEvent('profile_language_changed', { language: targetLanguage });
       toast.success(t('preferences.successToast'));
     } catch (error) {
       toast.error(t('preferences.errorToast'));
@@ -79,6 +81,7 @@ export default function ProfilePage() {
   const handlePrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory', value: boolean) => {
     try {
       await updateProfile({ [field]: value });
+      trackEvent('profile_privacy_changed', { field, value });
       toast.success(t('privacy.successToast'));
     } catch (error) {
       toast.error(t('privacy.errorToast'));
@@ -88,6 +91,7 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    trackEvent('profile_avatar_selected');
     try {
       const converted = isHeic(file) ? await convertHeicToJpeg(file) : file;
       const dataUrl = await new Promise<string>((resolve) => {
@@ -109,6 +113,7 @@ export default function ProfilePage() {
     try {
       const compressed = await compressImage(croppedFile);
       await uploadAvatar(compressed);
+      trackEvent('profile_avatar_uploaded');
       toast.success(t('avatarUpload.successToast'));
     } catch {
       toast.error(t('avatarUpload.errorToast'));
@@ -121,6 +126,7 @@ export default function ProfilePage() {
     setIsAvatarLoading(true);
     try {
       await removeAvatar();
+      trackEvent('profile_avatar_removed');
       toast.success(t('avatarRemove.successToast'));
     } catch {
       toast.error(t('avatarRemove.errorToast'));
@@ -132,6 +138,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       await logout();
+      trackEvent('user_logged_out');
       router.push('/login');
       toast.success(t('logout.successToast'));
     } catch (error) {
@@ -148,6 +155,7 @@ export default function ProfilePage() {
     try {
       await navigator.clipboard.writeText(profileUrl);
       setIsProfileLinkCopied(true);
+      trackEvent('profile_link_copied');
       toast.success(t('copyLink.successToast'));
       setTimeout(() => setIsProfileLinkCopied(false), 2000);
     } catch (error) {
@@ -159,12 +167,14 @@ export default function ProfilePage() {
   const handleBioEdit = () => {
     setBioInput(user?.bio || '');
     setIsBioEditing(true);
+    trackEvent('profile_bio_edit_started');
   };
 
   const handleBioSave = async () => {
     setIsBioSaving(true);
     try {
       await updateProfile({ bio: bioInput.trim() });
+      trackEvent('profile_bio_saved', { length: bioInput.trim().length });
       toast.success(t('bio.successToast'));
       setIsBioEditing(false);
     } catch {
@@ -204,7 +214,7 @@ export default function ProfilePage() {
             <div className="relative group shrink-0">
               <button
                 type="button"
-                onClick={() => user.avatar && setIsAvatarViewerOpen(true)}
+                onClick={() => { if (user.avatar) { setIsAvatarViewerOpen(true); trackEvent('profile_avatar_viewed'); } }}
                 className={`w-20 h-20 rounded-3xl overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center ${
                   user.avatar ? 'cursor-pointer' : ''
                 } transition-all hover:scale-105`}
@@ -283,14 +293,14 @@ export default function ProfilePage() {
             {followStats && (
               <div className="hidden md:flex gap-2 shrink-0">
                 <button
-                  onClick={() => setFollowDialog('followers')}
+                  onClick={() => { setFollowDialog('followers'); trackEvent('profile_followers_dialog_opened'); }}
                   className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
                 >
                   <span className="text-lg font-bold leading-tight select-none">{followStats.followersCount}</span>
                   <span className="text-xs text-muted-foreground select-none">{t('follow.followers')}</span>
                 </button>
                 <button
-                  onClick={() => setFollowDialog('following')}
+                  onClick={() => { setFollowDialog('following'); trackEvent('profile_following_dialog_opened'); }}
                   className="flex flex-col items-center px-4 py-2 rounded-xl bg-muted/60 hover:bg-muted transition-colors w-[88px]"
                 >
                   <span className="text-lg font-bold leading-tight select-none">{followStats.followingCount}</span>

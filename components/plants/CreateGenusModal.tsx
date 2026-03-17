@@ -17,6 +17,7 @@ import { genusApi, Genus } from '@/lib/api';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
 import { getFullDisplayName } from '@/lib/utils/language';
+import { trackEvent } from '@/lib/analytics';
 
 interface CreateGenusModalProps {
   open: boolean;
@@ -60,12 +61,14 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
     const trimmed = query.trim();
     if (!trimmed) return;
 
+    trackEvent('plant_genus_ai_recognize_clicked', { query: trimmed });
     setIsValidating(true);
     try {
       const result = await genusApi.validate(trimmed);
       setSuggestion(result.suggestion);
 
       if (result.suggestion.recognized) {
+        trackEvent('plant_genus_ai_recognized', { query: trimmed, nameRu: result.suggestion.nameRu, nameEn: result.suggestion.nameEn });
         const [ruResults, enResults] = await Promise.all([
           genusApi.getAll(result.suggestion.nameRu),
           genusApi.getAll(result.suggestion.nameEn),
@@ -81,6 +84,9 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
       }
 
       setStep('confirm');
+      if (!result.suggestion.recognized) {
+        trackEvent('plant_genus_ai_not_recognized', { query: trimmed });
+      }
     } catch (error) {
       toast.error(t('toasts.validationError'));
     } finally {
@@ -98,6 +104,7 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
         nameRu: suggestion.nameRu,
         nameEn: suggestion.nameEn,
       });
+      trackEvent('plant_genus_created', { nameRu: suggestion.nameRu, nameEn: suggestion.nameEn });
       toast.success(t('toasts.createSuccess', { name: displayName }));
       onCreated(genus);
       handleOpenChange(false);
@@ -114,6 +121,7 @@ export function CreateGenusModal({ open, onOpenChange, initialQuery = '', onCrea
 
   const handleUseExisting = () => {
     if (existingGenus) {
+      trackEvent('plant_genus_duplicate_used', { nameRu: existingGenus.nameRu, nameEn: existingGenus.nameEn });
       onCreated(existingGenus);
       handleOpenChange(false);
     }
