@@ -15,11 +15,13 @@ import {
   History,
   Shield,
   BarChart3,
+  Bell,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin/info', label: 'Инфо', icon: BarChart3 },
   { href: '/admin/users', label: 'Пользователи', icon: Users },
+  { href: '/admin/notifications', label: 'Уведомления', icon: Bell },
   { href: '/admin/genus', label: 'Роды', icon: BookOpen },
   { href: '/admin/variety', label: 'Сорта', icon: Tag },
   { href: '/admin/plants', label: 'Растения', icon: Leaf },

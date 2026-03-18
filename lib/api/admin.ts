@@ -41,4 +41,17 @@ export const adminApi = {
     const response = await apiClient.get('/admin/info');
     return response.data;
   },
+
+  async broadcastNotification(
+    title: string,
+    message: string,
+    userIds?: string[],
+  ): Promise<{ sent: number }> {
+    const response = await apiClient.post<{ sent: number }>('/admin/notifications/broadcast', {
+      title,
+      message,
+      userIds,
+    });
+    return response.data;
+  },
 };

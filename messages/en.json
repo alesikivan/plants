@@ -1337,5 +1337,17 @@
     "copyLinkTooltip": "Copy shelf link",
     "copyLinkSuccess": "Link copied to clipboard",
     "copyLinkError": "Failed to copy link"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear all",
+    "loading": "Loading...",
+    "empty": "No notifications",
+    "actions": {
+      "new_follower": "followed you",
+      "new_bookmark_plant": "saved your plant",
+      "new_bookmark_history": "saved your plant update",
+      "system": "System notification"
+    }
   }
 }

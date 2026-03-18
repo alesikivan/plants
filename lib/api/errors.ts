@@ -153,6 +153,11 @@ export function shouldShowError(errorType: ErrorType, url?: string, message?: st
     return false;
   }
 
+  // Notification polling — silent fail, don't annoy user
+  if (url?.includes('/notifications/unread-count')) {
+    return false;
+  }
+
   // Show UNAUTHORIZED errors for login/register pages (invalid credentials)
   if (errorType === ErrorType.UNAUTHORIZED) {
     // Show toast for auth endpoints (login/register fail)

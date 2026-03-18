@@ -9,6 +9,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { Logo } from '@/components/logo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { LayoutDashboard, Settings, Layers, Users, User, Leaf, Rss } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { getAvatarUrl } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
 import type { AppLocale } from '@/i18n/routing';
@@ -111,6 +112,7 @@ export default function ProtectedShell({
             {user && (
               <>
                 <div className="flex items-center gap-3">
+                  <NotificationBell />
                   <LanguageSwitcher locale={locale} />
 
                   <Link

@@ -1340,5 +1340,17 @@
     "copyLinkTooltip": "Скопировать ссылку на полку",
     "copyLinkSuccess": "Ссылка скопирована в буфер обмена",
     "copyLinkError": "Не удалось скопировать ссылку"
+  },
+  "Notifications": {
+    "title": "Уведомления",
+    "clearAll": "Очистить всё",
+    "loading": "Загрузка...",
+    "empty": "Нет уведомлений",
+    "actions": {
+      "new_follower": "подписался на вас",
+      "new_bookmark_plant": "сохранил ваше растение",
+      "new_bookmark_history": "сохранил запись вашего растения",
+      "system": "Системное уведомление"
+    }
   }
 }
