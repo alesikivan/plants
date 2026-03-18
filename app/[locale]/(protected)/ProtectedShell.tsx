@@ -122,7 +122,7 @@ export default function ProtectedShell({
                   >
                     <div className="flex flex-col items-end">
                       <p className="text-sm font-semibold text-foreground">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      {/* <p className="text-xs text-muted-foreground">{user.email}</p> */}
                     </div>
                     <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 bg-primary/10 flex items-center justify-center shrink-0">
                       {user.avatar ? (
