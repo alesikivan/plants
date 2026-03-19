@@ -107,7 +107,7 @@ export function NotificationBell() {
 
       {open && (
         <>
-        <div className="fixed inset-x-0 top-16 z-50 flex flex-col max-h-[calc(100dvh-4rem)] md:absolute md:inset-x-auto md:top-full md:right-0 md:mt-2 md:w-[360px] md:max-h-[480px] md:rounded-md bg-popover border border-border/50 shadow-lg">
+        <div className="fixed inset-x-0 top-16 z-50 flex flex-col max-h-[calc(100dvh-4rem-4rem)] md:absolute md:inset-x-auto md:top-full md:right-0 md:mt-2 md:w-[360px] md:max-h-[480px] md:rounded-md bg-popover border border-border/50 shadow-lg overflow-hidden">
           <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border/50">
             <h3 className="font-semibold text-sm">{t('title')}</h3>
             {notifications.length > 0 && (
