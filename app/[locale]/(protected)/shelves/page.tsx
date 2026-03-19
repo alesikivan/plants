@@ -4,11 +4,24 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Layers, Search, X } from 'lucide-react';
+import { Plus, Layers, Search, X, GripVertical, Check } from 'lucide-react';
 import { shelvesApi, Shelf } from '@/lib/api';
 import { AddShelfModal } from '@/components/shelves/AddShelfModal';
 import { ShelfCard } from '@/components/shelves/ShelfCard';
+import { SortableShelfCard } from '@/components/shelves/SortableShelfCard';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 
 export default function ShelvesPage() {
   const t = useTranslations('ShelvesPage');
@@ -19,6 +32,15 @@ export default function ShelvesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const searchRef = useRef('');
+
+  const [isReorderMode, setIsReorderMode] = useState(false);
+  const [isReorderSaving, setIsReorderSaving] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  );
 
   useEffect(() => {
     loadShelves();
@@ -72,6 +94,37 @@ export default function ShelvesPage() {
     loadShelves();
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveDragId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = shelves.findIndex((s) => s._id === active.id);
+    const newIndex = shelves.findIndex((s) => s._id === over.id);
+    setShelves(arrayMove(shelves, oldIndex, newIndex));
+  };
+
+  const handleSaveOrder = async () => {
+    setIsReorderSaving(true);
+    try {
+      await shelvesApi.reorder(shelves.map((s) => s._id));
+      setIsReorderMode(false);
+      toast.success(t('messages.orderSaved'));
+    } catch {
+      toast.error(t('messages.saveOrderError'));
+    } finally {
+      setIsReorderSaving(false);
+    }
+  };
+
+  const handleCancelReorder = () => {
+    setIsReorderMode(false);
+    loadShelves();
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
       {/* Header */}
@@ -82,14 +135,48 @@ export default function ShelvesPage() {
             {t('header.description')}
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2 transition-all active:scale-95 w-full sm:w-auto">
-          <Plus className="w-4 h-4" />
-          {t('buttons.createShelf')}
-        </Button>
+        {isReorderMode ? (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              onClick={handleCancelReorder}
+              disabled={isReorderSaving}
+              className="flex-1 sm:flex-none gap-2"
+            >
+              <X className="w-4 h-4" />
+              {t('buttons.cancelReorder')}
+            </Button>
+            <Button
+              onClick={handleSaveOrder}
+              disabled={isReorderSaving}
+              className="flex-1 sm:flex-none gap-2"
+            >
+              <Check className="w-4 h-4" />
+              {t('buttons.saveOrder')}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {shelves.length > 1 && !searchQuery && (
+              <Button
+                variant="outline"
+                onClick={() => setIsReorderMode(true)}
+                className="flex-1 sm:flex-none gap-2"
+              >
+                <GripVertical className="w-4 h-4" />
+                {t('buttons.reorder')}
+              </Button>
+            )}
+            <Button onClick={() => setIsModalOpen(true)} className="flex-1 sm:flex-none gap-2 transition-all active:scale-95">
+              <Plus className="w-4 h-4" />
+              {t('buttons.createShelf')}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Search */}
-      {!isLoading && shelves.length > 0 && (
+      {!isReorderMode && !isLoading && shelves.length > 0 && (
         <div className="relative animate-in fade-in duration-500">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <Input
@@ -141,6 +228,31 @@ export default function ShelvesPage() {
             {t('empty.noResults.button')}
           </Button>
         </div>
+      ) : isReorderMode ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={shelves.map((s) => s._id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+              {shelves.map((shelf, index) => (
+                <SortableShelfCard key={shelf._id} shelf={shelf} index={index} />
+              ))}
+            </div>
+          </SortableContext>
+          <DragOverlay>
+            {activeDragId ? (
+              <div className="opacity-90 rotate-2 scale-105 shadow-2xl">
+                <ShelfCard
+                  shelf={shelves.find((s) => s._id === activeDragId)!}
+                  index={shelves.findIndex((s) => s._id === activeDragId)}
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       ) : (
         <div className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 transition-opacity duration-200 ${isFiltering ? 'opacity-50' : 'opacity-100'}`}>
           {shelves.map((shelf, index) => (

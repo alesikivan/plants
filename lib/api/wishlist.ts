@@ -98,4 +98,8 @@ export const wishlistApi = {
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/wishlist/${id}`);
   },
+
+  reorder: async (ids: string[]): Promise<void> => {
+    await apiClient.patch('/wishlist/reorder', { ids });
+  },
 };

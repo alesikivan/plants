@@ -104,4 +104,8 @@ export const shelvesApi = {
   adminDelete: async (id: string): Promise<void> => {
     await apiClient.delete(`/shelves/admin/${id}`);
   },
+
+  reorder: async (ids: string[]): Promise<void> => {
+    await apiClient.patch('/shelves/reorder', { ids });
+  },
 };

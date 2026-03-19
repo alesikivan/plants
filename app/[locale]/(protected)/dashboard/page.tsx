@@ -8,11 +8,23 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
-import { Leaf, Heart, Plus, Search, X, SlidersHorizontal } from 'lucide-react';
+import { Leaf, Heart, Plus, Search, X, SlidersHorizontal, GripVertical, Check } from 'lucide-react';
 import { wishlistApi, Wishlist, Genus } from '@/lib/api';
-import { WishlistCard, AddWishlistModal } from '@/components/wishlist';
+import { WishlistCard, AddWishlistModal, SortableWishlistCard } from '@/components/wishlist';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 
 const COMBOBOX_CLASS = 'h-10 rounded-xl border-2 text-sm font-normal';
 
@@ -33,6 +45,15 @@ export default function DashboardPage() {
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
+  const [isReorderMode, setIsReorderMode] = useState(false);
+  const [isReorderSaving, setIsReorderSaving] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  );
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const filtersRef = useRef({ search: '', genusId: '' });
@@ -121,13 +142,44 @@ export default function DashboardPage() {
     initialLoad();
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveDragId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = wishlist.findIndex((item) => item._id === active.id);
+    const newIndex = wishlist.findIndex((item) => item._id === over.id);
+    setWishlist(arrayMove(wishlist, oldIndex, newIndex));
+  };
+
+  const handleSaveOrder = async () => {
+    setIsReorderSaving(true);
+    try {
+      await wishlistApi.reorder(wishlist.map((item) => item._id));
+      setIsReorderMode(false);
+      toast.success(t('orderSaved'));
+    } catch {
+      toast.error(t('saveOrderError'));
+    } finally {
+      setIsReorderSaving(false);
+    }
+  };
+
+  const handleCancelReorder = () => {
+    setIsReorderMode(false);
+    applyFilters(filtersRef.current.search, filtersRef.current.genusId);
+  };
+
   const hasFilters = searchQuery !== '' || genusFilter !== '';
   const isBusy = isLoading || isFiltering;
 
   return (
     <div className="space-y-8 mx-auto animate-in fade-in slide-in-from-bottom-2 duration-700">
       {/* Quick Actions */}
-      <div className="animate-in fade-in slide-in-from-top-2 duration-500">
+      {/* <div className="animate-in fade-in slide-in-from-top-2 duration-500">
         <h2 className="text-2xl font-bold mb-4">{t('quickActions')}</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <button
@@ -143,7 +195,7 @@ export default function DashboardPage() {
             </div>
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Wishlist Section */}
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-700">
@@ -152,14 +204,48 @@ export default function DashboardPage() {
             <Heart className="w-6 h-6 text-primary" />
             <h2 className="text-2xl font-bold">{t('wishlist')}</h2>
           </div>
-          <Button onClick={() => setIsAddModalOpen(true)} size="sm">
-            <Plus className="w-4 h-4" />
-            <span className='hidden sm:block'>{t('addWishlist')}</span>
-          </Button>
+          {isReorderMode ? (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancelReorder}
+                disabled={isReorderSaving}
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:block">{t('cancelReorder')}</span>
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSaveOrder}
+                disabled={isReorderSaving}
+              >
+                <Check className="w-4 h-4" />
+                <span className="hidden sm:block">{t('saveOrder')}</span>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              {wishlist.length > 1 && !hasFilters && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsReorderMode(true)}
+                >
+                  <GripVertical className="w-4 h-4" />
+                  <span className="hidden sm:block">{t('reorder')}</span>
+                </Button>
+              )}
+              <Button onClick={() => setIsAddModalOpen(true)} size="sm">
+                <Plus className="w-4 h-4" />
+                <span className='hidden sm:block'>{t('addWishlist')}</span>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Filters */}
-        {!isLoading && (genera.length > 0 || wishlist.length > 0 || hasFilters) && (
+        {!isReorderMode && !isLoading && (genera.length > 0 || wishlist.length > 0 || hasFilters) && (
           <div className="flex flex-col gap-2 mb-4">
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -255,6 +341,35 @@ export default function DashboardPage() {
               {t('clearFilters')}
             </Button>
           </div>
+        ) : isReorderMode ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={wishlist.map((item) => item._id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {wishlist.map((item) => (
+                  <SortableWishlistCard
+                    key={item._id}
+                    wishlistItem={item}
+                    onUpdate={handleSuccess}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+            <DragOverlay>
+              {activeDragId ? (
+                <div className="opacity-90 rotate-2 scale-105 shadow-2xl">
+                  <WishlistCard
+                    wishlistItem={wishlist.find((item) => item._id === activeDragId)!}
+                    onUpdate={handleSuccess}
+                  />
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         ) : (
           <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 transition-opacity duration-200 ${isBusy ? 'opacity-50' : 'opacity-100'}`}>
             {wishlist.map((item) => (

@@ -308,7 +308,12 @@
     "nothingFound": "Nothing found",
     "tryChangingQuery": "Try changing your search or filters",
     "clearFiltersButton": "Clear filters",
-    "wishlistLoadError": "Failed to load wishlist"
+    "wishlistLoadError": "Failed to load wishlist",
+    "reorder": "Reorder",
+    "saveOrder": "Save",
+    "cancelReorder": "Cancel",
+    "orderSaved": "Order saved",
+    "saveOrderError": "Failed to save order"
   },
   "AddWishlistModal": {
     "title": "Add to wishlist",
@@ -830,14 +835,19 @@
       "description": "Organize your plants by shelves"
     },
     "buttons": {
-      "createShelf": "Create shelf"
+      "createShelf": "Create shelf",
+      "reorder": "Reorder",
+      "saveOrder": "Save",
+      "cancelReorder": "Cancel"
     },
     "search": {
       "placeholder": "Search by shelf name..."
     },
     "messages": {
       "loading": "Loading shelves...",
-      "loadError": "Failed to load shelves"
+      "loadError": "Failed to load shelves",
+      "orderSaved": "Order saved",
+      "saveOrderError": "Failed to save order"
     },
     "empty": {
       "noShelves": {

@@ -145,7 +145,7 @@ export function NotificationBell() {
         {createPortal(
           <div
             onClick={() => setOpen(false)}
-            className="notifications-bg fixed inset-x-0 top-16 z-49"
+            className="notifications-bg fixed inset-x-0 top-16 z-10"
           />,
           document.body
         )}

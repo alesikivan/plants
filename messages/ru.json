@@ -308,7 +308,12 @@
     "nothingFound": "Ничего не найдено",
     "tryChangingQuery": "Попробуйте изменить запрос или фильтры",
     "clearFiltersButton": "Сбросить фильтры",
-    "wishlistLoadError": "Ошибка загрузки списка желаний"
+    "wishlistLoadError": "Ошибка загрузки списка желаний",
+    "reorder": "Изменить порядок",
+    "saveOrder": "Сохранить",
+    "cancelReorder": "Отмена",
+    "orderSaved": "Порядок сохранён",
+    "saveOrderError": "Ошибка сохранения порядка"
   },
   "AddWishlistModal": {
     "title": "Добавить в список желаний",
@@ -830,14 +835,19 @@
       "description": "Организуйте свои растения по полкам"
     },
     "buttons": {
-      "createShelf": "Создать полку"
+      "createShelf": "Создать полку",
+      "reorder": "Изменить порядок",
+      "saveOrder": "Сохранить",
+      "cancelReorder": "Отмена"
     },
     "search": {
       "placeholder": "Поиск по названию полки..."
     },
     "messages": {
       "loading": "Загрузка полок...",
-      "loadError": "Ошибка загрузки полок"
+      "loadError": "Ошибка загрузки полок",
+      "orderSaved": "Порядок сохранён",
+      "saveOrderError": "Ошибка сохранения порядка"
     },
     "empty": {
       "noShelves": {
