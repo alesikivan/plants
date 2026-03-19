@@ -16,6 +16,7 @@ import {
   Shield,
   BarChart3,
   Bell,
+  Brain,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: '/admin/plants', label: 'Растения', icon: Leaf },
   { href: '/admin/shelves', label: 'Полки', icon: Layers },
   { href: '/admin/plant-history', label: 'История растений', icon: History },
+  { href: '/admin/ai-recognition', label: 'ИИ распознавание', icon: Brain },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
