@@ -161,10 +161,11 @@ export default function ShelvesPage() {
               <Button
                 variant="outline"
                 onClick={() => setIsReorderMode(true)}
-                className="flex-1 sm:flex-none gap-2"
+                className="h-11 w-11 px-0 sm:w-auto sm:px-6 sm:flex-none gap-2"
+                title={t('buttons.reorder')}
               >
                 <GripVertical className="w-4 h-4" />
-                {t('buttons.reorder')}
+                <span className="hidden sm:inline">{t('buttons.reorder')}</span>
               </Button>
             )}
             <Button onClick={() => setIsModalOpen(true)} className="flex-1 sm:flex-none gap-2 transition-all active:scale-95">
