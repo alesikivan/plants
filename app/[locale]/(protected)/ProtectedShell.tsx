@@ -190,7 +190,7 @@ export default function ProtectedShell({
 
       {user && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-bottom">
-          <div className="flex items-center justify-around px-2 pt-1.5 pb-1">
+          <div className="flex items-center justify-around px-2 pt-1 pb-2">
             {[
               { href: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), event: 'dashboard' },
               { href: '/plants', icon: Leaf, label: t('plants'), event: 'plants' },
@@ -204,23 +204,23 @@ export default function ProtectedShell({
                   key={href}
                   href={href}
                   onClick={() => trackEvent('nav_clicked', { item: event, device: 'mobile' })}
-                  className="flex select-none flex-col items-center gap-0.5 min-w-[3.5rem] py-1 transition-colors"
+                  className="flex select-none flex-col items-center gap-1 min-w-[4rem] py-1.5 transition-colors"
                 >
                   <div
-                    className={`relative flex items-center justify-center w-14 h-8 rounded-2xl transition-all duration-300 ease-in-out ${
+                    className={`relative flex items-center justify-center w-16 h-9 rounded-2xl transition-all duration-300 ease-in-out ${
                       isActive
                         ? 'bg-primary/15'
                         : 'bg-transparent'
                     }`}
                   >
                     <Icon
-                      className={`w-[1.25rem] h-[1.25rem] transition-all duration-300 ${
+                      className={`w-[1.4rem] h-[1.4rem] transition-all duration-300 ${
                         isActive ? 'text-primary stroke-[2.5]' : 'text-muted-foreground stroke-[1.75]'
                       }`}
                     />
                   </div>
                   <span
-                    className={`text-[0.625rem] leading-tight select-none transition-colors duration-300 ${
+                    className={`text-[0.688rem] leading-tight select-none transition-colors duration-300 ${
                       isActive ? 'text-primary font-semibold' : 'text-muted-foreground font-medium'
                     }`}
                   >
