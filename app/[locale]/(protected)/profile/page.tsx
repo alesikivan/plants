@@ -270,7 +270,7 @@ export default function ProfilePage() {
             </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-3xl">{user.name}</CardTitle>
+                  <CardTitle className="text-xl">{user.name}</CardTitle>
                   <Button
                     variant="ghost"
                     size="icon"
