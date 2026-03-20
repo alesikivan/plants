@@ -144,7 +144,7 @@ export default function UsersPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate" title={user.name}>
-                      {user.name.length > 20 ? `${user.name.slice(0, 20)}...` : user.name}
+                      {user.name.length > 16 ? `${user.name.slice(0, 16)}...` : user.name}
                     </p>
                     {/* <p className="text-xs text-muted-foreground capitalize">{user.role}</p> */}
                   </div>

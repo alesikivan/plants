@@ -869,7 +869,9 @@
     },
     "buttons": {
       "edit": "Редактировать",
-      "delete": "Удалить"
+      "delete": "Удалить",
+      "copyLink": "Скопировать ссылку",
+      "linkCopied": "Скопировано!"
     },
     "deleteDialog": {
       "title": "Вы уверены?",
@@ -897,7 +899,9 @@
     "toasts": {
       "loadError": "Ошибка загрузки полки",
       "deleteSuccess": "Полка успешно удалена",
-      "deleteError": "Ошибка при удалении полки"
+      "deleteError": "Ошибка при удалении полки",
+      "linkCopied": "Ссылка скопирована",
+      "linkCopyError": "Не удалось скопировать ссылку"
     }
   },
   "AddShelfModal": {

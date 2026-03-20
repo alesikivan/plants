@@ -869,7 +869,9 @@
     },
     "buttons": {
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "copyLink": "Copy link",
+      "linkCopied": "Copied!"
     },
     "deleteDialog": {
       "title": "Are you sure?",
@@ -897,7 +899,9 @@
     "toasts": {
       "loadError": "Failed to load shelf",
       "deleteSuccess": "Shelf deleted successfully",
-      "deleteError": "Error deleting shelf"
+      "deleteError": "Error deleting shelf",
+      "linkCopied": "Link copied",
+      "linkCopyError": "Failed to copy link"
     }
   },
   "AddShelfModal": {

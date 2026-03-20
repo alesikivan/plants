@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Layers, Trash2, Pencil, Leaf } from 'lucide-react';
+import { ArrowLeft, Layers, Trash2, Pencil, Leaf, Copy, Check } from 'lucide-react';
 import { shelvesApi, Shelf, getShelfPhotoUrl, getPlantPhotoUrl } from '@/lib/api';
 import { toast } from 'sonner';
 import { AddShelfModal, ManagePlantsModal } from '@/components/shelves';
@@ -31,6 +31,7 @@ export default function ShelfDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isManagePlantsModalOpen, setIsManagePlantsModalOpen] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -74,6 +75,21 @@ export default function ShelfDetailPage() {
     }
   };
 
+  const handleCopyPublicLink = async () => {
+    if (!shelf) return;
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const publicUrl = `${baseUrl}/profile/${shelf.userId}/shelves/${shelf._id}`;
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      setIsLinkCopied(true);
+      toast.success(t('toasts.linkCopied'));
+      setTimeout(() => setIsLinkCopied(false), 2000);
+    } catch (error) {
+      toast.error(t('toasts.linkCopyError'));
+      console.error('Failed to copy link:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64 animate-in fade-in duration-300">
@@ -109,6 +125,21 @@ export default function ShelfDetailPage() {
           <span className="hidden sm:inline">{t('header.backButton')}</span>
         </Button>
         <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+          <Button
+            variant="outline"
+            onClick={handleCopyPublicLink}
+            className="gap-2 transition-all active:scale-95"
+            title={t('buttons.copyLink')}
+          >
+            {isLinkCopied ? (
+              <Check className="w-4 h-4 text-green-500" />
+            ) : (
+              <Copy className="w-4 h-4" />
+            )}
+            <span className="hidden sm:inline">
+              {isLinkCopied ? t('buttons.linkCopied') : t('buttons.copyLink')}
+            </span>
+          </Button>
           <Button
             variant="outline"
             onClick={() => setIsEditModalOpen(true)}
