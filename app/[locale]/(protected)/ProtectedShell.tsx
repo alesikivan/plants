@@ -189,48 +189,46 @@ export default function ProtectedShell({
       </footer>
 
       {user && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center justify-around px-4 py-2">
-            <Link
-              href="/dashboard"
-              onClick={() => trackEvent('nav_clicked', { item: 'dashboard', device: 'mobile' })}
-              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">{t('dashboard')}</span>
-            </Link>
-            <Link
-              href="/plants"
-              onClick={() => trackEvent('nav_clicked', { item: 'plants', device: 'mobile' })}
-              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
-            >
-              <Leaf className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">{t('plants')}</span>
-            </Link>
-            <Link
-              href="/feed"
-              onClick={() => trackEvent('nav_clicked', { item: 'feed', device: 'mobile' })}
-              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
-            >
-              <Rss className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">{t('feed')}</span>
-            </Link>
-            <Link
-              href="/shelves"
-              onClick={() => trackEvent('nav_clicked', { item: 'shelves', device: 'mobile' })}
-              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
-            >
-              <Layers className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">{t('shelves')}</span>
-            </Link>
-            <Link
-              href="/users"
-              onClick={() => trackEvent('nav_clicked', { item: 'users', device: 'mobile' })}
-              className="flex select-none flex-col items-center gap-1 px-3 py-2 transition-colors"
-            >
-              <Users className="w-5 h-5" />
-              <span className="text-xs font-medium select-none">{t('mobile.users')}</span>
-            </Link>
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-bottom">
+          <div className="flex items-center justify-around px-2 pt-1.5 pb-1">
+            {[
+              { href: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), event: 'dashboard' },
+              { href: '/plants', icon: Leaf, label: t('plants'), event: 'plants' },
+              { href: '/feed', icon: Rss, label: t('feed'), event: 'feed' },
+              { href: '/shelves', icon: Layers, label: t('shelves'), event: 'shelves' },
+              { href: '/users', icon: Users, label: t('mobile.users'), event: 'users' },
+            ].map(({ href, icon: Icon, label, event }) => {
+              const isActive = pathname === `/${locale}${href}` || pathname?.startsWith(`/${locale}${href}/`);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => trackEvent('nav_clicked', { item: event, device: 'mobile' })}
+                  className="flex select-none flex-col items-center gap-0.5 min-w-[3.5rem] py-1 transition-colors"
+                >
+                  <div
+                    className={`relative flex items-center justify-center w-14 h-8 rounded-2xl transition-all duration-300 ease-in-out ${
+                      isActive
+                        ? 'bg-primary/15'
+                        : 'bg-transparent'
+                    }`}
+                  >
+                    <Icon
+                      className={`w-[1.25rem] h-[1.25rem] transition-all duration-300 ${
+                        isActive ? 'text-primary stroke-[2.5]' : 'text-muted-foreground stroke-[1.75]'
+                      }`}
+                    />
+                  </div>
+                  <span
+                    className={`text-[0.625rem] leading-tight select-none transition-colors duration-300 ${
+                      isActive ? 'text-primary font-semibold' : 'text-muted-foreground font-medium'
+                    }`}
+                  >
+                    {label}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </nav>
       )}
