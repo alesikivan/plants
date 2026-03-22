@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { User, Shield, Calendar, Leaf, Layers, Search, Users as UsersIcon, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { User, Leaf, Layers, Search, Users as UsersIcon, X, ArrowUpDown, Clock, History, TrendingUp } from 'lucide-react';
 import { usersApi, UserProfileWithStats } from '@/lib/api';
 import { getAvatarUrl } from '@/lib/api/users';
 import Image from 'next/image';
@@ -13,22 +14,25 @@ import { toast } from 'sonner';
 import { trackEvent } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 
+type SortOption = 'newest' | 'oldest' | 'mostPlants';
+
 export default function UsersPage() {
   const router = useRouter();
   const t = useTranslations('UsersPage');
   const [users, setUsers] = useState<UserProfileWithStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('mostPlants');
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     loadUsers();
   }, []);
 
-  const loadUsers = async (query?: string) => {
+  const loadUsers = async (query?: string, sort?: SortOption) => {
     setIsLoading(true);
     try {
-      const data = await usersApi.searchUsers(query);
+      const data = await usersApi.searchUsers(query, sort || sortBy);
       setUsers(data);
     } catch (error) {
       toast.error(t('error'));
@@ -53,6 +57,12 @@ export default function UsersPage() {
     loadUsers();
   };
 
+  const handleSortChange = (value: SortOption) => {
+    setSortBy(value);
+    trackEvent('users_sorted', { sort: value });
+    loadUsers(searchQuery, value);
+  };
+
   if (isLoading && users.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -75,31 +85,59 @@ export default function UsersPage() {
           </p>
         </div>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder={t('search.placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          <Button type="submit" disabled={isSearching}>
-            {isSearching ? t('search.loading') : t('search.submit')}
-          </Button>
-        </form>
+        {/* Search Bar + Sort */}
+        <div className="flex gap-2">
+          <form onSubmit={handleSearch} className="flex gap-2 flex-1">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={t('search.placeholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <Button type="submit" disabled={isSearching}>
+              {isSearching ? t('search.loading') : t('search.submit')}
+            </Button>
+          </form>
+
+          <Select value={sortBy} onValueChange={(v) => handleSortChange(v as SortOption)}>
+            <SelectTrigger className="h-11 w-11 justify-center px-0 rounded-xl shrink-0 [&>svg:last-child]:hidden">
+              <ArrowUpDown className="w-4 h-4" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest" textValue={t('sort.newest')}>
+                <span className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 shrink-0" />
+                  {t('sort.newest')}
+                </span>
+              </SelectItem>
+              <SelectItem value="oldest" textValue={t('sort.oldest')}>
+                <span className="flex items-center gap-2">
+                  <History className="w-4 h-4 shrink-0" />
+                  {t('sort.oldest')}
+                </span>
+              </SelectItem>
+              <SelectItem value="mostPlants" textValue={t('sort.mostPlants')}>
+                <span className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 shrink-0" />
+                  {t('sort.mostPlants')}
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Users Grid */}
@@ -146,7 +184,6 @@ export default function UsersPage() {
                     <p className="font-medium truncate" title={user.name}>
                       {user.name.length > 16 ? `${user.name.slice(0, 16)}...` : user.name}
                     </p>
-                    {/* <p className="text-xs text-muted-foreground capitalize">{user.role}</p> */}
                   </div>
                 </div>
 

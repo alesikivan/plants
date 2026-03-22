@@ -487,7 +487,12 @@
       "noUsers": "No users",
       "tryChanging": "Try changing your search parameters"
     },
-    "error": "Failed to load users"
+    "error": "Failed to load users",
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "mostPlants": "Most active"
+    }
   },
   "AdminUsersPage": {
     "header": {

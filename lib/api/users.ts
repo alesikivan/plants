@@ -19,9 +19,11 @@ export const usersApi = {
     return response.data;
   },
 
-  // Search users with optional query
-  searchUsers: async (query?: string): Promise<UserProfileWithStats[]> => {
-    const params = query ? { q: query } : {};
+  // Search users with optional query and sort
+  searchUsers: async (query?: string, sort?: string): Promise<UserProfileWithStats[]> => {
+    const params: Record<string, string> = {};
+    if (query) params.q = query;
+    if (sort) params.sort = sort;
     const response = await apiClient.get<UserProfileWithStats[]>('/users/search', { params });
     return response.data;
   },
