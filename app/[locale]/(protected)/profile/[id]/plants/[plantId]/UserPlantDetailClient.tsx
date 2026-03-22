@@ -55,16 +55,6 @@ export default function UserPlantDetailClient({
     setIsMounted(true);
   }, []);
 
-  // Scroll to history entry from URL hash (e.g. #history-<id>)
-  useEffect(() => {
-    if (!isMounted || history.length === 0) return;
-    const hash = window.location.hash;
-    if (!hash.startsWith('#history-')) return;
-    const el = document.getElementById(hash.slice(1));
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [isMounted, history]);
 
   useEffect(() => {
     if (!userId || !plantId) return;
@@ -333,7 +323,7 @@ export default function UserPlantDetailClient({
                 const year = date.getFullYear();
                 const formattedDate = `${day}.${month}.${year}`;
                 return (
-                  <div key={item._id} id={`history-${item._id}`} className="relative flex gap-3 scroll-mt-6">
+                  <div key={item._id} className="relative flex gap-3">
                     <div className="relative flex flex-col items-center pt-1">
                       <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center z-10 flex-shrink-0">
                         <Calendar className="w-4 h-4 text-muted-foreground" />

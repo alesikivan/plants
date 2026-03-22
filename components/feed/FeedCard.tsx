@@ -247,13 +247,9 @@ function HistoryFeedCard({
 
       {/* Comment */}
       {item.historyEntry.comment && (
-        <Link
-          href={`/profile/${item.user._id}/plants/${item.plantMeta._id}#history-${item.historyEntry._id}`}
-          onClick={() => trackEvent('feed_card_clicked', { type: 'plant_history' })}
-          className="block px-4 pb-4 text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed hover:text-foreground transition-colors"
-        >
+        <p className="px-4 pb-4 text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
           {item.historyEntry.comment}
-        </Link>
+        </p>
       )}
 
       {/* Photos */}
@@ -262,7 +258,7 @@ function HistoryFeedCard({
           {photos.slice(0, 3).map((photo, index) => (
             <Link
               key={photo}
-              href={`/profile/${item.user._id}/plants/${item.plantMeta._id}#history-${item.historyEntry._id}`}
+              href={`/profile/${item.user._id}/plants/${item.plantMeta._id}`}
               onClick={() => trackEvent('feed_card_clicked', { type: 'plant_history' })}
               className="relative aspect-square overflow-hidden bg-muted block"
             >
