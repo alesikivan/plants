@@ -107,8 +107,9 @@ export default function UsersPage() {
                 </button>
               )}
             </div>
-            <Button type="submit" disabled={isSearching}>
-              {isSearching ? t('search.loading') : t('search.submit')}
+            <Button type="submit" disabled={isSearching} size="icon" className="sm:w-auto sm:px-6">
+              <Search className="w-4 h-4" />
+              <span className="hidden sm:inline">{isSearching ? t('search.loading') : t('search.submit')}</span>
             </Button>
           </form>
 
@@ -117,6 +118,12 @@ export default function UsersPage() {
               <ArrowUpDown className="w-4 h-4" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="mostPlants" textValue={t('sort.mostPlants')}>
+                <span className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 shrink-0" />
+                  {t('sort.mostPlants')}
+                </span>
+              </SelectItem>
               <SelectItem value="newest" textValue={t('sort.newest')}>
                 <span className="flex items-center gap-2">
                   <Clock className="w-4 h-4 shrink-0" />
@@ -127,12 +134,6 @@ export default function UsersPage() {
                 <span className="flex items-center gap-2">
                   <History className="w-4 h-4 shrink-0" />
                   {t('sort.oldest')}
-                </span>
-              </SelectItem>
-              <SelectItem value="mostPlants" textValue={t('sort.mostPlants')}>
-                <span className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 shrink-0" />
-                  {t('sort.mostPlants')}
                 </span>
               </SelectItem>
             </SelectContent>

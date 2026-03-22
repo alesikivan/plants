@@ -247,30 +247,36 @@ function HistoryFeedCard({
 
       {/* Comment */}
       {item.historyEntry.comment && (
-        <p className="px-4 pb-4 text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
+        <Link
+          href={`/profile/${item.user._id}/plants/${item.plantMeta._id}#history-${item.historyEntry._id}`}
+          onClick={() => trackEvent('feed_card_clicked', { type: 'plant_history' })}
+          className="block px-4 pb-4 text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed hover:text-foreground transition-colors"
+        >
           {item.historyEntry.comment}
-        </p>
+        </Link>
       )}
 
       {/* Photos */}
       {photos.length > 0 && (
         <div className={`grid gap-0.5 ${gridClass}`}>
           {photos.slice(0, 3).map((photo, index) => (
-            <div
+            <Link
               key={photo}
-              className="relative aspect-square overflow-hidden bg-muted"
+              href={`/profile/${item.user._id}/plants/${item.plantMeta._id}#history-${item.historyEntry._id}`}
+              onClick={() => trackEvent('feed_card_clicked', { type: 'plant_history' })}
+              className="relative aspect-square overflow-hidden bg-muted block"
             >
               <img
                 src={getFeedHistoryPhotoUrl(photo)!}
                 alt={tCard('photoAlt', { number: index + 1 })}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
               />
               {index === 2 && photos.length > 3 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <span className="text-white font-semibold text-xl">+{photos.length - 3}</span>
                 </div>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       )}
