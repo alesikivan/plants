@@ -1144,7 +1144,13 @@
   "FollowButton": {
     "follow": "Follow",
     "following": "Following",
-    "error": "Error. Try again"
+    "error": "Error. Try again",
+    "unfollowConfirm": {
+      "title": "Unfollow?",
+      "description": "Are you sure you want to unfollow this user?",
+      "cancel": "Cancel",
+      "confirm": "Unfollow"
+    }
   },
   "DiscoverBanner": {
     "joinCommunity": "Join our community",
