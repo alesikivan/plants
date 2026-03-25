@@ -10,6 +10,7 @@ import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, Eye
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { plantsApi, shelvesApi, Plant, Shelf } from '@/lib/api';
 import { trackEvent } from '@/lib/analytics';
@@ -57,6 +58,7 @@ export default function ProfilePage() {
   const [followStats, setFollowStats] = useState<FollowStats | null>(null);
   const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
   const [isProfileLinkCopied, setIsProfileLinkCopied] = useState(false);
+  const [privacyConfirm, setPrivacyConfirm] = useState<{ field: 'showPlants' | 'showPlantHistory' } | null>(null);
 
   useEffect(() => {
     plantsApi.getAll().then(setPlants).catch(() => {}).finally(() => setLoadingPlants(false));
@@ -81,8 +83,19 @@ export default function ProfilePage() {
   };
 
   const handlePrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory', value: boolean) => {
+    if (!value && (field === 'showPlants' || field === 'showPlantHistory')) {
+      setPrivacyConfirm({ field });
+      return;
+    }
+    await applyPrivacyChange(field, value);
+  };
+
+  const applyPrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory', value: boolean) => {
     try {
-      await updateProfile({ [field]: value });
+      const update = field === 'showPlants' && value === false
+        ? { showPlants: false, showShelves: false, showPlantHistory: false }
+        : { [field]: value };
+      await updateProfile(update);
       trackEvent('profile_privacy_changed', { field, value });
       toast.success(t('privacy.successToast'));
     } catch (error) {
@@ -272,7 +285,7 @@ export default function ProfilePage() {
               />
             </div>
               <div>
-                <div className="flex flex-col flex-wrap items-center gap-1">
+                <div className="flex flex-col flex-wrap gap-1">
                   <CardTitle className="text-xl break-all">{user.name}</CardTitle>
                   <div className="flex flex-wrap items-center gap-1">
                     <Button
@@ -467,7 +480,7 @@ export default function ProfilePage() {
             />
           </div>
 
-          <div className="border-t pt-4 flex items-center justify-between gap-4">
+          <div className={`border-t pt-4 flex items-center justify-between gap-4 ${!(user.showPlants ?? true) ? 'opacity-50' : ''}`}>
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 {(user.showShelves ?? true) ? (
@@ -478,16 +491,19 @@ export default function ProfilePage() {
                 <span className="text-sm font-medium">{t('privacy.showShelves.label')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('privacy.showShelves.description')}
+                {!(user.showPlants ?? true)
+                  ? t('privacy.showShelves.requiresPlants')
+                  : t('privacy.showShelves.description')}
               </p>
             </div>
             <Switch
               checked={user.showShelves ?? true}
               onCheckedChange={(v) => handlePrivacyChange('showShelves', v)}
+              disabled={!(user.showPlants ?? true)}
             />
           </div>
 
-          <div className="border-t pt-4 flex items-center justify-between gap-4">
+          <div className={`border-t pt-4 flex items-center justify-between gap-4 ${!(user.showPlants ?? true) ? 'opacity-50' : ''}`}>
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 {(user.showPlantHistory ?? true) ? (
@@ -498,16 +514,45 @@ export default function ProfilePage() {
                 <span className="text-sm font-medium">{t('privacy.showPlantHistory.label')}</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('privacy.showPlantHistory.description')}
+                {!(user.showPlants ?? true)
+                  ? t('privacy.showPlantHistory.requiresPlants')
+                  : t('privacy.showPlantHistory.description')}
               </p>
             </div>
             <Switch
               checked={user.showPlantHistory ?? true}
               onCheckedChange={(v) => handlePrivacyChange('showPlantHistory', v)}
+              disabled={!(user.showPlants ?? true)}
             />
           </div>
         </CardContent>
       </Card>
+
+      {/* Privacy disable confirmation dialog */}
+      <AlertDialog open={!!privacyConfirm} onOpenChange={(open) => { if (!open) setPrivacyConfirm(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('privacy.disableConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {privacyConfirm && t(`privacy.disableConfirm.${privacyConfirm.field}`)}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('privacy.disableConfirm.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (privacyConfirm) {
+                  await applyPrivacyChange(privacyConfirm.field, false);
+                  setPrivacyConfirm(null);
+                }
+              }}
+            >
+              {t('privacy.disableConfirm.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Social Links */}
       <Card>

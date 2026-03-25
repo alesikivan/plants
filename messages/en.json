@@ -1292,14 +1292,23 @@
       },
       "showShelves": {
         "label": "Show my shelves",
-        "description": "Other users can see your shelves"
+        "description": "Other users can see your shelves",
+        "requiresPlants": "Enable plant visibility first"
       },
       "showPlantHistory": {
         "label": "Show plant history",
-        "description": "Other users can view your plants' history"
+        "description": "Other users can view your plants' history",
+        "requiresPlants": "Enable plant visibility first"
       },
       "successToast": "Privacy settings updated",
-      "errorToast": "Error updating settings"
+      "errorToast": "Error updating settings",
+      "disableConfirm": {
+        "title": "Hide from other users?",
+        "showPlants": "Your plants, shelves and histories will be hidden from other users.",
+        "showPlantHistory": "Your plants histories will be removed from other users saved lists.",
+        "cancel": "Cancel",
+        "confirm": "Hide and remove"
+      }
     },
     "bio": {
       "title": "About me",

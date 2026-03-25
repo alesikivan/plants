@@ -297,7 +297,7 @@ export default function UserPlantDetailClient({
                         </p>
                       </div>
                     </div>
-                    
+
                     {variety && (
                       <div className="flex items-start gap-3">
                         <Leaf className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
