@@ -285,7 +285,7 @@ export default function ProfilePage() {
                     )}
                   </Button>
                 </div>
-                <p className="text-muted-foreground">{user.email}</p>
+                <p className="text-muted-foreground">{user.email.length > 23 ? user.email.slice(0, 23) + '..' : user.email}</p>
               </div>
             </div>
 
