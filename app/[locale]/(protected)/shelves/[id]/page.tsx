@@ -10,6 +10,7 @@ import { shelvesApi, Shelf, getShelfPhotoUrl, getPlantPhotoUrl } from '@/lib/api
 import { toast } from 'sonner';
 import { AddShelfModal, ManagePlantsModal } from '@/components/shelves';
 import { PlantCard } from '@/components/plants/PlantCard';
+import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +33,7 @@ export default function ShelfDetailPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isManagePlantsModalOpen, setIsManagePlantsModalOpen] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -192,6 +194,15 @@ export default function ShelfDetailPage() {
         />
       )}
 
+      {/* Photo Gallery */}
+      {isPhotoGalleryOpen && photoUrl && (
+        <PhotoGallery
+          photos={[photoUrl]}
+          initialIndex={0}
+          onClose={() => setIsPhotoGalleryOpen(false)}
+        />
+      )}
+
       {/* Shelf Info */}
       <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '100ms' }}>
         <CardContent className="py-6">
@@ -200,11 +211,16 @@ export default function ShelfDetailPage() {
             <div className="shrink-0 w-32">
               <div className="relative bg-background rounded-lg overflow-hidden shadow-sm h-32 border">
                 {photoUrl ? (
-                  <img
-                    src={photoUrl}
-                    alt={shelf.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <button
+                    onClick={() => setIsPhotoGalleryOpen(true)}
+                    className="w-full h-full group"
+                  >
+                    <img
+                      src={photoUrl}
+                      alt={shelf.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                    />
+                  </button>
                 ) : plantPhotos.length > 0 ? (
                   <div className="w-full h-full flex items-center justify-center p-2 bg-gradient-to-br from-muted/5 to-muted/20">
                     <div className="relative w-full h-full">
