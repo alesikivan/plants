@@ -1229,6 +1229,21 @@
       "loading": "Загрузка..."
     },
     "copyProfileLink": "Скопировать ссылку на профиль",
+    "name": {
+      "editTooltip": "Изменить имя",
+      "modalTitle": "Изменить имя",
+      "modalDescription": "Придумайте уникальное имя",
+      "label": "Имя",
+      "placeholder": "Введите новое имя",
+      "hint": "От 5 до 17 символов",
+      "save": "Сохранить",
+      "cancel": "Отмена",
+      "successToast": "Имя успешно изменено",
+      "errorTaken": "Это имя уже занято",
+      "errorToast": "Ошибка при изменении имени",
+      "minLength": "Минимум 5 символов",
+      "maxLength": "Максимум 17 символов"
+    },
     "follow": {
       "followers": "Подписчики",
       "following": "Подписки",

@@ -28,6 +28,7 @@ export interface UserResponse {
 }
 
 export interface UpdateUserDto {
+  name?: string;
   bio?: string;
   preferredLanguage?: string;
   showPlants?: boolean;

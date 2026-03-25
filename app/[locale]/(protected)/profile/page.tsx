@@ -21,6 +21,7 @@ import { ShelfCard } from '@/components/shelves/ShelfCard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AvatarViewer } from '@/components/profile/AvatarViewer';
+import { EditNameModal } from '@/components/profile/EditNameModal';
 import { ImageCropModal } from '@/components/ui/image-crop-modal';
 import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 import { SocialLink } from '@/lib/types/user';
@@ -44,6 +45,7 @@ export default function ProfilePage() {
   const [isBioEditing, setIsBioEditing] = useState(false);
   const [bioInput, setBioInput] = useState('');
   const [isBioSaving, setIsBioSaving] = useState(false);
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -184,6 +186,7 @@ export default function ProfilePage() {
     }
   };
 
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -269,23 +272,34 @@ export default function ProfilePage() {
               />
             </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <CardTitle className="text-xl">{user.name}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleCopyProfileLink}
-                    className="h-8 w-8 shrink-0"
-                    title={t('copyProfileLink')}
-                  >
-                    {isProfileLinkCopied ? (
-                      <Check className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
+                <div className="flex flex-col flex-wrap items-center gap-1">
+                  <CardTitle className="text-xl break-all">{user.name}</CardTitle>
+                  <div className="flex flex-wrap items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsNameModalOpen(true)}
+                      className="h-7 w-7 shrink-0"
+                      title={t('name.editTooltip')}
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopyProfileLink}
+                      className="h-7 w-7 shrink-0"
+                      title={t('copyProfileLink')}
+                    >
+                      {isProfileLinkCopied ? (
+                        <Check className="w-3.5 h-3.5 text-green-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-muted-foreground">{user.email.length > 23 ? user.email.slice(0, 23) + '..' : user.email}</p>
+                {/* <p className="text-muted-foreground">{user.email.length > 23 ? user.email.slice(0, 23) + '..' : user.email}</p> */}
               </div>
             </div>
 
@@ -688,6 +702,13 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Name Modal */}
+      <EditNameModal
+        open={isNameModalOpen}
+        onOpenChange={setIsNameModalOpen}
+        currentName={user.name}
+      />
 
       {/* Avatar Crop */}
       {cropImageSrc && (

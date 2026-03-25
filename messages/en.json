@@ -1226,6 +1226,21 @@
       "loading": "Loading..."
     },
     "copyProfileLink": "Copy profile link",
+    "name": {
+      "editTooltip": "Edit name",
+      "modalTitle": "Edit name",
+      "modalDescription": "Choose a unique name",
+      "label": "Name",
+      "placeholder": "Enter new name",
+      "hint": "5 to 17 characters",
+      "save": "Save",
+      "cancel": "Cancel",
+      "successToast": "Name updated successfully",
+      "errorTaken": "This name is already taken",
+      "errorToast": "Failed to update name",
+      "minLength": "Minimum 5 characters",
+      "maxLength": "Maximum 17 characters"
+    },
     "follow": {
       "followers": "Followers",
       "following": "Following",
