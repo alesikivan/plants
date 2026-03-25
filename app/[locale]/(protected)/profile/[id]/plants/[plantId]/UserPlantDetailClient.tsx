@@ -5,8 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare, Copy, Check, User } from 'lucide-react';
+import { ArrowLeft, Calendar, EyeOff, FileText, Leaf, MessageSquare, Copy, Check, User, Bookmark } from 'lucide-react';
 import { usersApi, Plant, PlantHistory, Genus, Variety, getPlantPhotoUrl, getPlantHistoryPhotoUrl } from '@/lib/api';
+import { bookmarksApi } from '@/lib/api/bookmarks';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
@@ -50,10 +51,38 @@ export default function UserPlantDetailClient({
   const [selectedHistoryPhotos, setSelectedHistoryPhotos] = useState<{ photos: string[]; index: number } | null>(null);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const isOwnPlant = user && plant && user.id === plant.userId;
+
+  useEffect(() => {
+    if (!user || !plantId || isOwnPlant) return;
+    bookmarksApi.getStatus('plant', plantId)
+      .then((res) => setIsBookmarked(res.isBookmarked))
+      .catch(() => {});
+  }, [user, plantId, isOwnPlant]);
+
+  const handleBookmarkToggle = async () => {
+    if (!user || !plantId || isBookmarkLoading) return;
+    setIsBookmarkLoading(true);
+    const prev = isBookmarked;
+    setIsBookmarked(!prev);
+    try {
+      const res = await bookmarksApi.toggle('plant', plantId);
+      setIsBookmarked(res.bookmarked);
+      toast.success(res.bookmarked ? t('bookmark.saved') : t('bookmark.removed'));
+    } catch {
+      setIsBookmarked(prev);
+      toast.error(t('bookmark.error'));
+    } finally {
+      setIsBookmarkLoading(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -187,6 +216,19 @@ export default function UserPlantDetailClient({
                   <h1 className="text-xl sm:text-2xl font-semibold">
                     {plantName || 'Noname'}
                   </h1>
+
+                  {user && !isOwnPlant && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleBookmarkToggle}
+                      disabled={isBookmarkLoading}
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground transition-all active:scale-95 shrink-0"
+                      title={isBookmarked ? t('bookmark.remove') : t('bookmark.save')}
+                    >
+                      <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current text-primary' : ''}`} />
+                    </Button>
+                  )}
 
                   <Button
                     variant="ghost"

@@ -6,8 +6,9 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComboBox } from '@/components/ui/combobox';
-import { Plus, Leaf, Search, X, SlidersHorizontal, Archive, GripVertical, Check } from 'lucide-react';
+import { Plus, Leaf, Search, X, SlidersHorizontal, Archive, GripVertical, Check, Bookmark } from 'lucide-react';
 import { plantsApi, Plant, shelvesApi, Shelf, Genus } from '@/lib/api';
+import { bookmarksApi } from '@/lib/api/bookmarks';
 import { AddPlantModal } from '@/components/plants/AddPlantModal';
 import { trackEvent } from '@/lib/analytics';
 import { PlantCard } from '@/components/plants/PlantCard';
@@ -32,14 +33,19 @@ export function PlantsPageContent() {
   const t = useTranslations('PlantsPage');
   const locale = useLocale();
   const searchParams = useSearchParams();
+  type TabMode = 'active' | 'archive' | 'saved';
+  const initialTab: TabMode = searchParams.get('tab') === 'archive' ? 'archive' : searchParams.get('tab') === 'saved' ? 'saved' : 'active';
+
   const [plants, setPlants] = useState<Plant[]>([]);
   const [genera, setGenera] = useState<Genus[]>([]);
   const [shelves, setShelves] = useState<Shelf[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(initialTab !== 'saved');
   const [isFiltering, setIsFiltering] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [showArchived, setShowArchived] = useState(searchParams.get('tab') === 'archive');
+  const [tabMode, setTabMode] = useState<TabMode>(initialTab);
+  const showArchived = tabMode === 'archive';
+  const [savedPlants, setSavedPlants] = useState<Plant[]>([]);
+  const [isSavedLoading, setIsSavedLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
@@ -59,8 +65,24 @@ export function PlantsPageContent() {
   const filtersRef = useRef({ search: '', genusId: '', shelfId: '' });
 
   useEffect(() => {
-    initialLoad(showArchived);
+    if (tabMode === 'saved') {
+      loadSavedPlants();
+    } else {
+      initialLoad(tabMode === 'archive');
+    }
   }, []);
+
+  const loadSavedPlants = async () => {
+    setIsSavedLoading(true);
+    try {
+      const data = await bookmarksApi.getPlants();
+      setSavedPlants(data);
+    } catch {
+      toast.error(t('toasts.loadError'));
+    } finally {
+      setIsSavedLoading(false);
+    }
+  };
 
   const initialLoad = async (archived = false) => {
     setIsLoading(true);
@@ -168,9 +190,9 @@ export function PlantsPageContent() {
     );
   };
 
-  const handleTabChange = (archived: boolean) => {
-    trackEvent('plants_tab_switched', { tab: archived ? 'archive' : 'active' });
-    setShowArchived(archived);
+  const handleTabChange = (tab: TabMode) => {
+    trackEvent('plants_tab_switched', { tab });
+    setTabMode(tab);
     setSearchQuery('');
     setGenusFilter('');
     setGenusSearch('');
@@ -178,7 +200,11 @@ export function PlantsPageContent() {
     setShelfSearch('');
     filtersRef.current = { search: '', genusId: '', shelfId: '' };
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    applyFilters('', '', '', archived);
+    if (tab === 'saved') {
+      loadSavedPlants();
+    } else {
+      applyFilters('', '', '', tab === 'archive');
+    }
   };
 
   const clearFilters = () => {
@@ -238,7 +264,7 @@ export function PlantsPageContent() {
   const hasFilters =
     searchQuery !== '' || genusFilter !== '' || shelfFilter !== '';
   const isBusy = isLoading || isFiltering;
-  const canShowAdvancedFilters = !showArchived && (genera.length > 1 || shelves.length > 0);
+  const canShowAdvancedFilters = tabMode === 'active' && (genera.length > 1 || shelves.length > 0);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
@@ -273,7 +299,7 @@ export function PlantsPageContent() {
             </>
           ) : (
             <>
-              {!showArchived && !hasFilters && plants.length > 1 && (
+              {tabMode === 'active' && !hasFilters && plants.length > 1 && (
                 <Button
                   variant="outline"
                   onClick={() => { setIsReorderMode(true); trackEvent('plants_reorder_started'); }}
@@ -296,28 +322,35 @@ export function PlantsPageContent() {
         </div>
       </div>
 
-      {/* Tabs: active / archived */}
+      {/* Tabs: active / archived / saved */}
       {!isLoading && (
         <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300 !mt-2">
           <button
-            onClick={() => !showArchived || handleTabChange(false)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${!showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => tabMode !== 'active' && handleTabChange('active')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tabMode === 'active' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
           >
-            <Leaf className="w-4 h-4" />
-            {t('tabs.active')}
+            <Leaf className="w-4 h-4 shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${tabMode === 'active' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.active')}</span>
           </button>
           <button
-            onClick={() => showArchived || handleTabChange(true)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${showArchived ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => tabMode !== 'archive' && handleTabChange('archive')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tabMode === 'archive' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
           >
-            <Archive className="w-4 h-4" />
-            {t('tabs.archive')}
+            <Archive className="w-4 h-4 shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${tabMode === 'archive' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.archive')}</span>
+          </button>
+          <button
+            onClick={() => tabMode !== 'saved' && handleTabChange('saved')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${tabMode === 'saved' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <Bookmark className="w-4 h-4 shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${tabMode === 'saved' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.saved')}</span>
           </button>
         </div>
       )}
 
       {/* Filters */}
-      {!isLoading && (
+      {!isLoading && tabMode !== 'saved' && (
         <div className="flex flex-col gap-2 animate-in fade-in duration-500 !mt-2">
           {/* Row 1: search + filter toggle */}
           <div className="flex items-center gap-2">
@@ -416,8 +449,36 @@ export function PlantsPageContent() {
         </div>
       )}
 
+      {/* Saved plants */}
+      {tabMode === 'saved' && (
+        isSavedLoading ? (
+          <div className="flex items-center justify-center h-64 animate-in fade-in duration-500">
+            <div className="text-center space-y-2">
+              <Bookmark className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
+              <p className="text-muted-foreground">{t('messages.loading')}</p>
+            </div>
+          </div>
+        ) : savedPlants.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
+            <Bookmark className="w-16 h-16 text-muted-foreground/50 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">{t('empty.noSaved.title')}</h3>
+            <p className="text-muted-foreground">{t('empty.noSaved.description')}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {savedPlants.map((plant) => (
+              <PlantCard
+                key={plant._id}
+                plant={plant}
+                href={`/profile/${plant.userId}/plants/${plant._id}`}
+              />
+            ))}
+          </div>
+        )
+      )}
+
       {/* Content */}
-      {isLoading ? (
+      {tabMode !== 'saved' && (isLoading ? (
         <div className="flex items-center justify-center h-64 animate-in fade-in duration-500">
           <div className="text-center space-y-2">
             <Leaf className="w-12 h-12 text-primary/50 animate-pulse mx-auto" />
@@ -508,7 +569,7 @@ export function PlantsPageContent() {
             </div>
           )}
         </div>
-      )}
+      ))}
 
       <AddPlantModal
         open={isModalOpen}

@@ -1,5 +1,6 @@
 import apiClient from './client';
 import { FeedResponse } from './feed';
+import { Plant } from './plants';
 
 export const bookmarksApi = {
   toggle: async (
@@ -10,6 +11,21 @@ export const bookmarksApi = {
       itemType,
       itemId,
     });
+    return response.data;
+  },
+
+  getStatus: async (
+    itemType: 'plant' | 'plant_history',
+    itemId: string,
+  ): Promise<{ isBookmarked: boolean }> => {
+    const response = await apiClient.get<{ isBookmarked: boolean }>('/bookmarks/status', {
+      params: { itemType, itemId },
+    });
+    return response.data;
+  },
+
+  getPlants: async (): Promise<Plant[]> => {
+    const response = await apiClient.get<Plant[]>('/bookmarks/plants');
     return response.data;
   },
 

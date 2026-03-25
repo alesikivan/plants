@@ -579,7 +579,8 @@
     },
     "tabs": {
       "active": "Active",
-      "archive": "Archive"
+      "archive": "Archive",
+      "saved": "Saved"
     },
     "buttons": {
       "addPlant": "Add plant",
@@ -622,6 +623,10 @@
         "title": "Nothing found",
         "description": "Try changing your filters or search query",
         "button": "Clear filters"
+      },
+      "noSaved": {
+        "title": "No saved plants",
+        "description": "Save plants you like by tapping the bookmark icon on a plant page"
       }
     },
     "toasts": {
@@ -1212,6 +1217,13 @@
       "loadError": "Error loading plant",
       "copyLinkError": "Failed to copy link",
       "copyLinkSuccess": "Plant link copied to clipboard"
+    },
+    "bookmark": {
+      "save": "Save plant",
+      "remove": "Remove from saved",
+      "saved": "Plant saved",
+      "removed": "Removed from saved",
+      "error": "Failed to save plant"
     }
   },
   "ProfilePage": {
