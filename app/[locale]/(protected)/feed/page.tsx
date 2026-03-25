@@ -220,11 +220,12 @@ export default function FeedPage() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Scroll to top"
-      className={`fixed bottom-[95px] left-1/2 -translate-x-1/2 z-50 group w-10 h-10 rounded-full bg-primary/50 backdrop-blur-sm text-primary-foreground shadow-md flex items-center justify-center transition-all duration-300 hover:bg-primary/70 hover:scale-105 active:scale-95 ${
+      className={`fixed bottom-[95px] left-1/2 -translate-x-1/2 sm:left-4 sm:translate-x-0 sm:bottom-8 z-50 group w-10 h-10 sm:w-auto sm:h-10 sm:pl-3 sm:pr-4 rounded-full bg-primary/50 backdrop-blur-sm text-primary-foreground shadow-md flex items-center justify-center sm:gap-2 transition-all duration-300 hover:bg-primary/70 hover:scale-105 active:scale-95 ${
         showScrollTop ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
       <ArrowUp className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+      <span className="hidden sm:inline text-sm font-medium">Поднять</span>
     </button>
     <div
       className="max-w-lg mx-auto"
