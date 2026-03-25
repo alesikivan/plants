@@ -16,10 +16,10 @@ type PublicPlant = Plant & {
   owner?: { _id: string; name: string };
 };
 
-async function fetchJson<T>(path: string): Promise<FetchResult<T>> {
+async function fetchJson<T>(path: string, noCache = false): Promise<FetchResult<T>> {
   try {
     const response = await fetch(`${API_URL}${path}`, {
-      next: { revalidate: REVALIDATE_SECONDS },
+      ...(noCache ? { cache: 'no-store' } : { next: { revalidate: REVALIDATE_SECONDS } }),
     });
 
     if (!response.ok) {
@@ -62,7 +62,7 @@ export async function getPublicProfilePageData(userId: string) {
 }
 
 export async function getPublicProfilePlantsPageData(userId: string) {
-  const result = await fetchJson<Plant[]>(`/users/${userId}/plants`);
+  const result = await fetchJson<Plant[]>(`/users/${userId}/plants`, true);
 
   return {
     status: result.status,
@@ -72,7 +72,7 @@ export async function getPublicProfilePlantsPageData(userId: string) {
 }
 
 export async function getPublicProfileShelvesPageData(userId: string) {
-  const result = await fetchJson<Shelf[]>(`/users/${userId}/shelves`);
+  const result = await fetchJson<Shelf[]>(`/users/${userId}/shelves`, true);
 
   return {
     status: result.status,
@@ -83,8 +83,8 @@ export async function getPublicProfileShelvesPageData(userId: string) {
 
 export async function getPublicProfilePlantPageData(userId: string, plantId: string) {
   const [plantResult, historyResult, profileResult] = await Promise.all([
-    fetchJson<Plant>(`/users/${userId}/plants/${plantId}`),
-    fetchJson<PlantHistory[]>(`/users/${userId}/plants/${plantId}/history`),
+    fetchJson<Plant>(`/users/${userId}/plants/${plantId}`, true),
+    fetchJson<PlantHistory[]>(`/users/${userId}/plants/${plantId}/history`, true),
     fetchJson<UserProfileWithStats>(`/users/${userId}/profile`),
   ]);
 
@@ -99,7 +99,7 @@ export async function getPublicProfilePlantPageData(userId: string, plantId: str
 }
 
 export async function getPublicProfileShelfPageData(userId: string, shelfId: string) {
-  const result = await fetchJson<Shelf>(`/users/${userId}/shelves/${shelfId}`);
+  const result = await fetchJson<Shelf>(`/users/${userId}/shelves/${shelfId}`, true);
 
   return {
     status: result.status,
