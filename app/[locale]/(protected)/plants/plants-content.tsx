@@ -46,6 +46,13 @@ export function PlantsPageContent() {
   const showArchived = tabMode === 'archive';
   const [savedPlants, setSavedPlants] = useState<Plant[]>([]);
   const [isSavedLoading, setIsSavedLoading] = useState(false);
+  const [isSavedFiltering, setIsSavedFiltering] = useState(false);
+  const [savedGenera, setSavedGenera] = useState<Genus[]>([]);
+  const [savedSearchQuery, setSavedSearchQuery] = useState('');
+  const [savedGenusFilter, setSavedGenusFilter] = useState('');
+  const [savedGenusSearch, setSavedGenusSearch] = useState('');
+  const savedFiltersRef = useRef({ search: '', genusId: '' });
+  const savedSearchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [genusFilter, setGenusFilter] = useState('');
   const [genusSearch, setGenusSearch] = useState('');
@@ -72,15 +79,30 @@ export function PlantsPageContent() {
     }
   }, []);
 
-  const loadSavedPlants = async () => {
-    setIsSavedLoading(true);
+  const loadSavedPlants = async (filters?: { search?: string; genusId?: string }) => {
+    const hasFilters = filters && (filters.search || filters.genusId);
+    if (hasFilters) {
+      setIsSavedFiltering(true);
+    } else {
+      setIsSavedLoading(true);
+    }
     try {
-      const data = await bookmarksApi.getPlants();
+      const data = await bookmarksApi.getPlants(filters);
       setSavedPlants(data);
+      if (!hasFilters) {
+        const genusMap = new Map<string, Genus>();
+        data.forEach((p) => {
+          if (typeof p.genusId === 'object' && p.genusId) {
+            genusMap.set(p.genusId._id, p.genusId as Genus);
+          }
+        });
+        setSavedGenera(Array.from(genusMap.values()).sort((a, b) => a.nameRu.localeCompare(b.nameRu)));
+      }
     } catch {
       toast.error(t('toasts.loadError'));
     } finally {
       setIsSavedLoading(false);
+      setIsSavedFiltering(false);
     }
   };
 
@@ -126,6 +148,16 @@ export function PlantsPageContent() {
       )
       .map((g) => ({ value: g._id, label: getDisplayName(g.nameRu, g.nameEn) }));
   }, [genera, genusSearch, locale]);
+
+  const savedGenusOptions = useMemo(() => {
+    const q = savedGenusSearch.toLowerCase();
+    const getDisplayName = (nameRu: string, nameEn: string) => {
+      return locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
+    };
+    return savedGenera
+      .filter((g) => !q || g.nameRu.toLowerCase().includes(q) || g.nameEn.toLowerCase().includes(q))
+      .map((g) => ({ value: g._id, label: getDisplayName(g.nameRu, g.nameEn) }));
+  }, [savedGenera, savedGenusSearch, locale]);
 
   const shelfOptions = useMemo(() => {
     const q = shelfSearch.toLowerCase();
@@ -190,6 +222,34 @@ export function PlantsPageContent() {
     );
   };
 
+  const handleSavedSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSavedSearchQuery(value);
+    savedFiltersRef.current.search = value;
+    if (savedSearchDebounceRef.current) clearTimeout(savedSearchDebounceRef.current);
+    savedSearchDebounceRef.current = setTimeout(() => {
+      const { search, genusId } = savedFiltersRef.current;
+      loadSavedPlants(search || genusId ? { search: search || undefined, genusId: genusId || undefined } : undefined);
+    }, 400);
+  };
+
+  const handleSavedGenusChange = (value: string) => {
+    setSavedGenusFilter(value);
+    setSavedGenusSearch('');
+    savedFiltersRef.current.genusId = value;
+    const { search } = savedFiltersRef.current;
+    loadSavedPlants(search || value ? { search: search || undefined, genusId: value || undefined } : undefined);
+  };
+
+  const clearSavedFilters = () => {
+    setSavedSearchQuery('');
+    setSavedGenusFilter('');
+    setSavedGenusSearch('');
+    savedFiltersRef.current = { search: '', genusId: '' };
+    if (savedSearchDebounceRef.current) clearTimeout(savedSearchDebounceRef.current);
+    loadSavedPlants();
+  };
+
   const handleTabChange = (tab: TabMode) => {
     trackEvent('plants_tab_switched', { tab });
     setTabMode(tab);
@@ -201,6 +261,11 @@ export function PlantsPageContent() {
     filtersRef.current = { search: '', genusId: '', shelfId: '' };
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     if (tab === 'saved') {
+      setSavedSearchQuery('');
+      setSavedGenusFilter('');
+      setSavedGenusSearch('');
+      savedFiltersRef.current = { search: '', genusId: '' };
+      if (savedSearchDebounceRef.current) clearTimeout(savedSearchDebounceRef.current);
       loadSavedPlants();
     } else {
       applyFilters('', '', '', tab === 'archive');
@@ -263,8 +328,11 @@ export function PlantsPageContent() {
 
   const hasFilters =
     searchQuery !== '' || genusFilter !== '' || shelfFilter !== '';
+  const hasSavedFilters = savedSearchQuery !== '' || savedGenusFilter !== '';
   const isBusy = isLoading || isFiltering;
+  const isSavedBusy = isSavedLoading || isSavedFiltering;
   const canShowAdvancedFilters = tabMode === 'active' && (genera.length > 1 || shelves.length > 0);
+  const canShowSavedAdvancedFilters = savedGenera.length > 1;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
@@ -346,6 +414,85 @@ export function PlantsPageContent() {
             <Bookmark className="w-4 h-4 shrink-0" />
             <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${tabMode === 'saved' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.saved')}</span>
           </button>
+        </div>
+      )}
+
+      {/* Filters for saved tab */}
+      {!isLoading && tabMode === 'saved' && (
+        <div className="flex flex-col gap-2 animate-in fade-in duration-500 !mt-2">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                placeholder={t('search.placeholder')}
+                value={savedSearchQuery}
+                onChange={handleSavedSearchChange}
+                className="pl-9"
+              />
+            </div>
+            {canShowSavedAdvancedFilters ? (
+              <Button
+                variant={hasSavedFilters ? 'default' : 'outline'}
+                onClick={() => setShowFilters((v) => !v)}
+                className="relative shrink-0 h-11 w-11 p-0 rounded-xl"
+                title={t('filters.title')}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                {hasSavedFilters && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
+                )}
+              </Button>
+            ) : (
+              savedSearchQuery && (
+                <Button
+                  variant="outline"
+                  onClick={clearSavedFilters}
+                  className="shrink-0 h-11 w-11 p-0 rounded-xl"
+                  title={t('buttons.clearSearchMobile')}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )
+            )}
+          </div>
+
+          {showFilters && canShowSavedAdvancedFilters && (
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="w-full sm:flex-1">
+                <ComboBox
+                  options={savedGenusOptions}
+                  value={savedGenusFilter}
+                  onValueChange={handleSavedGenusChange}
+                  placeholder={t('search.allGenus')}
+                  searchPlaceholder={t('search.genusPlaceholder')}
+                  emptyText={t('search.emptyText')}
+                  onSearchChange={setSavedGenusSearch}
+                  className={COMBOBOX_CLASS}
+                />
+              </div>
+
+              {hasSavedFilters && (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={clearSavedFilters}
+                    className="shrink-0 h-11 w-11 p-0 rounded-xl hidden sm:flex items-center justify-center"
+                    title={t('buttons.clearFilters')}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={clearSavedFilters}
+                    className="w-full h-11 gap-2 rounded-xl sm:hidden"
+                  >
+                    <X className="w-4 h-4" />
+                    {t('buttons.clearSearch')}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -458,21 +605,36 @@ export function PlantsPageContent() {
               <p className="text-muted-foreground">{t('messages.loading')}</p>
             </div>
           </div>
-        ) : savedPlants.length === 0 ? (
+        ) : savedPlants.length === 0 && !hasSavedFilters ? (
           <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
             <Bookmark className="w-16 h-16 text-muted-foreground/50 mb-4" />
             <h3 className="text-xl font-semibold mb-2">{t('empty.noSaved.title')}</h3>
             <p className="text-muted-foreground">{t('empty.noSaved.description')}</p>
           </div>
+        ) : savedPlants.length === 0 && hasSavedFilters ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center animate-in fade-in zoom-in-95 duration-700">
+            <Search className="w-16 h-16 text-muted-foreground/50 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">{t('empty.noResults.title')}</h3>
+            <p className="text-muted-foreground mb-4">{t('empty.noResults.description')}</p>
+            <Button variant="outline" onClick={clearSavedFilters} className="gap-2">
+              <X className="w-4 h-4" />
+              {t('empty.noResults.button')}
+            </Button>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {savedPlants.map((plant) => (
-              <PlantCard
-                key={plant._id}
-                plant={plant}
-                href={`/profile/${plant.userId}/plants/${plant._id}`}
-              />
-            ))}
+          <div className="space-y-4">
+            {hasSavedFilters && !isSavedBusy && (
+              <p className="text-sm text-muted-foreground">{t('messages.found', { count: savedPlants.length })}</p>
+            )}
+            <div className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 transition-opacity duration-200 ${isSavedFiltering ? 'opacity-50' : 'opacity-100'}`}>
+              {savedPlants.map((plant) => (
+                <PlantCard
+                  key={plant._id}
+                  plant={plant}
+                  href={`/profile/${plant.userId}/plants/${plant._id}`}
+                />
+              ))}
+            </div>
           </div>
         )
       )}

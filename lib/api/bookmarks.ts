@@ -24,8 +24,11 @@ export const bookmarksApi = {
     return response.data;
   },
 
-  getPlants: async (): Promise<Plant[]> => {
-    const response = await apiClient.get<Plant[]>('/bookmarks/plants');
+  getPlants: async (filters?: { search?: string; genusId?: string }): Promise<Plant[]> => {
+    const params: Record<string, string> = {};
+    if (filters?.search) params.search = filters.search;
+    if (filters?.genusId) params.genusId = filters.genusId;
+    const response = await apiClient.get<Plant[]>('/bookmarks/plants', { params });
     return response.data;
   },
 
