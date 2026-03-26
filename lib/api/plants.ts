@@ -200,6 +200,21 @@ export const plantsApi = {
     return response.data;
   },
 
+  adminUpdate: async (id: string, data: UpdatePlantDto): Promise<Plant> => {
+    const formData = new FormData();
+    if (data.genusId) formData.append('genusId', data.genusId);
+    if (data.varietyId) formData.append('varietyId', data.varietyId);
+    if (data.removeVariety) formData.append('removeVariety', 'true');
+    if (data.purchaseDate) formData.append('purchaseDate', data.purchaseDate);
+    if (data.photo) formData.append('photo', data.photo);
+    if (data.description !== undefined) formData.append('description', data.description);
+    if (data.removePhoto) formData.append('removePhoto', 'true');
+    const response = await apiClient.patch<Plant>(`/plants/admin/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   adminDelete: async (id: string): Promise<void> => {
     await apiClient.delete(`/plants/admin/${id}`);
   },

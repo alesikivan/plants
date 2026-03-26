@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { plantsApi, Plant, getPlantPhotoUrl } from '@/lib/api/plants';
 import { Genus } from '@/lib/api/genus';
 import { Variety } from '@/lib/api/variety';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,18 +21,197 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
+import { FileInput } from '@/components/ui/file-input';
+import { PlantSelector } from '@/components/plants/PlantSelector';
 import { toast } from 'sonner';
-import { Leaf, Trash2, Search, Eye } from 'lucide-react';
+import { Leaf, Trash2, Search, Eye, Pencil } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 
 const PAGE_SIZE = 20;
+
+interface AdminEditFormData {
+  description?: string;
+}
+
+function AdminEditPlantModal({
+  open,
+  plant,
+  onOpenChange,
+  onSuccess,
+}: {
+  open: boolean;
+  plant: Plant | null;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}) {
+  const [selectedGenusId, setSelectedGenusId] = useState('');
+  const [selectedVarietyId, setSelectedVarietyId] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState<Date | undefined>(undefined);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { register, handleSubmit, reset } = useForm<AdminEditFormData>();
+
+  useEffect(() => {
+    if (open && plant) {
+      setSelectedGenusId(typeof plant.genusId === 'object' ? plant.genusId._id : plant.genusId);
+      setSelectedVarietyId(
+        typeof plant.varietyId === 'object' ? plant.varietyId?._id || '' : plant.varietyId || '',
+      );
+      setPurchaseDate(plant.purchaseDate ? new Date(plant.purchaseDate) : undefined);
+      setPhotoPreview(plant.photo ? getPlantPhotoUrl(plant.photo) || null : null);
+      setSelectedFile(null);
+    }
+  }, [open, plant]);
+
+  useEffect(() => {
+    if (!open) {
+      reset();
+      setSelectedGenusId('');
+      setSelectedVarietyId('');
+      setPurchaseDate(undefined);
+      setPhotoPreview(null);
+      setSelectedFile(null);
+    }
+  }, [open, reset]);
+
+  const onSubmit = async (data: AdminEditFormData) => {
+    if (!plant) return;
+    setIsLoading(true);
+    try {
+      await plantsApi.adminUpdate(plant._id, {
+        genusId: selectedGenusId,
+        varietyId: selectedVarietyId || undefined,
+        removeVariety: !selectedVarietyId,
+        purchaseDate: purchaseDate ? purchaseDate.toISOString() : undefined,
+        photo: selectedFile || undefined,
+        description: data.description || undefined,
+      });
+      toast.success('Растение обновлено');
+      onOpenChange(false);
+      onSuccess();
+    } catch (error) {
+      toast.error('Не удалось обновить растение');
+      console.error('Failed to update plant:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setPhotoPreview(null);
+    }
+  };
+
+  const disableFutureDates = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
+
+  if (!plant) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Редактировать растение</DialogTitle>
+          <DialogDescription>
+            Редактирование растения пользователя{' '}
+            <span className="font-mono text-xs">{plant.userId}</span>
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-4">
+            <PlantSelector
+              selectedGenusId={selectedGenusId}
+              selectedVarietyId={selectedVarietyId}
+              onGenusChange={(id) => {
+                setSelectedGenusId(id);
+                setSelectedVarietyId('');
+              }}
+              onVarietyChange={setSelectedVarietyId}
+              allowCreate
+              required
+            />
+
+            <div className="grid gap-2">
+              <Label>Дата покупки</Label>
+              <DatePicker
+                date={purchaseDate}
+                onDateChange={setPurchaseDate}
+                placeholder="Выберите дату"
+                disabledMatcher={disableFutureDates}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Фото</Label>
+              <FileInput
+                id="admin-plant-photo"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif"
+                onFileChange={handleFileChange}
+                preview={photoPreview}
+                onRemove={() => handleFileChange(null)}
+                maxSize={5 * 1024 * 1024}
+                acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="admin-plant-description">Описание</Label>
+              <Textarea
+                id="admin-plant-description"
+                placeholder="Описание растения"
+                {...register('description')}
+                rows={3}
+                defaultValue={plant.description || ''}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Отмена
+            </Button>
+            <Button type="submit" disabled={isLoading || !selectedGenusId}>
+              {isLoading ? 'Сохранение...' : 'Сохранить'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function AdminPlantsPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [deletePlant, setDeletePlant] = useState<Plant | null>(null);
+  const [editPlant, setEditPlant] = useState<Plant | null>(null);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['admin-plants'],
@@ -84,7 +266,10 @@ export default function AdminPlantsPage() {
         <Input
           placeholder="Поиск по роду, сорту или userId..."
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="pl-9"
         />
       </div>
@@ -127,13 +312,19 @@ export default function AdminPlantsPage() {
                         {variety && (
                           <span className="text-sm text-muted-foreground">{variety}</span>
                         )}
+                        {p.isArchived && (
+                          <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                            архив
+                          </span>
+                        )}
                       </div>
                       <p className="text-xs text-muted-foreground font-mono truncate">
                         Пользователь: {p.userId}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Добавлено: {new Date(p.createdAt).toLocaleDateString('ru-RU')}
-                        {p.purchaseDate && ` · Куплено: ${new Date(p.purchaseDate).toLocaleDateString('ru-RU')}`}
+                        {p.purchaseDate &&
+                          ` · Куплено: ${new Date(p.purchaseDate).toLocaleDateString('ru-RU')}`}
                       </p>
                     </div>
 
@@ -148,11 +339,10 @@ export default function AdminPlantsPage() {
                           <Eye className="w-4 h-4" />
                         </Link>
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeletePlant(p)}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setEditPlant(p)}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => setDeletePlant(p)}>
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
@@ -163,7 +353,21 @@ export default function AdminPlantsPage() {
           )}
         </CardContent>
       </Card>
-      <Pagination page={page} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />
+      <Pagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={filtered.length}
+        onPageChange={setPage}
+      />
+
+      <AdminEditPlantModal
+        open={!!editPlant}
+        plant={editPlant}
+        onOpenChange={(open) => !open && setEditPlant(null)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['admin-plants'] });
+        }}
+      />
 
       <AlertDialog open={!!deletePlant} onOpenChange={(open) => !open && setDeletePlant(null)}>
         <AlertDialogContent>
