@@ -19,6 +19,7 @@ export interface UserResponse {
   showPlants: boolean;
   showShelves: boolean;
   showPlantHistory: boolean;
+  showWishlist: boolean;
   isBlocked: boolean;
   bio?: string;
   avatar?: string;
@@ -34,6 +35,7 @@ export interface UpdateUserDto {
   showPlants?: boolean;
   showShelves?: boolean;
   showPlantHistory?: boolean;
+  showWishlist?: boolean;
   socialLinks?: SocialLink[];
 }
 
@@ -59,6 +61,7 @@ export interface UserProfileWithStats {
   showPlants: boolean;
   showShelves: boolean;
   showPlantHistory: boolean;
+  showWishlist: boolean;
   bio?: string;
   avatar?: string;
   socialLinks?: SocialLink[];

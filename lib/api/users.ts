@@ -64,6 +64,12 @@ export const usersApi = {
     return response.data;
   },
 
+  // Public: get another user's wishlist
+  getUserWishlist: async (userId: string): Promise<import('./wishlist').Wishlist[]> => {
+    const response = await apiClient.get(`/users/${userId}/wishlist`);
+    return response.data;
+  },
+
   // Public: get another user's shelves
   getUserShelves: async (userId: string): Promise<Shelf[]> => {
     const response = await apiClient.get<Shelf[]>(`/users/${userId}/shelves`);

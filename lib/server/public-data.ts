@@ -1,6 +1,7 @@
 import type { UserProfileWithStats } from '@/lib/api/users';
 import type { Plant, PlantHistory } from '@/lib/api/plants';
 import type { Shelf } from '@/lib/api/shelves';
+import type { Wishlist } from '@/lib/api/wishlist';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3008/api';
 const REVALIDATE_SECONDS = 60;
@@ -45,10 +46,11 @@ async function fetchJson<T>(path: string, noCache = false): Promise<FetchResult<
 }
 
 export async function getPublicProfilePageData(userId: string) {
-  const [profileResult, plantsResult, shelvesResult] = await Promise.all([
+  const [profileResult, plantsResult, shelvesResult, wishlistResult] = await Promise.all([
     fetchJson<UserProfileWithStats>(`/users/${userId}/profile`),
     fetchJson<Plant[]>(`/users/${userId}/plants`),
     fetchJson<Shelf[]>(`/users/${userId}/shelves`),
+    fetchJson<Wishlist[]>(`/users/${userId}/wishlist`),
   ]);
 
   const profile = profileResult.ok ? profileResult.data : null;
@@ -58,6 +60,7 @@ export async function getPublicProfilePageData(userId: string) {
     profileStatus: profileResult.status,
     plants: plantsResult.ok ? plantsResult.data ?? [] : [],
     shelves: shelvesResult.ok ? shelvesResult.data ?? [] : [],
+    wishlist: wishlistResult.ok ? wishlistResult.data ?? [] : [],
   };
 }
 

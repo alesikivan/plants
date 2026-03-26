@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff, Copy, Check } from 'lucide-react';
+import { User, Leaf, Layers, Star, BookOpen, ArrowLeft, ChevronRight, EyeOff, Copy, Check, Heart } from 'lucide-react';
 import { usersApi, UserProfileWithStats, Plant, Shelf } from '@/lib/api';
+import { Wishlist, getWishlistPhotoUrl } from '@/lib/api/wishlist';
+import { getDisplayName } from '@/lib/utils/language';
 import { followsApi, FollowStats, PublicFollowStats } from '@/lib/api/follows';
 import { getAvatarUrl } from '@/lib/api/users';
 import { FollowButton } from '@/components/follows/FollowButton';
@@ -28,12 +30,14 @@ interface ProfilePageClientProps {
   initialProfile?: UserProfileWithStats | null;
   initialPlants?: Plant[];
   initialShelves?: Shelf[];
+  initialWishlist?: Wishlist[];
 }
 
 export default function ProfilePageClient({
   initialProfile = null,
   initialPlants = [],
   initialShelves = [],
+  initialWishlist = [],
 }: ProfilePageClientProps) {
   const t = useTranslations('PublicProfilePage');
   const locale = useLocale();
@@ -49,10 +53,12 @@ export default function ProfilePageClient({
   const [profile, setProfile] = useState<UserProfileWithStats | null>(initialProfile);
   const [plants, setPlants] = useState<Plant[]>(initialPlants);
   const [shelves, setShelves] = useState<Shelf[]>(initialShelves);
+  const [wishlist, setWishlist] = useState<Wishlist[]>(initialWishlist);
   const [followStats, setFollowStats] = useState<FollowStats | PublicFollowStats | null>(null);
   const [isLoading, setIsLoading] = useState(!initialProfile);
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [loadingShelves, setLoadingShelves] = useState(false);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
   const [followDialog, setFollowDialog] = useState<'followers' | 'following' | null>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -95,6 +101,11 @@ export default function ProfilePageClient({
           usersApi.getUserShelves(userId)
             .then(setShelves).catch(() => {}).finally(() => setLoadingShelves(false));
         }
+        if (isAdmin || data.showWishlist) {
+          setLoadingWishlist(true);
+          usersApi.getUserWishlist(userId)
+            .then(setWishlist).catch(() => {}).finally(() => setLoadingWishlist(false));
+        }
       })
       .catch(() => toast.error(t('errors.loadError')))
       .finally(() => setIsLoading(false));
@@ -121,6 +132,7 @@ export default function ProfilePageClient({
 
   const previewPlants = plants.slice(0, DESKTOP_PREVIEW);
   const previewShelves = shelves.slice(0, DESKTOP_PREVIEW);
+  const previewWishlist = wishlist.slice(0, DESKTOP_PREVIEW);
 
   return (
     <div className="space-y-4 max-w-4xl mx-auto">
@@ -282,6 +294,55 @@ export default function ProfilePageClient({
       )}
 
       {showGuestBanner && <DiscoverBanner />}
+
+      {/* Wishlist Preview — only shown if user made it public */}
+      {(isAdmin || profile.showWishlist) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Heart className="w-5 h-5 text-pink-500" />
+              {t('sections.wishlist.title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingWishlist ? (
+              <div className="text-center text-muted-foreground py-6">{t('sections.wishlist.loading')}</div>
+            ) : wishlist.length === 0 ? (
+              <div className="text-center text-muted-foreground py-6">
+                <Heart className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
+                <p>{t('sections.wishlist.empty')}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
+                {previewWishlist.map((item, i) => {
+                  const genus = typeof item.genusId === 'object' ? item.genusId : null;
+                  const variety = typeof item.varietyId === 'object' ? item.varietyId : null;
+                  const genusName = getDisplayName(genus, locale);
+                  const varietyName = getDisplayName(variety, locale);
+                  const photoUrl = getWishlistPhotoUrl(item.photo);
+                  return (
+                    <div key={item._id} className={i >= MOBILE_PREVIEW ? 'hidden sm:block' : ''}>
+                      <div className="aspect-square relative bg-background rounded-lg overflow-hidden mb-2 shadow-sm">
+                        {photoUrl ? (
+                          <img src={photoUrl} alt={genusName || ''} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                            <Leaf className="w-10 h-10 text-muted-foreground/20" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-center space-y-0.5">
+                        <p className="font-medium text-xs text-foreground/90 truncate">{genusName}</p>
+                        {varietyName && <p className="text-xs text-muted-foreground truncate">{varietyName}</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Plants Preview */}
       <Card>

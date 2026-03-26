@@ -1093,6 +1093,11 @@
         "empty": "No shelves",
         "hidden": "User hid their shelves",
         "loading": "Loading..."
+      },
+      "wishlist": {
+        "title": "Wishlist",
+        "empty": "Wishlist is empty",
+        "loading": "Loading..."
       }
     },
     "errors": {
@@ -1299,6 +1304,10 @@
         "label": "Show plant history",
         "description": "Other users can view your plants' history",
         "requiresPlants": "Enable plant visibility first"
+      },
+      "showWishlist": {
+        "label": "Show my wishlist",
+        "description": "Other users will be able to see your wishlist"
       },
       "successToast": "Privacy settings updated",
       "errorToast": "Error updating settings",

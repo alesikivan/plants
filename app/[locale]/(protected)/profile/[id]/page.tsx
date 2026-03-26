@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { id, locale } = await params;
-  const { profile, profileStatus, plants, shelves } = await getPublicProfilePageData(id);
+  const { profile, profileStatus, plants, shelves, wishlist } = await getPublicProfilePageData(id);
 
   if (profileStatus === 404 || !profile) {
     notFound();
@@ -74,6 +74,7 @@ export default async function Page({ params }: Props) {
       initialProfile={profile}
       initialPlants={plants}
       initialShelves={shelves}
+      initialWishlist={wishlist}
     />
   );
 }

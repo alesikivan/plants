@@ -82,7 +82,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory', value: boolean) => {
+  const handlePrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory' | 'showWishlist', value: boolean) => {
     if (!value && (field === 'showPlants' || field === 'showPlantHistory')) {
       setPrivacyConfirm({ field });
       return;
@@ -90,7 +90,7 @@ export default function ProfilePage() {
     await applyPrivacyChange(field, value);
   };
 
-  const applyPrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory', value: boolean) => {
+  const applyPrivacyChange = async (field: 'showPlants' | 'showShelves' | 'showPlantHistory' | 'showWishlist', value: boolean) => {
     try {
       const update = field === 'showPlants' && value === false
         ? { showPlants: false, showShelves: false, showPlantHistory: false }
@@ -523,6 +523,26 @@ export default function ProfilePage() {
               checked={user.showPlantHistory ?? true}
               onCheckedChange={(v) => handlePrivacyChange('showPlantHistory', v)}
               disabled={!(user.showPlants ?? true)}
+            />
+          </div>
+
+          <div className="border-t pt-4 flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                {user.showWishlist ? (
+                  <Eye className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <EyeOff className="w-4 h-4 text-muted-foreground" />
+                )}
+                <span className="text-sm font-medium">{t('privacy.showWishlist.label')}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('privacy.showWishlist.description')}
+              </p>
+            </div>
+            <Switch
+              checked={user.showWishlist ?? false}
+              onCheckedChange={(v) => handlePrivacyChange('showWishlist', v)}
             />
           </div>
         </CardContent>
