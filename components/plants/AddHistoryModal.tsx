@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -33,6 +33,16 @@ export function AddHistoryModal({
   const [comment, setComment] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!open) {
+      photoPreviews.forEach(url => URL.revokeObjectURL(url));
+      setDate(new Date());
+      setComment('');
+      setPhotos([]);
+      setPhotoPreviews([]);
+    }
+  }, [open]);
 
   const handleDateFound = (date: Date | null) => {
     setDate(date ?? new Date());
@@ -91,11 +101,6 @@ export function AddHistoryModal({
       toast.success(t('toasts.success'));
       onSuccess();
       onOpenChange(false);
-      // Reset form
-      setDate(new Date());
-      setComment('');
-      setPhotos([]);
-      setPhotoPreviews([]);
     } catch (error) {
       toast.error(t('toasts.error'));
       console.error('Failed to add history:', error);

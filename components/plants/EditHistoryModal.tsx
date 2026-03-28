@@ -43,8 +43,8 @@ export function EditHistoryModal({
       setDate(new Date(historyItem.date));
       setComment(historyItem.comment ?? '');
       setExistingPhotos(historyItem.photos);
+      setNewPhotoPreviews(prev => { prev.forEach(url => URL.revokeObjectURL(url)); return []; });
       setNewPhotos([]);
-      setNewPhotoPreviews([]);
       setRemovePhotos([]);
     }
   }, [open, historyItem]);
