@@ -11,6 +11,7 @@ import { Wishlist, getWishlistPhotoUrl } from '@/lib/api/wishlist';
 import { getDisplayName } from '@/lib/utils/language';
 import { useAuthStore } from '@/lib/store/authStore';
 import { WishlistDiscoverBanner } from '@/components/public/WishlistDiscoverBanner';
+import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -50,6 +51,7 @@ export default function UserWishlistClient({
   const isGuest = initialized && !currentUser;
 
   const [wishlist, setWishlist] = useState<Wishlist[]>(initialWishlist);
+  const [photoDialogUrl, setPhotoDialogUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isHidden, setIsHidden] = useState(initialHidden);
   const [total, setTotal] = useState(initialTotal);
@@ -242,7 +244,12 @@ export default function UserWishlistClient({
                 <div key={item._id}>
                   <div className="aspect-square relative bg-background rounded-lg overflow-hidden mb-2 shadow-sm">
                     {photoUrl ? (
-                      <img src={photoUrl} alt={genusName || ''} className="w-full h-full object-cover" />
+                      <img
+                        src={photoUrl}
+                        alt={genusName || ''}
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => setPhotoDialogUrl(photoUrl)}
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-muted/20">
                         <Leaf className="w-10 h-10 text-muted-foreground/20" />
@@ -285,6 +292,14 @@ export default function UserWishlistClient({
             </div>
           )}
         </>
+      )}
+
+      {photoDialogUrl && (
+        <PhotoGallery
+          photos={[photoDialogUrl]}
+          initialIndex={0}
+          onClose={() => setPhotoDialogUrl(null)}
+        />
       )}
     </div>
   );

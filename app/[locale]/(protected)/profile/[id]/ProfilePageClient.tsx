@@ -22,6 +22,7 @@ import { AvatarViewer } from '@/components/profile/AvatarViewer';
 import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 import { FollowersDialog } from '@/components/follows/FollowersDialog';
 import { DiscoverBanner } from '@/components/public/DiscoverBanner';
+import { PhotoGallery } from '@/components/plants/PhotoGallery';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -54,6 +55,7 @@ export default function ProfilePageClient({
   const [plants, setPlants] = useState<Plant[]>(initialPlants);
   const [shelves, setShelves] = useState<Shelf[]>(initialShelves);
   const [wishlist, setWishlist] = useState<Wishlist[]>(initialWishlist);
+  const [wishlistPhotoUrl, setWishlistPhotoUrl] = useState<string | null>(null);
   const [followStats, setFollowStats] = useState<FollowStats | PublicFollowStats | null>(null);
   const [isLoading, setIsLoading] = useState(!initialProfile);
   const [loadingPlants, setLoadingPlants] = useState(false);
@@ -333,7 +335,12 @@ export default function ProfilePageClient({
                     <div key={item._id} className={i >= MOBILE_PREVIEW ? 'hidden sm:block' : ''}>
                       <div className="aspect-square relative bg-background rounded-lg overflow-hidden mb-2 shadow-sm">
                         {photoUrl ? (
-                          <img src={photoUrl} alt={genusName || ''} className="w-full h-full object-cover" />
+                          <img
+                            src={photoUrl}
+                            alt={genusName || ''}
+                            className="w-full h-full object-cover cursor-pointer"
+                            onClick={() => setWishlistPhotoUrl(photoUrl)}
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-muted/20">
                             <Leaf className="w-10 h-10 text-muted-foreground/20" />
@@ -351,6 +358,14 @@ export default function ProfilePageClient({
             )}
           </CardContent>
         </Card>
+      )}
+
+      {wishlistPhotoUrl && (
+        <PhotoGallery
+          photos={[wishlistPhotoUrl]}
+          initialIndex={0}
+          onClose={() => setWishlistPhotoUrl(null)}
+        />
       )}
 
       {/* Plants Preview */}
