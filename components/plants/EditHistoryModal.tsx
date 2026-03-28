@@ -105,6 +105,11 @@ export function EditHistoryModal({
     const hasPhotos = existingPhotos.length > 0 || newPhotos.length > 0;
     const hasComment = comment.trim().length > 0;
 
+    if (comment.length > 600) {
+      toast.error(t('commentMaxLength'));
+      return;
+    }
+
     if (!hasComment && !hasPhotos) {
       toast.error(t('commentLabel'));
       return;
@@ -161,7 +166,7 @@ export function EditHistoryModal({
               id="comment"
               placeholder={t('commentPlaceholder')}
               value={comment}
-              onChange={(e) => setComment(e.target.value.slice(0, 600))}
+              onChange={(e) => setComment(e.target.value)}
               rows={4}
             />
             <p className={`text-xs text-right ${comment.length >= 600 ? 'text-destructive' : 'text-muted-foreground'}`}>
