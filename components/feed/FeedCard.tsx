@@ -165,7 +165,7 @@ function PlantFeedCard({
 
         {/* Description */}
         {item.plant.description ? (
-          <p className="px-4 pt-3 pb-4 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+          <p className="px-4 pt-3 pb-4 text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
             {item.plant.description}
           </p>
         ) : (
