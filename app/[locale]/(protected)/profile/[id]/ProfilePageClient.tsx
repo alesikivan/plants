@@ -396,15 +396,6 @@ export default function ProfilePageClient({
                   </div>
                 ))}
               </div>
-              {plants.length > DESKTOP_PREVIEW && (
-                <div className="mt-4 text-center">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/profile/${userId}/plants`}>
-                      {t('sections.plants.showAllWithCount', { count: plants.length })}
-                    </Link>
-                  </Button>
-                </div>
-              )}
             </>
           )}
         </CardContent>
@@ -453,15 +444,6 @@ export default function ProfilePageClient({
                   </div>
                 ))}
               </div>
-              {shelves.length > DESKTOP_PREVIEW && (
-                <div className="mt-4 text-center">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/profile/${userId}/shelves`}>
-                      {t('sections.shelves.showAllWithCount', { count: shelves.length })}
-                    </Link>
-                  </Button>
-                </div>
-              )}
             </>
           )}
         </CardContent>
