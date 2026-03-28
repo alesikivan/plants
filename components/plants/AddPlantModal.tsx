@@ -51,7 +51,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<PlantFormData>();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<PlantFormData>();
+  const description = watch('description') ?? '';
 
   useEffect(() => {
     if (open) {
@@ -244,9 +245,12 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
               <Textarea
                 id="description"
                 placeholder={t('descriptionPlaceholder')}
-                {...register('description')}
+                {...register('description', { maxLength: 600 })}
                 rows={3}
               />
+              <p className={`text-xs text-right ${description.length >= 600 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                {description.length}/600{description.length >= 600 && ` — ${t('descriptionMaxLength')}`}
+              </p>
             </div>
           </div>
 

@@ -647,6 +647,7 @@
     "purchaseDatePlaceholder": "Выберите дату покупки",
     "photo": "Фото растения",
     "descriptionPlaceholder": "Добавьте описание вашего растения...",
+    "descriptionMaxLength": "достигнут лимит",
     "buttons": {
       "cancel": "Отмена",
       "add": "Добавить",
@@ -670,6 +671,7 @@
     "purchaseDatePlaceholder": "Выберите дату покупки",
     "photo": "Фото растения",
     "descriptionPlaceholder": "Добавьте описание вашего растения...",
+    "descriptionMaxLength": "достигнут лимит",
     "buttons": {
       "cancel": "Отмена",
       "save": "Сохранить",

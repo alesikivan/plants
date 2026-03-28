@@ -647,6 +647,7 @@
     "purchaseDatePlaceholder": "Select purchase date",
     "photo": "Plant photo",
     "descriptionPlaceholder": "Add a description of your plant...",
+    "descriptionMaxLength": "limit reached",
     "buttons": {
       "cancel": "Cancel",
       "add": "Add",
@@ -670,6 +671,7 @@
     "purchaseDatePlaceholder": "Select purchase date",
     "photo": "Plant photo",
     "descriptionPlaceholder": "Add a description of your plant...",
+    "descriptionMaxLength": "limit reached",
     "buttons": {
       "cancel": "Cancel",
       "save": "Save",
