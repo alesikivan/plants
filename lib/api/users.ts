@@ -64,9 +64,22 @@ export const usersApi = {
     return response.data;
   },
 
-  // Public: get another user's wishlist
+  // Public: get another user's wishlist (preview, all items)
   getUserWishlist: async (userId: string): Promise<import('./wishlist').Wishlist[]> => {
-    const response = await apiClient.get(`/users/${userId}/wishlist`);
+    const response = await apiClient.get<{ items: import('./wishlist').Wishlist[]; total: number; page: number; totalPages: number }>(`/users/${userId}/wishlist`);
+    return response.data.items;
+  },
+
+  // Public: get another user's wishlist with pagination and search
+  getUserWishlistPaginated: async (
+    userId: string,
+    params?: { search?: string; page?: number; limit?: number },
+  ): Promise<{ items: import('./wishlist').Wishlist[]; total: number; page: number; totalPages: number }> => {
+    const query: Record<string, string> = {};
+    if (params?.search) query.search = params.search;
+    if (params?.page) query.page = String(params.page);
+    if (params?.limit) query.limit = String(params.limit);
+    const response = await apiClient.get(`/users/${userId}/wishlist`, { params: query });
     return response.data;
   },
 

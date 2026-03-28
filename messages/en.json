@@ -1096,6 +1096,7 @@
       },
       "wishlist": {
         "title": "Wishlist",
+        "showAll": "Show all",
         "empty": "Wishlist is empty",
         "loading": "Loading..."
       }
@@ -1142,6 +1143,40 @@
       "loadError": "Failed to load shelves"
     }
   },
+  "UserWishlistPage": {
+    "header": {
+      "title": "Wishlist",
+      "description": "User's desired plants",
+      "descriptionGuest": "Desired plants of",
+      "backButton": "Back"
+    },
+    "search": {
+      "placeholder": "Search by name...",
+      "clear": "Clear"
+    },
+    "empty": {
+      "title": "Wishlist is empty",
+      "description": "This user has no desired plants"
+    },
+    "emptySearch": {
+      "title": "Nothing found",
+      "description": "Try a different query"
+    },
+    "hidden": {
+      "title": "Wishlist hidden",
+      "description": "User hid their wishlist"
+    },
+    "loading": "Loading...",
+    "total": "{count} plants",
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {page} of {total}"
+    },
+    "errors": {
+      "loadError": "Failed to load wishlist"
+    }
+  },
   "FollowersDialog": {
     "titleFollowers": "Followers",
     "titleFollowing": "Following",
@@ -1173,6 +1208,12 @@
     "title": "Organize your shelves and plants",
     "description": "Create your own profile and systematize your collection. Share shelves and inspire other plant collectors 🌿",
     "buttonText": "Create an account"
+  },
+  "WishlistDiscoverBanner": {
+    "joinCommunity": "Join our community",
+    "title": "Build your own wishlist",
+    "description": "Collect your dream plants, follow others' wishlists, and connect with fellow plant enthusiasts 🌱",
+    "buttonText": "Create your profile"
   },
   "PublicPlantDetailPage": {
     "loading": "Loading...",

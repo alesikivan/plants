@@ -50,7 +50,7 @@ export async function getPublicProfilePageData(userId: string) {
     fetchJson<UserProfileWithStats>(`/users/${userId}/profile`),
     fetchJson<Plant[]>(`/users/${userId}/plants`),
     fetchJson<Shelf[]>(`/users/${userId}/shelves`),
-    fetchJson<Wishlist[]>(`/users/${userId}/wishlist`),
+    fetchJson<{ items: Wishlist[]; total: number; page: number; totalPages: number }>(`/users/${userId}/wishlist`),
   ]);
 
   const profile = profileResult.ok ? profileResult.data : null;
@@ -60,7 +60,7 @@ export async function getPublicProfilePageData(userId: string) {
     profileStatus: profileResult.status,
     plants: plantsResult.ok ? plantsResult.data ?? [] : [],
     shelves: shelvesResult.ok ? shelvesResult.data ?? [] : [],
-    wishlist: wishlistResult.ok ? wishlistResult.data ?? [] : [],
+    wishlist: wishlistResult.ok ? wishlistResult.data?.items ?? [] : [],
   };
 }
 
@@ -107,6 +107,31 @@ export async function getPublicProfileShelfPageData(userId: string, shelfId: str
   return {
     status: result.status,
     shelf: result.ok ? result.data : null,
+    isHidden: result.status === 403,
+  };
+}
+
+export async function getPublicProfileWishlistPageData(
+  userId: string,
+  search?: string,
+  page = 1,
+  limit = 20,
+) {
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  params.set('page', String(page));
+  params.set('limit', String(limit));
+
+  const result = await fetchJson<{ items: any[]; total: number; page: number; totalPages: number }>(
+    `/users/${userId}/wishlist?${params.toString()}`,
+    true,
+  );
+
+  return {
+    status: result.status,
+    wishlist: result.ok ? result.data?.items ?? [] : [],
+    total: result.data?.total ?? 0,
+    totalPages: result.data?.totalPages ?? 0,
     isHidden: result.status === 403,
   };
 }
