@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams, usePathname } from 'next/navigat
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, EyeOff, Heart, Leaf, Search, X } from 'lucide-react';
+import { ArrowLeft, Check, Copy, EyeOff, Heart, Leaf, Search, X } from 'lucide-react';
 import { usersApi } from '@/lib/api';
 import { Wishlist, getWishlistPhotoUrl } from '@/lib/api/wishlist';
 import { getDisplayName } from '@/lib/utils/language';
@@ -56,6 +56,7 @@ export default function UserWishlistClient({
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [search, setSearch] = useState(initialSearch);
   const [page, setPage] = useState(initialPage);
+  const [copied, setCopied] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -143,10 +144,23 @@ export default function UserWishlistClient({
           </Button>
         )}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-            <Heart className="w-6 h-6 text-pink-500" />
-            {t('header.title')}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+              <Heart className="w-6 h-6 text-pink-500" />
+              {t('header.title')}
+            </h1>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="ml-1 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              title={t('header.copyLink')}
+            >
+              {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
           {isGuest && profileName ? (
             <p className="text-muted-foreground text-sm">
               {t('header.descriptionGuest')}{' '}

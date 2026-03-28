@@ -1148,7 +1148,8 @@
       "title": "Wishlist",
       "description": "User's desired plants",
       "descriptionGuest": "Desired plants of",
-      "backButton": "Back"
+      "backButton": "Back",
+      "copyLink": "Copy link"
     },
     "search": {
       "placeholder": "Search by name...",
