@@ -702,13 +702,6 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
-              {plants.length > DESKTOP_PREVIEW && (
-                <div className="mt-4 text-center">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/plants">{t('plants.showAllCount', { count: plants.length })}</Link>
-                  </Button>
-                </div>
-              )}
             </>
           )}
         </CardContent>
@@ -756,13 +749,6 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
-              {shelves.length > DESKTOP_PREVIEW && (
-                <div className="mt-4 text-center">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/shelves">{t('shelves.showAllCount', { count: shelves.length })}</Link>
-                  </Button>
-                </div>
-              )}
             </>
           )}
         </CardContent>
