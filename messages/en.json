@@ -374,7 +374,8 @@
     "addMore": "Add more photos",
     "processing": "Processing photo...",
     "skipButton": "Skip",
-    "helperText": "Max size: {size} per file. Formats: {formats}. Up to {maxFiles} photos"
+    "helperText": "Max size: {size} per file. Formats: {formats}. Up to {maxFiles} photos",
+    "limitExceeded": "Maximum {maxFiles} photos"
   },
   "ImageCropModal": {
     "title": "Crop photo",
@@ -836,7 +837,8 @@
       "success": "Entry updated!",
       "error": "Failed to update entry",
       "dateFound": "Date updated from photo metadata: {date}",
-      "photoDeleteSuccess": "Photo deleted"
+      "photoDeleteSuccess": "Photo deleted",
+      "tooManyPhotos": "Maximum 3 photos per entry"
     }
   },
   "ShelvesPage": {

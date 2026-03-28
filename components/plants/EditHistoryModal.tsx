@@ -110,6 +110,11 @@ export function EditHistoryModal({
       return;
     }
 
+    if (existingPhotos.length + newPhotos.length > 3) {
+      toast.error(t('toasts.tooManyPhotos'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await plantHistoryApi.update(plantId, historyItem._id, {
@@ -196,7 +201,7 @@ export function EditHistoryModal({
               onRemove={handleRemoveNewPhoto}
               maxSize={5 * 1024 * 1024}
               acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
-              maxFiles={5}
+              maxFiles={3 - existingPhotos.length}
               disableDateDetection={true}
             />
           </div>

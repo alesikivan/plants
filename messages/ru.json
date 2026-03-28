@@ -374,7 +374,8 @@
     "addMore": "Добавить ещё фото",
     "processing": "Обработка фото...",
     "skipButton": "Пропустить",
-    "helperText": "Максимальный размер: {size} на файл. Форматы: {formats}. До {maxFiles} фото"
+    "helperText": "Максимальный размер: {size} на файл. Форматы: {formats}. До {maxFiles} фото",
+    "limitExceeded": "Максимум {maxFiles} фото"
   },
   "ImageCropModal": {
     "title": "Обрезать фото",
@@ -836,7 +837,8 @@
       "success": "Запись обновлена!",
       "error": "Ошибка при обновлении записи",
       "dateFound": "Дата обновлена по данным фото: {date}",
-      "photoDeleteSuccess": "Фото удалено"
+      "photoDeleteSuccess": "Фото удалено",
+      "tooManyPhotos": "Максимум 3 фото на одну запись"
     }
   },
   "ShelvesPage": {

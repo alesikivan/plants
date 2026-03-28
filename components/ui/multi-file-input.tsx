@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
 import { Upload, X, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { ImageCropModal } from '@/components/ui/image-crop-modal';
 import { compressImage } from '@/lib/utils/image-compression';
@@ -80,10 +81,17 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       onChangeFiredRef.current = true;
-      const files = e.target.files ? Array.from(e.target.files) : [];
+      let files = e.target.files ? Array.from(e.target.files) : [];
       e.target.value = '';
 
       if (files.length === 0) return;
+
+      const remaining = maxFiles - previews.length;
+      if (files.length > remaining) {
+        toast.error(t('limitExceeded', { maxFiles }));
+        files = files.slice(0, remaining);
+        if (files.length === 0) return;
+      }
 
       setIsLoading(true);
       try {
@@ -202,7 +210,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             <span className="ml-2 text-sm text-muted-foreground">{t('processing')}</span>
           </div>
-        ) : (
+        ) : previews.length < maxFiles ? (
           <button
             type="button"
             onClick={handleClick}
@@ -216,7 +224,7 @@ export const MultiFileInput = React.forwardRef<HTMLInputElement, MultiFileInputP
               {previews.length > 0 ? t('addMore') : t('selectButton')}
             </span>
           </button>
-        )}
+        ) : null}
 
         {maxSize && acceptedFormats && (
           <p className="text-xs text-muted-foreground">
