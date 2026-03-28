@@ -805,6 +805,7 @@
     "datePlaceholder": "Выберите дату",
     "commentLabel": "Описание",
     "commentPlaceholder": "Что произошло с растением...",
+    "commentMaxLength": "достигнут лимит",
     "photosLabel": "Фото события (необязательно)",
     "buttons": {
       "cancel": "Отмена",
@@ -824,6 +825,7 @@
     "datePlaceholder": "Выберите дату",
     "commentLabel": "Описание",
     "commentPlaceholder": "Что произошло с растением...",
+    "commentMaxLength": "достигнут лимит",
     "photosLabel": "Фото события (необязательно)",
     "deletePhotoTitle": "Удалить фото?",
     "deletePhotoDescription": "Это действие нельзя отменить.",

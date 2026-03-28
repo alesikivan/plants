@@ -161,9 +161,12 @@ export function EditHistoryModal({
               id="comment"
               placeholder={t('commentPlaceholder')}
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              onChange={(e) => setComment(e.target.value.slice(0, 600))}
               rows={4}
             />
+            <p className={`text-xs text-right ${comment.length >= 600 ? 'text-destructive' : 'text-muted-foreground'}`}>
+              {comment.length}/600{comment.length >= 600 && ` — ${t('commentMaxLength')}`}
+            </p>
           </div>
 
           {existingPhotos.length > 0 && (

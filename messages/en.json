@@ -805,6 +805,7 @@
     "datePlaceholder": "Select date",
     "commentLabel": "Description",
     "commentPlaceholder": "What happened to the plant...",
+    "commentMaxLength": "limit reached",
     "photosLabel": "Event photos (optional)",
     "buttons": {
       "cancel": "Cancel",
@@ -824,6 +825,7 @@
     "datePlaceholder": "Select date",
     "commentLabel": "Description",
     "commentPlaceholder": "What happened to the plant...",
+    "commentMaxLength": "limit reached",
     "photosLabel": "Event photos (optional)",
     "deletePhotoTitle": "Delete photo?",
     "deletePhotoDescription": "This action cannot be undone.",
