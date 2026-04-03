@@ -55,56 +55,32 @@ export default function ProtectedShell({
 
               {user && (
                 <nav className="hidden md:flex items-center gap-1">
-                  <Link
-                    href="/dashboard"
-                    onClick={() => trackEvent('nav_clicked', { item: 'dashboard', device: 'desktop' })}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    {t('dashboard')}
-                  </Link>
-                  <Link
-                    href="/plants"
-                    onClick={() => trackEvent('nav_clicked', { item: 'plants', device: 'desktop' })}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <Leaf className="w-4 h-4" />
-                    {t('myPlants')}
-                  </Link>
-                  <Link
-                    href="/shelves"
-                    onClick={() => trackEvent('nav_clicked', { item: 'shelves', device: 'desktop' })}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <Layers className="w-4 h-4" />
-                    {t('shelves')}
-                  </Link>
-                  <Link
-                    href="/feed"
-                    onClick={() => trackEvent('nav_clicked', { item: 'feed', device: 'desktop' })}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <Rss className="w-4 h-4" />
-                    {t('feed')}
-                  </Link>
-                  <Link
-                    href="/users"
-                    onClick={() => trackEvent('nav_clicked', { item: 'users', device: 'desktop' })}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <Users className="w-4 h-4" />
-                    {t('users')}
-                  </Link>
-                  {user.role === 'admin' && (
-                    <Link
-                      href="/admin/info"
-                      onClick={() => trackEvent('nav_clicked', { item: 'admin', device: 'desktop' })}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/50 transition-colors"
-                    >
-                      <Settings className="w-4 h-4" />
-                      {t('admin')}
-                    </Link>
-                  )}
+                  {[
+                    { href: '/dashboard', icon: LayoutDashboard, label: t('dashboard'), event: 'dashboard' },
+                    { href: '/plants', icon: Leaf, label: t('myPlants'), event: 'plants' },
+                    { href: '/shelves', icon: Layers, label: t('shelves'), event: 'shelves' },
+                    { href: '/feed', icon: Rss, label: t('feed'), event: 'feed' },
+                    { href: '/users', icon: Users, label: t('users'), event: 'users' },
+                    ...(user.role === 'admin' ? [{ href: '/admin/info', icon: Settings, label: t('admin'), event: 'admin' }] : []),
+                  ].map(({ href, icon: Icon, label, event }) => {
+                    const normalizedPath = pathname?.replace(`/${locale}`, '') || '/';
+                    const isActive = normalizedPath === href || normalizedPath?.startsWith(`${href}/`);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => trackEvent('nav_clicked', { item: event, device: 'desktop' })}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-colors ${
+                          isActive
+                            ? 'font-semibold text-primary bg-primary/10'
+                            : 'font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className={isActive ? '' : 'max-[1299px]:hidden'}>{label}</span>
+                      </Link>
+                    );
+                  })}
                 </nav>
               )}
             </div>
@@ -198,7 +174,8 @@ export default function ProtectedShell({
               { href: '/shelves', icon: Layers, label: t('shelves'), event: 'shelves' },
               { href: '/users', icon: Users, label: t('mobile.users'), event: 'users' },
             ].map(({ href, icon: Icon, label, event }) => {
-              const isActive = pathname === `/${locale}${href}` || pathname?.startsWith(`/${locale}${href}/`);
+              const normalizedPath = pathname?.replace(`/${locale}`, '') || '/';
+              const isActive = normalizedPath === href || normalizedPath?.startsWith(`${href}/`);
               return (
                 <Link
                   key={href}
