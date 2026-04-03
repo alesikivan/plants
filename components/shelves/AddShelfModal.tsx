@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import {
   Dialog,
@@ -54,11 +54,13 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
   const [selectedPlantIds, setSelectedPlantIds] = useState<string[]>([]);
   const [plantSearch, setPlantSearch] = useState('');
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ShelfFormData>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<ShelfFormData>({
     defaultValues: {
       name: editShelf?.name || '',
     },
   });
+
+  const nameValue = useWatch({ control, name: 'name', defaultValue: editShelf?.name || '' });
 
   // Загрузка растений при открытии модального окна
   useEffect(() => {
@@ -240,13 +242,21 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
               <Label htmlFor="name">
                 {t('fields.name.label')} <span className="text-destructive">*</span>
               </Label>
-              <Input
-                id="name"
-                placeholder={t('fields.name.placeholder')}
-                {...register('name', { required: true })}
-              />
-              {errors.name && (
+              <div className="relative">
+                <Input
+                  id="name"
+                  placeholder={t('fields.name.placeholder')}
+                  {...register('name', { required: true, maxLength: 20 })}
+                />
+                <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs ${(nameValue?.length || 0) > 20 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  {nameValue?.length || 0}/20
+                </span>
+              </div>
+              {errors.name?.type === 'required' && (
                 <p className="text-sm text-destructive">{t('fields.name.required')}</p>
+              )}
+              {errors.name?.type === 'maxLength' && (
+                <p className="text-sm text-destructive">{t('fields.name.maxLength')}</p>
               )}
             </div>
 

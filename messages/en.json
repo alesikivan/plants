@@ -929,7 +929,8 @@
       "name": {
         "label": "Shelf name",
         "placeholder": "Shelf №1",
-        "required": "This field is required"
+        "required": "This field is required",
+        "maxLength": "Maximum 20 characters"
       },
       "photo": {
         "label": "Shelf photo",
