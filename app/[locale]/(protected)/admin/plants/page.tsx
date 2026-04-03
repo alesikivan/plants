@@ -72,6 +72,7 @@ function AdminEditPlantModal({
       setPurchaseDate(plant.purchaseDate ? new Date(plant.purchaseDate) : undefined);
       setPhotoPreview(plant.photo ? getPlantPhotoUrl(plant.photo) || null : null);
       setSelectedFile(null);
+      reset({ description: plant.description || '' });
     }
   }, [open, plant]);
 
@@ -182,7 +183,6 @@ function AdminEditPlantModal({
                 placeholder="Описание растения"
                 {...register('description')}
                 rows={3}
-                defaultValue={plant.description || ''}
               />
             </div>
           </div>

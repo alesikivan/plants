@@ -246,10 +246,10 @@ export function AddShelfModal({ open, onOpenChange, onSuccess, editShelf }: AddS
                 <Input
                   id="name"
                   placeholder={t('fields.name.placeholder')}
-                  {...register('name', { required: true, maxLength: 20 })}
+                  {...register('name', { required: true, maxLength: 30 })}
                 />
-                <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs ${(nameValue?.length || 0) > 20 ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {nameValue?.length || 0}/20
+                <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs ${(nameValue?.length || 0) > 30 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  {nameValue?.length || 0}/30
                 </span>
               </div>
               {errors.name?.type === 'required' && (
