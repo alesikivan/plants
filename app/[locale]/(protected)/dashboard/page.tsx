@@ -208,7 +208,6 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                size="sm"
                 onClick={handleCancelReorder}
                 disabled={isReorderSaving}
               >
@@ -216,7 +215,6 @@ export default function DashboardPage() {
                 <span className="hidden sm:block">{t('cancelReorder')}</span>
               </Button>
               <Button
-                size="sm"
                 onClick={handleSaveOrder}
                 disabled={isReorderSaving}
               >
@@ -229,14 +227,13 @@ export default function DashboardPage() {
               {wishlist.length > 1 && !hasFilters && (
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() => setIsReorderMode(true)}
                 >
                   <GripVertical className="w-4 h-4" />
                   <span className="hidden sm:block">{t('reorder')}</span>
                 </Button>
               )}
-              <Button onClick={() => setIsAddModalOpen(true)} size="sm">
+              <Button onClick={() => setIsAddModalOpen(true)}>
                 <Plus className="w-4 h-4" />
                 <span className='hidden sm:block'>{t('addWishlist')}</span>
               </Button>
@@ -325,7 +322,7 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground mb-4 text-center">
                 {t('emptyWishlistDescription')}
               </p>
-              <Button onClick={() => setIsAddModalOpen(true)} size="sm">
+              <Button onClick={() => setIsAddModalOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 {t('addPlantButton')}
               </Button>
