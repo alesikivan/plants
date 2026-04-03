@@ -80,17 +80,26 @@ export const getFeedAvatarUrl = (filename: string | undefined): string | undefin
   return `${API_BASE_URL}/users/avatar/${filename}`;
 };
 
+export interface FeedFilters {
+  genusId?: string;
+  varietyId?: string;
+}
+
 export const feedApi = {
-  getGlobal: async (cursor?: string): Promise<FeedResponse> => {
+  getGlobal: async (cursor?: string, filters?: FeedFilters): Promise<FeedResponse> => {
     const params: Record<string, string> = {};
     if (cursor) params.cursor = cursor;
+    if (filters?.genusId) params.genusId = filters.genusId;
+    if (filters?.varietyId) params.varietyId = filters.varietyId;
     const response = await apiClient.get<FeedResponse>('/feed/global', { params });
     return response.data;
   },
 
-  getFollowing: async (cursor?: string): Promise<FeedResponse> => {
+  getFollowing: async (cursor?: string, filters?: FeedFilters): Promise<FeedResponse> => {
     const params: Record<string, string> = {};
     if (cursor) params.cursor = cursor;
+    if (filters?.genusId) params.genusId = filters.genusId;
+    if (filters?.varietyId) params.varietyId = filters.varietyId;
     const response = await apiClient.get<FeedResponse>('/feed/following', { params });
     return response.data;
   },

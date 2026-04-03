@@ -32,9 +32,11 @@ export const bookmarksApi = {
     return response.data;
   },
 
-  getFeed: async (cursor?: string): Promise<FeedResponse> => {
+  getFeed: async (cursor?: string, filters?: { genusId?: string; varietyId?: string }): Promise<FeedResponse> => {
     const params: Record<string, string> = {};
     if (cursor) params.cursor = cursor;
+    if (filters?.genusId) params.genusId = filters.genusId;
+    if (filters?.varietyId) params.varietyId = filters.varietyId;
     const response = await apiClient.get<FeedResponse>('/bookmarks/feed', { params });
     return response.data;
   },

@@ -1013,6 +1013,16 @@
     },
     "emptySaved": {
       "title": "Нет сохранённых записей"
+    },
+    "filters": {
+      "title": "Фильтры",
+      "allGenus": "Все роды",
+      "allVariety": "Все сорта",
+      "genusPlaceholder": "Поиск рода...",
+      "varietyPlaceholder": "Поиск сорта...",
+      "emptyText": "Ничего не найдено",
+      "loading": "Загрузка...",
+      "clear": "Сбросить фильтры"
     }
   },
   "FeedCard": {

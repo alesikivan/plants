@@ -1,14 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
-import { feedApi, FeedItem } from '@/lib/api/feed';
+import { useTranslations, useLocale } from 'next-intl';
+import { feedApi, FeedItem, FeedFilters } from '@/lib/api/feed';
 import { bookmarksApi } from '@/lib/api/bookmarks';
+import { genusApi, Genus } from '@/lib/api/genus';
+import { varietyApi, Variety } from '@/lib/api/variety';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { useAuthStore } from '@/lib/store/authStore';
-import { Globe, Users, Rss, RefreshCw, Bookmark, ArrowUp } from 'lucide-react';
+import { Globe, Users, Rss, RefreshCw, Bookmark, ArrowUp, SlidersHorizontal, X } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics';
+import { Button } from '@/components/ui/button';
+import { ComboBox } from '@/components/ui/combobox';
 
 type FeedMode = 'global' | 'following' | 'saved';
 
@@ -19,11 +23,24 @@ export default function FeedPage() {
   const user = useAuthStore((state) => state.user);
   const language = user?.preferredLanguage || 'ru';
 
+  const locale = useLocale();
   const [mode, setMode] = useState<FeedMode>('global');
   const [items, setItems] = useState<FeedItem[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [lastSeenDate, setLastSeenDate] = useState<Date | null>(null);
+
+  // Filters
+  const [showFilters, setShowFilters] = useState(false);
+  const [genusFilter, setGenusFilter] = useState('');
+  const [varietyFilter, setVarietyFilter] = useState('');
+  const [genusSearch, setGenusSearch] = useState('');
+  const [varietySearch, setVarietySearch] = useState('');
+  const [genera, setGenera] = useState<Genus[]>([]);
+  const [varieties, setVarieties] = useState<Variety[]>([]);
+  const [generaLoading, setGeneraLoading] = useState(false);
+  const [filterTrigger, setFilterTrigger] = useState(0);
+  const filtersRef = useRef<FeedFilters>({});
 
   // Pull-to-refresh state
   const [pullY, setPullY] = useState(0);
@@ -60,6 +77,13 @@ export default function FeedPage() {
     cursorRef.current = undefined;
     hasMoreRef.current = true;
     setHasMore(true);
+    // Reset filters on tab switch
+    setGenusFilter('');
+    setVarietyFilter('');
+    setGenusSearch('');
+    setVarietySearch('');
+    filtersRef.current = {};
+    setShowFilters(false);
   }, [mode]);
 
   // Update last-seen timestamp 3 seconds after landing on the page
@@ -77,12 +101,13 @@ export default function FeedPage() {
     setLoading(true);
     try {
       const cursor = cursorRef.current;
+      const filters = filtersRef.current;
       const result =
         mode === 'global'
-          ? await feedApi.getGlobal(cursor)
+          ? await feedApi.getGlobal(cursor, filters)
           : mode === 'following'
-            ? await feedApi.getFollowing(cursor)
-            : await bookmarksApi.getFeed(cursor);
+            ? await feedApi.getFollowing(cursor, filters)
+            : await bookmarksApi.getFeed(cursor, filters);
 
       setItems((prev) => (cursor ? [...prev, ...result.items] : result.items));
       cursorRef.current = result.nextCursor ?? undefined;
@@ -102,6 +127,12 @@ export default function FeedPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
+  // Reload when filters change
+  useEffect(() => {
+    if (filterTrigger > 0) doLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterTrigger]);
+
   const doRefresh = useCallback(async () => {
     if (loadingRef.current) return;
     setIsRefreshing(true);
@@ -110,12 +141,13 @@ export default function FeedPage() {
     setHasMore(true);
     loadingRef.current = true;
     try {
+      const filters = filtersRef.current;
       const result =
         mode === 'global'
-          ? await feedApi.getGlobal(undefined)
+          ? await feedApi.getGlobal(undefined, filters)
           : mode === 'following'
-            ? await feedApi.getFollowing(undefined)
-            : await bookmarksApi.getFeed(undefined);
+            ? await feedApi.getFollowing(undefined, filters)
+            : await bookmarksApi.getFeed(undefined, filters);
       setItems(result.items);
       cursorRef.current = result.nextCursor ?? undefined;
       hasMoreRef.current = result.hasMore;
@@ -176,6 +208,84 @@ export default function FeedPage() {
     observer.observe(element);
     return () => observer.disconnect();
   }, [doLoad]);
+
+  // Load genera when filter panel opens
+  useEffect(() => {
+    if (showFilters && genera.length === 0 && !generaLoading) {
+      setGeneraLoading(true);
+      genusApi.getAll().then((data) => {
+        setGenera(data);
+        setGeneraLoading(false);
+      }).catch(() => setGeneraLoading(false));
+    }
+  }, [showFilters]);
+
+  // Load varieties when genus is selected
+  useEffect(() => {
+    if (genusFilter) {
+      varietyApi.getAll(genusFilter).then(setVarieties).catch(() => {});
+    } else {
+      setVarieties([]);
+      if (varietyFilter) {
+        setVarietyFilter('');
+        filtersRef.current = { ...filtersRef.current, varietyId: undefined };
+      }
+    }
+  }, [genusFilter]);
+
+  const genusOptions = useMemo(() => {
+    const q = genusSearch.toLowerCase();
+    const getDisplayName = (nameRu: string, nameEn: string) =>
+      locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
+    return genera
+      .filter((g) => !q || g.nameRu.toLowerCase().includes(q) || g.nameEn.toLowerCase().includes(q))
+      .map((g) => ({ value: g._id, label: getDisplayName(g.nameRu, g.nameEn) }));
+  }, [genera, genusSearch, locale]);
+
+  const varietyOptions = useMemo(() => {
+    const q = varietySearch.toLowerCase();
+    const getDisplayName = (nameRu: string, nameEn: string) =>
+      locale === 'ru' ? `${nameRu} / ${nameEn}` : nameEn;
+    return varieties
+      .filter((v) => !q || v.nameRu.toLowerCase().includes(q) || v.nameEn.toLowerCase().includes(q))
+      .map((v) => ({ value: v._id, label: getDisplayName(v.nameRu, v.nameEn) }));
+  }, [varieties, varietySearch, locale]);
+
+  const applyFilter = useCallback((newFilters: FeedFilters) => {
+    filtersRef.current = newFilters;
+    setItems([]);
+    cursorRef.current = undefined;
+    hasMoreRef.current = true;
+    setHasMore(true);
+    loadingRef.current = false;
+    setFilterTrigger((n) => n + 1);
+  }, []);
+
+  const handleGenusChange = (value: string) => {
+    setGenusFilter(value);
+    setGenusSearch('');
+    const newFilters = { genusId: value || undefined, varietyId: undefined };
+    setVarietyFilter('');
+    setVarietySearch('');
+    applyFilter(newFilters);
+  };
+
+  const handleVarietyChange = (value: string) => {
+    setVarietyFilter(value);
+    setVarietySearch('');
+    const newFilters = { ...filtersRef.current, varietyId: value || undefined };
+    applyFilter(newFilters);
+  };
+
+  const clearFilters = () => {
+    setGenusFilter('');
+    setVarietyFilter('');
+    setGenusSearch('');
+    setVarietySearch('');
+    applyFilter({});
+  };
+
+  const hasActiveFilters = genusFilter !== '' || varietyFilter !== '';
 
   const isNew = (item: FeedItem): boolean => {
     if (!lastSeenDate) return false;
@@ -262,42 +372,107 @@ export default function FeedPage() {
         </div>
       </div>
 
-      {/* Mode tabs */}
-      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300 mb-2">
-        <button
-          onClick={() => { setMode('global'); trackEvent('feed_tab_switched', { tab: 'global' }); }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === 'global'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
+      {/* Mode tabs + filter button */}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit animate-in fade-in duration-300">
+          <button
+            onClick={() => { setMode('global'); trackEvent('feed_tab_switched', { tab: 'global' }); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === 'global'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Globe className="w-4 h-4 shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'global' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.global')}</span>
+          </button>
+          <button
+            onClick={() => { setMode('following'); trackEvent('feed_tab_switched', { tab: 'following' }); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === 'following'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Users className="w-4 h-4 shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'following' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.following')}</span>
+          </button>
+          <button
+            onClick={() => { setMode('saved'); trackEvent('feed_tab_switched', { tab: 'saved' }); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === 'saved'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Bookmark className="w-4 h-4 shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'saved' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.saved')}</span>
+          </button>
+        </div>
+        <Button
+          variant={hasActiveFilters ? 'default' : 'outline'}
+          onClick={() => setShowFilters((v) => !v)}
+          className="relative shrink-0 h-11 w-11 p-0 rounded-xl"
+          title={t('filters.title')}
         >
-          <Globe className="w-4 h-4 shrink-0" />
-          <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'global' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.global')}</span>
-        </button>
-        <button
-          onClick={() => { setMode('following'); trackEvent('feed_tab_switched', { tab: 'following' }); }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === 'following'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Users className="w-4 h-4 shrink-0" />
-          <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'following' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.following')}</span>
-        </button>
-        <button
-          onClick={() => { setMode('saved'); trackEvent('feed_tab_switched', { tab: 'saved' }); }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === 'saved'
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Bookmark className="w-4 h-4 shrink-0" />
-          <span className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap sm:max-w-none sm:opacity-100 ${mode === 'saved' ? 'max-w-24 opacity-100' : 'max-w-0 opacity-0'}`}>{t('tabs.saved')}</span>
-        </button>
+          <SlidersHorizontal className="w-4 h-4" />
+          {hasActiveFilters && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
+          )}
+        </Button>
       </div>
+
+      {/* Filter panel */}
+      {showFilters && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200 mb-2">
+          <div className="w-full sm:flex-1">
+            <ComboBox
+              options={genusOptions}
+              value={genusFilter}
+              onValueChange={handleGenusChange}
+              placeholder={generaLoading ? t('filters.loading') : t('filters.allGenus')}
+              searchPlaceholder={t('filters.genusPlaceholder')}
+              emptyText={t('filters.emptyText')}
+              onSearchChange={setGenusSearch}
+              className="h-11 rounded-xl border-2 text-base font-normal"
+            />
+          </div>
+          {genusFilter && varieties.length > 0 && (
+            <div className="w-full sm:flex-1">
+              <ComboBox
+                options={varietyOptions}
+                value={varietyFilter}
+                onValueChange={handleVarietyChange}
+                placeholder={t('filters.allVariety')}
+                searchPlaceholder={t('filters.varietyPlaceholder')}
+                emptyText={t('filters.emptyText')}
+                onSearchChange={setVarietySearch}
+                className="h-11 rounded-xl border-2 text-base font-normal"
+              />
+            </div>
+          )}
+          {hasActiveFilters && (
+            <>
+              <Button
+                variant="ghost"
+                onClick={clearFilters}
+                className="shrink-0 h-11 w-11 p-0 rounded-xl hidden sm:flex items-center justify-center"
+                title={t('filters.clear')}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={clearFilters}
+                className="w-full h-11 gap-2 rounded-xl sm:hidden"
+              >
+                <X className="w-4 h-4" />
+                {t('filters.clear')}
+              </Button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Feed */}
       <div className="space-y-4">

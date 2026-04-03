@@ -1010,6 +1010,16 @@
     },
     "emptySaved": {
       "title": "No saved posts yet"
+    },
+    "filters": {
+      "title": "Filters",
+      "allGenus": "All genera",
+      "allVariety": "All varieties",
+      "genusPlaceholder": "Search genus...",
+      "varietyPlaceholder": "Search variety...",
+      "emptyText": "Nothing found",
+      "loading": "Loading...",
+      "clear": "Clear filters"
     }
   },
   "FeedCard": {
