@@ -48,7 +48,7 @@ export function NotificationItem({ notification, onClose }: Props) {
             </p>
           )}
           {notification.data.message && (
-            <p className="text-sm text-muted-foreground leading-snug mt-0.5">
+            <p className="text-sm text-muted-foreground leading-snug mt-0.5 whitespace-pre-wrap">
               {notification.data.message}
             </p>
           )}
