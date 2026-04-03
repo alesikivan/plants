@@ -424,7 +424,7 @@ export default function FeedPage() {
 
       {/* Filter panel */}
       {showFilters && (
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200 mb-2">
+        <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-200 mb-2">
           <div className="w-full sm:flex-1">
             <ComboBox
               options={genusOptions}
@@ -452,24 +452,14 @@ export default function FeedPage() {
             </div>
           )}
           {hasActiveFilters && (
-            <>
-              <Button
-                variant="ghost"
-                onClick={clearFilters}
-                className="shrink-0 h-11 w-11 p-0 rounded-xl hidden sm:flex items-center justify-center"
-                title={t('filters.clear')}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={clearFilters}
-                className="w-full h-11 gap-2 rounded-xl sm:hidden"
-              >
-                <X className="w-4 h-4" />
-                {t('filters.clear')}
-              </Button>
-            </>
+            <Button
+              variant="outline"
+              onClick={clearFilters}
+              className="w-full h-11 gap-2 rounded-xl"
+            >
+              <X className="w-4 h-4" />
+              {t('filters.clear')}
+            </Button>
           )}
         </div>
       )}
