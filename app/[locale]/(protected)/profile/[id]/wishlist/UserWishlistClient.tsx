@@ -258,9 +258,11 @@ export default function UserWishlistClient({
                   </div>
                   <div className="text-center space-y-0.5">
                     <p className="font-medium text-xs text-foreground/90 truncate">{genusName}</p>
-                    {varietyName && (
+                    {varietyName ? (
                       <p className="text-xs text-muted-foreground truncate">{varietyName}</p>
-                    )}
+                    ) : item.note ? (
+                      <p className="text-xs text-muted-foreground">{item.note}</p>
+                    ) : null}
                   </div>
                 </div>
               );
