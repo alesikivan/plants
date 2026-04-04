@@ -10,6 +10,7 @@ export interface Wishlist {
   varietyId?: string | Variety;
   userId: string;
   photo?: string;
+  note?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,6 +18,7 @@ export interface Wishlist {
 export interface CreateWishlistDto {
   genusId: string;
   varietyId?: string;
+  note?: string;
   photo?: File;
 }
 
@@ -25,6 +27,7 @@ export interface UpdateWishlistDto {
   varietyId?: string;
   removeVariety?: boolean;
   removePhoto?: boolean;
+  note?: string;
   photo?: File;
 }
 
@@ -56,6 +59,9 @@ export const wishlistApi = {
     if (data.varietyId) {
       formData.append('varietyId', data.varietyId);
     }
+    if (data.note !== undefined) {
+      formData.append('note', data.note);
+    }
     if (data.photo) {
       formData.append('photo', data.photo);
     }
@@ -82,6 +88,9 @@ export const wishlistApi = {
     }
     if (data.removePhoto) {
       formData.append('removePhoto', 'true');
+    }
+    if (data.note !== undefined) {
+      formData.append('note', data.note);
     }
     if (data.photo) {
       formData.append('photo', data.photo);

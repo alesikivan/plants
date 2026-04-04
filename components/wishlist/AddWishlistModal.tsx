@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { FileInput } from '@/components/ui/file-input';
 import { wishlistApi } from '@/lib/api';
 import { toast } from 'sonner';
@@ -35,6 +36,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
   const t = useTranslations('AddWishlistModal');
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
+  const [note, setNote] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -51,6 +53,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
       await wishlistApi.create({
         genusId: data.genusId,
         varietyId: data.varietyId || undefined,
+        note: note.trim() || undefined,
         photo: selectedFile || undefined,
       });
       trackEvent('wishlist_item_created', { has_photo: !!selectedFile, has_variety: !!data.varietyId });
@@ -58,6 +61,7 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
+      setNote('');
       setPhotoPreview(null);
       setSelectedFile(null);
       onOpenChange(false);
@@ -133,6 +137,22 @@ export function AddWishlistModal({ open, onOpenChange, onSuccess }: AddWishlistM
               required
               genusError={!!errors.genusId}
             />
+
+            {/* Заметка */}
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="note">{t('noteLabel')}</Label>
+                <span className="text-xs text-muted-foreground">{note.length}/60</span>
+              </div>
+              <Textarea
+                id="note"
+                placeholder={t('notePlaceholder')}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                maxLength={60}
+                rows={2}
+              />
+            </div>
 
             {/* Фото растения */}
             <div className="grid gap-2">

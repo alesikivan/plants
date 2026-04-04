@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { FileInput } from '@/components/ui/file-input';
 import { wishlistApi, Wishlist, getWishlistPhotoUrl } from '@/lib/api';
 import { toast } from 'sonner';
@@ -36,6 +37,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
   const t = useTranslations('EditWishlistModal');
   const [selectedGenusId, setSelectedGenusId] = useState<string>('');
   const [selectedVarietyId, setSelectedVarietyId] = useState<string>('');
+  const [note, setNote] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -55,6 +57,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
 
       setSelectedGenusId(genusId);
       setSelectedVarietyId(varietyId || '');
+      setNote(wishlistItem.note || '');
       setValue('genusId', genusId);
       setValue('varietyId', varietyId || '');
 
@@ -73,6 +76,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
         varietyId: selectedVarietyId || undefined,
         removeVariety: !selectedVarietyId,
         removePhoto: removeCurrentPhoto,
+        note: note.trim() || undefined,
         photo: selectedFile || undefined,
       });
       trackEvent('wishlist_item_updated', { has_photo: !!selectedFile, has_variety: !!selectedVarietyId });
@@ -80,6 +84,7 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
       reset();
       setSelectedGenusId('');
       setSelectedVarietyId('');
+      setNote('');
       setPhotoPreview(null);
       setSelectedFile(null);
       setRemoveCurrentPhoto(false);
@@ -157,6 +162,22 @@ export function EditWishlistModal({ open, onOpenChange, onSuccess, wishlistItem 
               required
               genusError={!!errors.genusId}
             />
+
+            {/* Заметка */}
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="note">{t('noteLabel')}</Label>
+                <span className="text-xs text-muted-foreground">{note.length}/60</span>
+              </div>
+              <Textarea
+                id="note"
+                placeholder={t('notePlaceholder')}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                maxLength={60}
+                rows={2}
+              />
+            </div>
 
             {/* Фото растения */}
             <div className="grid gap-2">

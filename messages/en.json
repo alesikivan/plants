@@ -318,6 +318,8 @@
   "AddWishlistModal": {
     "title": "Add to wishlist",
     "description": "Select a plant you want to get",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Where to find it, special wishes...",
     "photoLabel": "Plant photo (optional)",
     "invalidFileType": "Only images are allowed (JPG, JPEG, PNG, GIF, WebP)",
     "cancel": "Cancel",
@@ -329,6 +331,8 @@
   "EditWishlistModal": {
     "title": "Edit wishlist item",
     "description": "Change information about the plant in your wishlist",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Where to find it, special wishes...",
     "photoLabel": "Plant photo (optional)",
     "invalidFileType": "Only images are allowed (JPG, JPEG, PNG, GIF, WebP)",
     "cancel": "Cancel",
@@ -339,6 +343,13 @@
   },
   "WishlistCard": {
     "noName": "No name",
+    "menuLabel": "Open menu",
+    "info": "Information",
+    "infoGenus": "Plant genus",
+    "infoVariety": "Variety",
+    "infoNote": "Note",
+    "noNote": "No note added",
+    "edit": "Edit",
     "deleteTitle": "Delete from wishlist?",
     "deleteDescription": "Are you sure you want to delete \"{name}\" from your wishlist? This action cannot be undone.",
     "cancel": "Cancel",
