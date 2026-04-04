@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -15,6 +16,7 @@ import {
   getFeedAvatarUrl,
 } from '@/lib/api/feed';
 import { trackEvent } from '@/lib/analytics';
+import { PhotoGallery } from '@/components/plants/PhotoGallery';
 
 function formatTimeAgo(dateStr: string, t: any): string {
   const date = new Date(dateStr);
@@ -115,6 +117,7 @@ function PlantFeedCard({
   const tCard = t as any;
   const photoUrl = getFeedPlantPhotoUrl(item.plant.photo);
   const { genusName, varietyName } = getNames(item.plant.genusId, item.plant.varietyId, language);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   return (
     <div className={`relative bg-card border border-border rounded-2xl overflow-hidden`}>
@@ -144,34 +147,45 @@ function PlantFeedCard({
         )}
       </div>
 
-      <Link href={`/profile/${item.user._id}/plants/${item.plant._id}`} className="block" onClick={() => trackEvent('feed_card_clicked', { type: 'plant' })}>
-        {/* Plant name badge above image */}
-        <div className="px-4 pb-2">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-            {genusName}{varietyName ? ` · ${varietyName}` : ''}
-          </span>
-        </div>
+      {/* Plant name badge — navigates to plant page */}
+      <div className="px-4 pb-2">
+        <Link
+          href={`/profile/${item.user._id}/plants/${item.plant._id}`}
+          onClick={() => trackEvent('feed_card_clicked', { type: 'plant' })}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+        >
+          {genusName}{varietyName ? ` · ${varietyName}` : ''}
+        </Link>
+      </div>
 
-        {/* Full-width image */}
-        {photoUrl && (
-          <div className="aspect-[4/3] overflow-hidden">
-            <img
-              src={photoUrl}
-              alt={genusName}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+      {/* Full-width image — opens gallery */}
+      {photoUrl && (
+        <button
+          onClick={() => setGalleryOpen(true)}
+          className="block w-full aspect-[4/3] overflow-hidden"
+        >
+          <img
+            src={photoUrl}
+            alt={genusName}
+            className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+          />
+        </button>
+      )}
 
-        {/* Description */}
-        {item.plant.description ? (
-          <p className="px-4 pt-3 pb-4 text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
-            {item.plant.description}
-          </p>
-        ) : (
-          ''
-        )}
-      </Link>
+      {/* Description */}
+      {item.plant.description && (
+        <p className="px-4 pt-3 pb-4 text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+          {item.plant.description}
+        </p>
+      )}
+
+      {galleryOpen && photoUrl && (
+        <PhotoGallery
+          photos={[photoUrl]}
+          initialIndex={0}
+          onClose={() => setGalleryOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -196,6 +210,8 @@ function HistoryFeedCard({
     language,
   );
   const photos = item.historyEntry.photos;
+  const photoUrls = photos.map((p) => getFeedHistoryPhotoUrl(p)!);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   const gridClass =
     photos.length === 1
@@ -234,12 +250,12 @@ function HistoryFeedCard({
         )}
       </div>
 
-      {/* Plant badge */}
+      {/* Plant badge — navigates to plant page */}
       <div className="px-4 pb-2">
         <Link
           href={`/profile/${item.user._id}/plants/${item.plantMeta._id}`}
-          onClick={(e) => { e.stopPropagation(); trackEvent('feed_card_clicked', { type: 'plant_history' }); }}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+          onClick={() => trackEvent('feed_card_clicked', { type: 'plant_history' })}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
         >
           <span>{genusName}{varietyName ? ` · ${varietyName}` : ''}</span>
         </Link>
@@ -252,14 +268,13 @@ function HistoryFeedCard({
         </p>
       )}
 
-      {/* Photos */}
+      {/* Photos — open gallery on click */}
       {photos.length > 0 && (
         <div className={`grid gap-0.5 ${gridClass}`}>
           {photos.slice(0, 3).map((photo, index) => (
-            <Link
+            <button
               key={photo}
-              href={`/profile/${item.user._id}/plants/${item.plantMeta._id}`}
-              onClick={() => trackEvent('feed_card_clicked', { type: 'plant_history' })}
+              onClick={() => setSelectedPhotoIndex(index)}
               className="relative aspect-square overflow-hidden bg-muted block"
             >
               <img
@@ -272,13 +287,21 @@ function HistoryFeedCard({
                   <span className="text-white font-semibold text-xl">+{photos.length - 3}</span>
                 </div>
               )}
-            </Link>
+            </button>
           ))}
         </div>
       )}
 
       {/* Bottom padding when no comment and no photos */}
       {!item.historyEntry.comment && photos.length === 0 && <div className="pb-4" />}
+
+      {selectedPhotoIndex !== null && (
+        <PhotoGallery
+          photos={photoUrls}
+          initialIndex={selectedPhotoIndex}
+          onClose={() => setSelectedPhotoIndex(null)}
+        />
+      )}
     </div>
   );
 }
