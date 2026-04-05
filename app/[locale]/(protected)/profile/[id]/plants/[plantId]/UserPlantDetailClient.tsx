@@ -12,6 +12,7 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
+import { PublicPlantMenu } from '@/components/plants/PublicPlantMenu';
 import { DiscoverBanner } from '@/components/public/DiscoverBanner';
 
 interface UserPlantDetailClientProps {
@@ -216,6 +217,10 @@ export default function UserPlantDetailClient({
                   <h1 className="text-xl sm:text-2xl font-semibold">
                     {plantName || 'Noname'}
                   </h1>
+
+                  {user && !isOwnPlant && plant && profile && (
+                    <PublicPlantMenu plant={plant} userId={userId} username={profile.name} />
+                  )}
 
                   {user && !isOwnPlant && (
                     <Button

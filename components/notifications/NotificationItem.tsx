@@ -61,14 +61,15 @@ export function NotificationItem({ notification, onClose }: Props) {
 
   // User-triggered notifications
   const href =
-    notification.type === 'new_follower'
+    notification.type === 'new_follower' || notification.type === 'wishlist_saved'
       ? `/profile/${notification.actor?.id}`
       : `/plants/${notification.data.plantId}`;
 
   const actionKey = notification.type as
     | 'new_follower'
     | 'new_bookmark_plant'
-    | 'new_bookmark_history';
+    | 'new_bookmark_history'
+    | 'wishlist_saved';
 
   return (
     <Link href={href} onClick={onClose} className={baseClass}>

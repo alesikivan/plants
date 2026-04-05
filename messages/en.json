@@ -1487,7 +1487,19 @@
       "new_follower": "followed you",
       "new_bookmark_plant": "saved your plant",
       "new_bookmark_history": "saved your plant update",
+      "wishlist_saved": "saved your plant to their wishlist",
       "system": "System notification"
     }
+  },
+  "PlantCardMenu": {
+    "menuAlt": "Plant menu",
+    "addToWishlist": "Save to my wishlist",
+    "loading": "Saving...",
+    "success": "Added to wishlist",
+    "error": "Failed to add to wishlist",
+    "confirmTitle": "Plant already in wishlist",
+    "confirmDescription": "You already have a plant with the same variety and genus in your wishlist. Are you sure you want to add another one?",
+    "confirmCancel": "Cancel",
+    "confirmAdd": "Add"
   }
 }

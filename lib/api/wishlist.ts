@@ -20,6 +20,8 @@ export interface CreateWishlistDto {
   varietyId?: string;
   note?: string;
   photo?: File;
+  sourceUserId?: string;
+  sourceUsername?: string;
 }
 
 export interface UpdateWishlistDto {
@@ -64,6 +66,12 @@ export const wishlistApi = {
     }
     if (data.photo) {
       formData.append('photo', data.photo);
+    }
+    if (data.sourceUserId) {
+      formData.append('sourceUserId', data.sourceUserId);
+    }
+    if (data.sourceUsername) {
+      formData.append('sourceUsername', data.sourceUsername);
     }
 
     const response = await apiClient.post<Wishlist>('/wishlist', formData, {

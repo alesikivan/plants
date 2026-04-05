@@ -8,7 +8,7 @@ export interface NotificationActor {
 
 export interface NotificationItem {
   id: string;
-  type: 'new_follower' | 'new_bookmark_plant' | 'new_bookmark_history' | 'system';
+  type: 'new_follower' | 'new_bookmark_plant' | 'new_bookmark_history' | 'wishlist_saved' | 'system';
   actor: NotificationActor;
   data: Record<string, string>;
   isRead: boolean;

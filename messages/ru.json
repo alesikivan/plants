@@ -1490,7 +1490,19 @@
       "new_follower": "подписался на вас",
       "new_bookmark_plant": "сохранил ваше растение",
       "new_bookmark_history": "сохранил запись вашего растения",
+      "wishlist_saved": "сохранил ваше растение себе в список желаний",
       "system": "Системное уведомление"
     }
+  },
+  "PlantCardMenu": {
+    "menuAlt": "Меню растения",
+    "addToWishlist": "Сохранить в мой wishlist",
+    "loading": "Сохранение...",
+    "success": "Добавлено в wishlist",
+    "error": "Не удалось добавить в wishlist",
+    "confirmTitle": "Растение уже в список желаний",
+    "confirmDescription": "У вас уже есть в wishlist растение с таким же сортом и родом. Вы уверены, что хотите добавить еще одно?",
+    "confirmCancel": "Отмена",
+    "confirmAdd": "Добавить"
   }
 }

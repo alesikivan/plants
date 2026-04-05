@@ -11,6 +11,7 @@ import { getDisplayName } from '@/lib/utils/language';
 import { toast } from 'sonner';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
 import { DiscoverBanner } from '@/components/public/DiscoverBanner';
+import { PublicPlantMenu } from '@/components/plants/PublicPlantMenu';
 
 interface PublicUserPlantDetailClientProps {
   initialPlant?: Plant | null;

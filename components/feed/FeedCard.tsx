@@ -17,6 +17,7 @@ import {
 } from '@/lib/api/feed';
 import { trackEvent } from '@/lib/analytics';
 import { PhotoGallery } from '@/components/plants/PhotoGallery';
+import { PlantCardMenu } from './PlantCardMenu';
 
 function formatTimeAgo(dateStr: string, t: any): string {
   const date = new Date(dateStr);
@@ -143,7 +144,10 @@ function PlantFeedCard({
           {formatTimeAgo(item.createdAt, tCard)}
         </span>
         {!item.isOwnItem && onBookmarkToggle && (
-          <BookmarkButton isBookmarked={item.isBookmarked} onToggle={onBookmarkToggle} t={tCard} />
+          <div className="flex items-center gap-1">
+            <BookmarkButton isBookmarked={item.isBookmarked} onToggle={onBookmarkToggle} t={tCard} />
+            <PlantCardMenu item={item} />
+          </div>
         )}
       </div>
 
