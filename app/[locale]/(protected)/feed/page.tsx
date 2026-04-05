@@ -46,6 +46,7 @@ export default function FeedPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartYRef = useRef(0);
   const newItemIdsRef = useRef<Set<string>>(new Set());
+  const isLoadingNewItemsRef = useRef(false);
   const PULL_THRESHOLD = 70;
 
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -223,10 +224,17 @@ export default function FeedPage() {
 
   // Handle "New items" button click
   const handleNewItems = useCallback(async () => {
-    // Save current item IDs before refresh
-    const oldItemIds = new Set(items.map(i => i._id));
-    await queryClient.invalidateQueries({ queryKey: ['feed', mode] });
+    // Prevent multiple clicks
+    if (isLoadingNewItemsRef.current) return;
+    isLoadingNewItemsRef.current = true;
+
+    // Scroll to top first (synchronous, no await)
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Then load new items
+    const oldItemIds = new Set(items.map(i => i._id));
+
+    await queryClient.invalidateQueries({ queryKey: ['feed', mode] });
     probe.reset();
 
     // After items load, find new ones
@@ -247,9 +255,10 @@ export default function FeedPage() {
         localStorage.setItem(STORAGE_KEY(mode), now.toISOString());
         setLastSeenDate(now);
 
-        // Clear new items after 3 seconds
+        // Unblock button and clear new items after 3 seconds
         setTimeout(() => {
           newItemIdsRef.current.clear();
+          isLoadingNewItemsRef.current = false;
         }, 3000);
       }, 100);
     }
