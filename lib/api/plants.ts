@@ -28,6 +28,7 @@ export interface CreatePlantDto {
   purchaseDate?: string;
   photo?: File;
   description?: string;
+  withFirstHistory?: boolean;
 }
 
 export interface UpdatePlantDto {
@@ -56,6 +57,7 @@ export interface CreatePlantHistoryDto {
   date: string;
   comment?: string;
   photos?: File[];
+  skipNotification?: boolean;
 }
 
 export interface UpdatePlantHistoryDto {
@@ -133,6 +135,9 @@ export const plantsApi = {
     }
     if (data.description) {
       formData.append('description', data.description);
+    }
+    if (data.withFirstHistory) {
+      formData.append('withFirstHistory', 'true');
     }
 
     const response = await apiClient.post<Plant>('/plants', formData, {
@@ -243,6 +248,9 @@ export const plantHistoryApi = {
       data.photos.forEach((photo) => {
         formData.append('photos', photo);
       });
+    }
+    if (data.skipNotification) {
+      formData.append('skipNotification', 'true');
     }
 
     const response = await apiClient.post<PlantHistory>(

@@ -18,8 +18,9 @@ import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileInput } from '@/components/ui/file-input';
 import { MultiComboBox } from '@/components/ui/multi-combobox';
-import { plantsApi, shelvesApi, Shelf } from '@/lib/api';
+import { plantsApi, plantHistoryApi, shelvesApi, Shelf } from '@/lib/api';
 import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox';
 import { PlantSelector } from './PlantSelector';
 import { trackEvent } from '@/lib/analytics';
 
@@ -50,6 +51,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   const [isLoadingShelves, setIsLoadingShelves] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [createFirstHistory, setCreateFirstHistory] = useState(false);
+  const [historyComment, setHistoryComment] = useState('');
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<PlantFormData>();
   const description = watch('description') ?? '';
@@ -70,6 +73,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       setPurchaseDate(new Date());
       setPhotoPreview(null);
       setSelectedFile(null);
+      setCreateFirstHistory(false);
+      setHistoryComment('');
     }
   }, [open]);
 
@@ -96,13 +101,14 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   const onSubmit = async (data: PlantFormData) => {
     setIsLoading(true);
     try {
-      await plantsApi.create({
+      const plant = await plantsApi.create({
         genusId: data.genusId,
         varietyId: data.varietyId || undefined,
         shelfIds: selectedShelfIds.length > 0 ? selectedShelfIds : undefined,
         purchaseDate: purchaseDate ? purchaseDate.toISOString() : undefined,
         photo: selectedFile || undefined,
         description: data.description || undefined,
+        withFirstHistory: createFirstHistory && !!selectedFile,
       });
       trackEvent('plant_created', {
         has_photo: !!selectedFile,
@@ -110,6 +116,20 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
         has_shelves: selectedShelfIds.length > 0,
         has_description: !!(data.description),
       });
+
+      if (createFirstHistory && selectedFile) {
+        try {
+          await plantHistoryApi.create(plant._id, {
+            date: (purchaseDate ?? new Date()).toISOString(),
+            comment: historyComment || undefined,
+            photos: [selectedFile],
+            skipNotification: true,
+          });
+        } catch {
+          toast.error(t('toasts.historyError'));
+        }
+      }
+
       toast.success(t('toasts.success'));
       reset();
       setSelectedGenusId('');
@@ -118,6 +138,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       setPurchaseDate(new Date());
       setPhotoPreview(null);
       setSelectedFile(null);
+      setCreateFirstHistory(false);
+      setHistoryComment('');
       onOpenChange(false);
       onSuccess();
     } catch (error) {
@@ -237,6 +259,49 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
                 maxSize={5 * 1024 * 1024}
                 acceptedFormats={['JPG', 'PNG', 'GIF', 'WebP', 'HEIC']}
               />
+            </div>
+
+            {/* Создать первую историю */}
+            <div
+              className={`rounded-lg border-2 p-3 transition-all ${
+                !selectedFile
+                  ? 'border-dashed border-muted-foreground/20 opacity-60'
+                  : createFirstHistory
+                  ? 'border-primary bg-primary/5'
+                  : 'border-dashed border-muted-foreground/30 hover:border-muted-foreground/60'
+              }`}
+            >
+              <label
+                htmlFor="createFirstHistory"
+                className={`flex items-center gap-3 ${selectedFile ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <Checkbox
+                  id="createFirstHistory"
+                  checked={createFirstHistory}
+                  disabled={!selectedFile}
+                  onCheckedChange={(checked) => setCreateFirstHistory(!!checked)}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium leading-tight">
+                    {t('firstHistory')}
+                  </span>
+                  <span className="text-xs text-muted-foreground mt-0.5">
+                    {selectedFile ? t('firstHistoryHint') : t('firstHistoryNoPhoto')}
+                  </span>
+                </div>
+              </label>
+              {createFirstHistory && selectedFile && (
+                <div className="mt-3">
+                  <Textarea
+                    placeholder={t('historyCommentPlaceholder')}
+                    value={historyComment}
+                    onChange={(e) => setHistoryComment(e.target.value)}
+                    rows={2}
+                    maxLength={600}
+                    className="focus-visible:ring-0 focus-visible:border-input"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Описание */}

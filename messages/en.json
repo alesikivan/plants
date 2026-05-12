@@ -657,6 +657,10 @@
     "purchaseDate": "Purchase date",
     "purchaseDatePlaceholder": "Select purchase date",
     "photo": "Plant photo",
+    "firstHistory": "Create first history entry",
+    "firstHistoryHint": "The plant photo will be added to history",
+    "firstHistoryNoPhoto": "Upload a plant photo first",
+    "historyCommentPlaceholder": "Comment for the entry (optional)...",
     "descriptionPlaceholder": "Add a description of your plant...",
     "descriptionMaxLength": "limit reached",
     "buttons": {
@@ -668,7 +672,8 @@
       "success": "Plant added successfully!",
       "error": "Failed to add plant",
       "shelvesError": "Failed to load shelves",
-      "dateFound": "Purchase date updated from photo data: {date}"
+      "dateFound": "Purchase date updated from photo data: {date}",
+      "historyError": "Plant created, but failed to add history entry"
     }
   },
   "EditPlantModal": {

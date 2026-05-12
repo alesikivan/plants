@@ -657,6 +657,10 @@
     "purchaseDate": "Дата покупки",
     "purchaseDatePlaceholder": "Выберите дату покупки",
     "photo": "Фото растения",
+    "firstHistory": "Создать первую запись в истории",
+    "firstHistoryHint": "Фото растения будет добавлено в историю",
+    "firstHistoryNoPhoto": "Сначала загрузите фото растения",
+    "historyCommentPlaceholder": "Комментарий к записи (необязательно)...",
     "descriptionPlaceholder": "Добавьте описание вашего растения...",
     "descriptionMaxLength": "достигнут лимит",
     "buttons": {
@@ -668,7 +672,8 @@
       "success": "Растение успешно добавлено!",
       "error": "Ошибка при добавлении растения",
       "shelvesError": "Ошибка загрузки полок",
-      "dateFound": "Дата покупки обновлена по данным фото: {date}"
+      "dateFound": "Дата покупки обновлена по данным фото: {date}",
+      "historyError": "Растение создано, но не удалось добавить запись в историю"
     }
   },
   "EditPlantModal": {
