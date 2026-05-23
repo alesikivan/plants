@@ -19,12 +19,29 @@ export const usersApi = {
     return response.data;
   },
 
-  // Search users with optional query and sort
-  searchUsers: async (query?: string, sort?: string): Promise<UserProfileWithStats[]> => {
+  // Search users with optional query, sort and pagination
+  searchUsers: async (
+    query?: string,
+    sort?: string,
+    page: number = 1,
+    limit: number = 24,
+  ): Promise<{
+    items: UserProfileWithStats[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> => {
     const params: Record<string, string> = {};
     if (query) params.q = query;
     if (sort) params.sort = sort;
-    const response = await apiClient.get<UserProfileWithStats[]>('/users/search', { params });
+    params.page = String(page);
+    params.limit = String(limit);
+    const response = await apiClient.get<{
+      items: UserProfileWithStats[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }>('/users/search', { params });
     return response.data;
   },
 

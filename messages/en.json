@@ -484,6 +484,9 @@
   "PublicHeader": {
     "startFree": "Start now!"
   },
+  "Pagination": {
+    "range": "{from}–{to} of {total}"
+  },
   "UsersPage": {
     "header": {
       "title": "Users",

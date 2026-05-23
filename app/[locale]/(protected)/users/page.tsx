@@ -13,8 +13,11 @@ import Image from 'next/image';
 import { toast } from 'sonner';
 import { trackEvent } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 
 type SortOption = 'newest' | 'oldest' | 'mostPlants';
+
+const PAGE_SIZE = 24;
 
 export default function UsersPage() {
   const router = useRouter();
@@ -24,16 +27,20 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('mostPlants');
   const [isSearching, setIsSearching] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    loadUsers();
+    loadUsers(undefined, undefined, 1);
   }, []);
 
-  const loadUsers = async (query?: string, sort?: SortOption) => {
+  const loadUsers = async (query?: string, sort?: SortOption, pageVal: number = 1) => {
     setIsLoading(true);
     try {
-      const data = await usersApi.searchUsers(query, sort || sortBy);
-      setUsers(data);
+      const data = await usersApi.searchUsers(query, sort || sortBy, pageVal, PAGE_SIZE);
+      setUsers(data.items);
+      setTotal(data.total);
+      setPage(data.page);
     } catch (error) {
       toast.error(t('error'));
       console.error('Failed to load users:', error);
@@ -47,20 +54,28 @@ export default function UsersPage() {
     e.preventDefault();
     if (searchQuery) trackEvent('users_searched', { query_length: searchQuery.length });
     setIsSearching(true);
-    loadUsers(searchQuery);
+    loadUsers(searchQuery, sortBy, 1);
   };
 
   const handleClearSearch = () => {
     trackEvent('users_search_cleared');
     setSearchQuery('');
     setIsSearching(true);
-    loadUsers();
+    loadUsers(undefined, sortBy, 1);
   };
 
   const handleSortChange = (value: SortOption) => {
     setSortBy(value);
     trackEvent('users_sorted', { sort: value });
-    loadUsers(searchQuery, value);
+    loadUsers(searchQuery, value, 1);
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    trackEvent('users_page_changed', { page: nextPage });
+    loadUsers(searchQuery, sortBy, nextPage);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   if (isLoading && users.length === 0) {
@@ -207,6 +222,15 @@ export default function UsersPage() {
             </Card>
           ))}
         </div>
+      )}
+
+      {users.length > 0 && (
+        <Pagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          total={total}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

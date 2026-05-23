@@ -484,6 +484,9 @@
   "PublicHeader": {
     "startFree": "Начать сейчас!"
   },
+  "Pagination": {
+    "range": "{from}–{to} из {total}"
+  },
   "UsersPage": {
     "header": {
       "title": "Пользователи",
