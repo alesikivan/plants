@@ -1560,5 +1560,8 @@
     "publishRecent": "Publish my 5 latest plants right away",
     "publishRecentHint": "The bot will post your 5 most recently added (non-archived) plants to the community",
     "decline": "Don't publish"
+  },
+  "TelegramTopBar": {
+    "text": "We're on Telegram — join us"
   }
 }

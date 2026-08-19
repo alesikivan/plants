@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import type { AppLocale } from '@/i18n/routing';
 import { trackEvent } from '@/lib/analytics';
 import { TelegramCommunityBanner } from '@/components/telegram/TelegramCommunityBanner';
+import { TelegramTopBar } from '@/components/telegram/TelegramTopBar';
 
 export default function ProtectedShell({
   children,
@@ -39,6 +40,7 @@ export default function ProtectedShell({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex flex-col">
+      <TelegramTopBar />
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex h-16 items-center justify-between">
