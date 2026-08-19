@@ -15,7 +15,7 @@ module.exports = {
   deploy: {
     production: {
       user: 'root',
-      host: '77.37.49.238',
+      host: '72.61.176.248',
       ref: 'origin/main',
       repo: 'https://github.com/alesikivan/plants',
       path: '/root/apps/plants-frontend',
