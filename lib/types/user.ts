@@ -21,6 +21,9 @@ export interface UserResponse {
   showPlantHistory: boolean;
   showWishlist: boolean;
   isBlocked: boolean;
+  telegramPublishPlants: boolean;
+  telegramPublishHistory: boolean;
+  telegramBannerDismissed: boolean;
   bio?: string;
   avatar?: string;
   socialLinks?: SocialLink[];
@@ -36,6 +39,9 @@ export interface UpdateUserDto {
   showShelves?: boolean;
   showPlantHistory?: boolean;
   showWishlist?: boolean;
+  telegramPublishPlants?: boolean;
+  telegramPublishHistory?: boolean;
+  telegramBannerDismissed?: boolean;
   socialLinks?: SocialLink[];
 }
 

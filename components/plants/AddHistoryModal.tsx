@@ -9,9 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/date-picker';
 import { MultiFileInput } from '@/components/ui/multi-file-input';
-import { Calendar } from 'lucide-react';
+import { Calendar, Send } from 'lucide-react';
 import { plantHistoryApi, CreatePlantHistoryDto } from '@/lib/api';
 import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useAuthStore } from '@/lib/store/authStore';
 
 interface AddHistoryModalProps {
   open: boolean;
@@ -33,6 +35,10 @@ export function AddHistoryModal({
   const [comment, setComment] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const telegramPublishEnabled = useAuthStore(
+    (state) => !!state.user?.telegramPublishHistory && (state.user?.showPlants ?? true) && (state.user?.showPlantHistory ?? true),
+  );
+  const [publishToTelegram, setPublishToTelegram] = useState(true);
 
   useEffect(() => {
     if (!open) {
@@ -41,6 +47,7 @@ export function AddHistoryModal({
       setComment('');
       setPhotos([]);
       setPhotoPreviews([]);
+      setPublishToTelegram(true);
     }
   }, [open]);
 
@@ -100,6 +107,7 @@ export function AddHistoryModal({
         date: date.toISOString(),
         comment: comment.trim() || undefined,
         photos,
+        publishToTelegram: telegramPublishEnabled ? publishToTelegram : undefined,
       };
 
       await plantHistoryApi.create(plantId, historyData);
@@ -163,6 +171,34 @@ export function AddHistoryModal({
               maxFiles={3}
             />
           </div>
+
+          {/* Публикация в Telegram-сообщество (только если включена автопубликация) */}
+          {telegramPublishEnabled && (
+            <div
+              className={`rounded-lg border-2 p-3 transition-all ${
+                publishToTelegram
+                  ? 'border-primary bg-primary/5'
+                  : 'border-dashed border-muted-foreground/30 hover:border-muted-foreground/60'
+              }`}
+            >
+              <label htmlFor="historyPublishToTelegram" className="flex items-center gap-3 cursor-pointer">
+                <Checkbox
+                  id="historyPublishToTelegram"
+                  checked={publishToTelegram}
+                  onCheckedChange={(checked) => setPublishToTelegram(!!checked)}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium leading-tight flex items-center gap-1.5">
+                    <Send className="h-3.5 w-3.5 text-primary" />
+                    {t('publishToTelegram')}
+                  </span>
+                  <span className="text-xs text-muted-foreground mt-0.5">
+                    {t('publishToTelegramHint')}
+                  </span>
+                </div>
+              </label>
+            </div>
+          )}
 
           <DialogFooter>
             <Button

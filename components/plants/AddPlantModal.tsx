@@ -23,6 +23,8 @@ import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlantSelector } from './PlantSelector';
 import { trackEvent } from '@/lib/analytics';
+import { useAuthStore } from '@/lib/store/authStore';
+import { Send } from 'lucide-react';
 
 interface AddPlantModalProps {
   open: boolean;
@@ -52,6 +54,8 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [createFirstHistory, setCreateFirstHistory] = useState(false);
+  const telegramPublishEnabled = useAuthStore((state) => !!state.user?.telegramPublishPlants && (state.user?.showPlants ?? true));
+  const [publishToTelegram, setPublishToTelegram] = useState(true);
   const [historyComment, setHistoryComment] = useState('');
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<PlantFormData>();
@@ -75,6 +79,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       setSelectedFile(null);
       setCreateFirstHistory(false);
       setHistoryComment('');
+      setPublishToTelegram(true);
     }
   }, [open]);
 
@@ -109,12 +114,14 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
         photo: selectedFile || undefined,
         description: data.description || undefined,
         withFirstHistory: createFirstHistory && !!selectedFile,
+        publishToTelegram: telegramPublishEnabled ? publishToTelegram : undefined,
       });
       trackEvent('plant_created', {
         has_photo: !!selectedFile,
         has_variety: !!data.varietyId,
         has_shelves: selectedShelfIds.length > 0,
         has_description: !!(data.description),
+        telegram_publish: telegramPublishEnabled ? publishToTelegram : null,
       });
 
       if (createFirstHistory && selectedFile) {
@@ -140,6 +147,7 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
       setSelectedFile(null);
       setCreateFirstHistory(false);
       setHistoryComment('');
+      setPublishToTelegram(true);
       onOpenChange(false);
       onSuccess();
     } catch (error) {
@@ -303,6 +311,34 @@ export function AddPlantModal({ open, onOpenChange, onSuccess }: AddPlantModalPr
                 </div>
               )}
             </div>
+
+            {/* Публикация в Telegram-сообщество (только если включена автопубликация) */}
+            {telegramPublishEnabled && (
+              <div
+                className={`rounded-lg border-2 p-3 transition-all ${
+                  publishToTelegram
+                    ? 'border-primary bg-primary/5'
+                    : 'border-dashed border-muted-foreground/30 hover:border-muted-foreground/60'
+                }`}
+              >
+                <label htmlFor="publishToTelegram" className="flex items-center gap-3 cursor-pointer">
+                  <Checkbox
+                    id="publishToTelegram"
+                    checked={publishToTelegram}
+                    onCheckedChange={(checked) => setPublishToTelegram(!!checked)}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium leading-tight flex items-center gap-1.5">
+                      <Send className="h-3.5 w-3.5 text-primary" />
+                      {t('publishToTelegram')}
+                    </span>
+                    <span className="text-xs text-muted-foreground mt-0.5">
+                      {t('publishToTelegramHint')}
+                    </span>
+                  </div>
+                </label>
+              </div>
+            )}
 
             {/* Описание */}
             <div className="grid gap-2">

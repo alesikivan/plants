@@ -29,6 +29,8 @@ export interface CreatePlantDto {
   photo?: File;
   description?: string;
   withFirstHistory?: boolean;
+  /** false = do not publish this particular plant to the Telegram community */
+  publishToTelegram?: boolean;
 }
 
 export interface UpdatePlantDto {
@@ -58,6 +60,8 @@ export interface CreatePlantHistoryDto {
   comment?: string;
   photos?: File[];
   skipNotification?: boolean;
+  /** false = do not publish this particular history entry to the Telegram community */
+  publishToTelegram?: boolean;
 }
 
 export interface UpdatePlantHistoryDto {
@@ -115,6 +119,12 @@ export const plantsApi = {
     await apiClient.patch('/plants/reorder', { ids });
   },
 
+  /** One-off: publish the user's 5 most recent plants to the Telegram community */
+  publishRecentToTelegram: async (): Promise<{ published: number }> => {
+    const response = await apiClient.post<{ published: number }>('/plants/telegram/publish-recent');
+    return response.data;
+  },
+
   create: async (data: CreatePlantDto): Promise<Plant> => {
     const formData = new FormData();
     formData.append('genusId', data.genusId);
@@ -138,6 +148,9 @@ export const plantsApi = {
     }
     if (data.withFirstHistory) {
       formData.append('withFirstHistory', 'true');
+    }
+    if (data.publishToTelegram === false) {
+      formData.append('publishToTelegram', 'false');
     }
 
     const response = await apiClient.post<Plant>('/plants', formData, {
@@ -251,6 +264,9 @@ export const plantHistoryApi = {
     }
     if (data.skipNotification) {
       formData.append('skipNotification', 'true');
+    }
+    if (data.publishToTelegram === false) {
+      formData.append('publishToTelegram', 'false');
     }
 
     const response = await apiClient.post<PlantHistory>(

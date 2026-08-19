@@ -12,6 +12,7 @@ import { getAvatarUrl } from '@/lib/api/users';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { TelegramBroadcastForm } from '@/components/admin/TelegramBroadcastForm';
 
 interface UserOption {
   id: string;
@@ -29,6 +30,7 @@ export default function AdminNotificationsPage() {
   const [search, setSearch] = useState('');
   const [sending, setSending] = useState(false);
   const [sentCount, setSentCount] = useState<number | null>(null);
+  const [channel, setChannel] = useState<'app' | 'telegram'>('app');
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -93,11 +95,41 @@ export default function AdminNotificationsPage() {
         </div>
         <div>
           <h1 className="text-xl font-semibold">Рассылка уведомлений</h1>
-          <p className="text-sm text-muted-foreground">Системные уведомления для пользователей</p>
+          <p className="text-sm text-muted-foreground">
+            {channel === 'app' ? 'Системные уведомления для пользователей' : 'Сообщение от имени бота в Telegram-сообщество'}
+          </p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-border/50 bg-card p-5 space-y-5">
+      {/* Channel switcher */}
+      <div className="inline-flex rounded-lg border border-border/60 bg-muted/40 p-1">
+        <button
+          type="button"
+          onClick={() => setChannel('app')}
+          className={cn(
+            'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors',
+            channel === 'app' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <Bell className="w-4 h-4" />
+          В приложении
+        </button>
+        <button
+          type="button"
+          onClick={() => setChannel('telegram')}
+          className={cn(
+            'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors',
+            channel === 'telegram' ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <Send className="w-4 h-4" />
+          Отправка в Telegram
+        </button>
+      </div>
+
+      {channel === 'telegram' && <TelegramBroadcastForm />}
+
+      <div className={cn('rounded-xl border border-border/50 bg-card p-5 space-y-5', channel !== 'app' && 'hidden')}>
         {/* Title */}
         <div className="space-y-1.5">
           <Label htmlFor="notif-title">Заголовок</Label>

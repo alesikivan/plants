@@ -677,7 +677,9 @@
       "shelvesError": "Failed to load shelves",
       "dateFound": "Purchase date updated from photo data: {date}",
       "historyError": "Plant created, but failed to add history entry"
-    }
+    },
+    "publishToTelegram": "Publish to Telegram community",
+    "publishToTelegramHint": "Uncheck if you don't want to publish this particular plant"
   },
   "EditPlantModal": {
     "title": "Edit plant",
@@ -837,7 +839,9 @@
       "success": "Entry added!",
       "error": "Failed to add entry",
       "dateFound": "Date updated from photo metadata: {date}"
-    }
+    },
+    "publishToTelegram": "Publish to Telegram community",
+    "publishToTelegramHint": "Uncheck if you don't want to publish this particular entry"
   },
   "EditHistoryModal": {
     "title": "Edit entry",
@@ -1446,6 +1450,24 @@
     "copyLink": {
       "successToast": "Profile link copied",
       "errorToast": "Failed to copy profile link"
+    },
+    "telegram": {
+      "title": "Telegram community",
+      "description": "PlantSheep plant lovers chat and automatic publishing of your plants to it",
+      "join": "Open community",
+      "publishPlants": {
+        "label": "Publish new plants",
+        "description": "When you add a plant, the bot posts it to the community (can be turned off per plant)",
+        "requiresPlants": "Unavailable while plants are hidden in privacy settings"
+      },
+      "publishHistory": {
+        "label": "Publish history entries",
+        "description": "New plant history entries will be posted to the community (can be turned off per entry)",
+        "requiresPlants": "Unavailable while plants are hidden in privacy settings",
+        "requiresHistory": "Unavailable while plant history is hidden in privacy settings"
+      },
+      "successToast": "Settings saved",
+      "errorToast": "Failed to save settings"
     }
   },
   "ApiError": {
@@ -1509,5 +1531,34 @@
     "confirmDescription": "You already have a plant with the same variety and genus in your wishlist. Are you sure you want to add another one?",
     "confirmCancel": "Cancel",
     "confirmAdd": "Add"
+  },
+  "TelegramBanner": {
+    "new": {
+      "title": "Welcome to PlantSheep! 🌱 We have a Telegram community",
+      "description": "Join our plant lovers chat: talk, share experience and photos, ask questions. Your new plants and history entries can also be published to the community automatically — set it up below."
+    },
+    "existing": {
+      "title": "New: PlantSheep Telegram community 🌱",
+      "description": "We now have a plant lovers chat: conversations, shared experience, plant photos in a convenient format. Your new plants and history entries can be auto-published to the community — choose what to share."
+    },
+    "publishPlants": "Publish new plants",
+    "publishPlantsHint": "Post to the community when you add a plant",
+    "publishHistory": "Publish history entries",
+    "publishHistoryHint": "New plant history entries go to the community",
+    "requiresPublicPlants": "Unavailable: plants are hidden in privacy settings",
+    "requiresPublicHistory": "Unavailable: plant history is hidden in privacy settings",
+    "join": "Open Telegram",
+    "save": "Save and close",
+    "saving": "Saving...",
+    "close": "Close (ask later)",
+    "toasts": {
+      "saved": "Settings saved",
+      "error": "Failed to save settings",
+      "recentPublished": "Plants published: {count}",
+      "recentError": "Failed to publish recent plants"
+    },
+    "publishRecent": "Publish my 5 latest plants right away",
+    "publishRecentHint": "The bot will post your 5 most recently added (non-archived) plants to the community",
+    "decline": "Don't publish"
   }
 }

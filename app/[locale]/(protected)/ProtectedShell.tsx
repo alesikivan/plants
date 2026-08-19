@@ -14,6 +14,7 @@ import { getAvatarUrl } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
 import type { AppLocale } from '@/i18n/routing';
 import { trackEvent } from '@/lib/analytics';
+import { TelegramCommunityBanner } from '@/components/telegram/TelegramCommunityBanner';
 
 export default function ProtectedShell({
   children,
@@ -145,7 +146,10 @@ export default function ProtectedShell({
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 lg:px-8 py-2 pb-24 md:pb-8">{children}</main>
+      <main className="flex-1 container mx-auto px-4 lg:px-8 py-2 pb-24 md:pb-8">
+        {user && <TelegramCommunityBanner />}
+        {children}
+      </main>
 
       <footer className="w-full border-t border-border/30 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/40 mt-16 md:mb-0 mb-20">
         <div className="container mx-auto px-4 lg:px-8">

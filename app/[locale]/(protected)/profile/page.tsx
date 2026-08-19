@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore } from '@/lib/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check, Pencil, Settings } from 'lucide-react';
+import { User, Mail, Shield, Calendar, Languages, LogOut, Leaf, Layers, Eye, EyeOff, ChevronRight, Lock, Camera, X, Loader2, Copy, Check, Pencil, Settings, Send, BookOpen, ExternalLink } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -28,6 +28,7 @@ import { SocialLinksSection } from '@/components/profile/SocialLinksSection';
 import { SocialLink } from '@/lib/types/user';
 import { followsApi, FollowStats } from '@/lib/api/follows';
 import { FollowersDialog } from '@/components/follows/FollowersDialog';
+import { TELEGRAM_COMMUNITY_URL, isTelegramCommunityEnabled } from '@/lib/config/telegram';
 
 const DESKTOP_PREVIEW = 5;
 const MOBILE_PREVIEW = 3;
@@ -100,6 +101,17 @@ export default function ProfilePage() {
       toast.success(t('privacy.successToast'));
     } catch (error) {
       toast.error(t('privacy.errorToast'));
+    }
+  };
+
+  const handleTelegramChange = async (field: 'telegramPublishPlants' | 'telegramPublishHistory', value: boolean) => {
+    try {
+      // Explicit choice in settings — no need to show the community modal anymore
+      await updateProfile({ [field]: value, telegramBannerDismissed: true });
+      trackEvent('profile_telegram_publish_changed', { field, value });
+      toast.success(t('telegram.successToast'));
+    } catch (error) {
+      toast.error(t('telegram.errorToast'));
     }
   };
 
@@ -547,6 +559,75 @@ export default function ProfilePage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Telegram community settings */}
+      {isTelegramCommunityEnabled() && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Send className="w-5 h-5" />
+              {t('telegram.title')}
+            </CardTitle>
+            <CardDescription>
+              {t('telegram.description')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <a
+                href={TELEGRAM_COMMUNITY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent('telegram_profile_join')}
+              >
+                <Send className="mr-2 h-4 w-4" />
+                {t('telegram.join')}
+                <ExternalLink className="ml-2 h-3.5 w-3.5 opacity-70" />
+              </a>
+            </Button>
+
+            <div className={`border-t pt-4 flex items-center justify-between gap-4 ${!(user.showPlants ?? true) ? 'opacity-50' : ''}`}>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <Leaf className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{t('telegram.publishPlants.label')}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {!(user.showPlants ?? true)
+                    ? t('telegram.publishPlants.requiresPlants')
+                    : t('telegram.publishPlants.description')}
+                </p>
+              </div>
+              <Switch
+                checked={user.telegramPublishPlants ?? false}
+                onCheckedChange={(v) => handleTelegramChange('telegramPublishPlants', v)}
+                disabled={!(user.showPlants ?? true)}
+              />
+            </div>
+
+            <div className={`border-t pt-4 flex items-center justify-between gap-4 ${!((user.showPlants ?? true) && (user.showPlantHistory ?? true)) ? 'opacity-50' : ''}`}>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{t('telegram.publishHistory.label')}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {!(user.showPlants ?? true)
+                    ? t('telegram.publishHistory.requiresPlants')
+                    : !(user.showPlantHistory ?? true)
+                    ? t('telegram.publishHistory.requiresHistory')
+                    : t('telegram.publishHistory.description')}
+                </p>
+              </div>
+              <Switch
+                checked={user.telegramPublishHistory ?? false}
+                onCheckedChange={(v) => handleTelegramChange('telegramPublishHistory', v)}
+                disabled={!((user.showPlants ?? true) && (user.showPlantHistory ?? true))}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Privacy disable confirmation dialog */}
       <AlertDialog open={!!privacyConfirm} onOpenChange={(open) => { if (!open) setPrivacyConfirm(null); }}>
