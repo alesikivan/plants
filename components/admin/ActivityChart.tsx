@@ -15,41 +15,69 @@ const RANGES: { key: RangeKey; label: string; hours: number }[] = [
   { key: 'week', label: 'Неделя', hours: 168 },
 ];
 
-// Stack order: bottom -> top. Colors are categorical slots 1-2 (see style block below)
+// Colors are categorical slots 1-2 (see style block below)
 const SERIES = [
   { key: 'plants', label: 'Новые растения', color: 'var(--activity-series-1)' },
   { key: 'history', label: 'Записи истории', color: 'var(--activity-series-2)' },
 ] as const;
 
 const HEIGHT = 220;
-const MARGIN = { top: 8, right: 8, bottom: 28, left: 32 };
-const MAX_BAR_WIDTH = 24;
-const SEGMENT_GAP = 2;
+const MARGIN = { top: 8, right: 12, bottom: 28, left: 32 };
 
 const hourFormatter = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' });
 const dayFormatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
 const dayShortFormatter = new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: '2-digit' });
 
-function niceMax(value: number): number {
-  if (value <= 4) return 4;
-  const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
-  const step = [1, 2, 2.5, 5, 10].find((m) => m * magnitude >= value / 4)! * magnitude;
-  return Math.ceil(value / step) * step;
+// Integer tick step so that 4 steps cover the value (counts are whole numbers)
+function niceStep(value: number): number {
+  const raw = Math.max(1, value / 4);
+  const magnitude = Math.pow(10, Math.floor(Math.log10(raw)));
+  return Math.max(1, [1, 2, 5, 10].find((m) => m * magnitude >= raw)! * magnitude);
 }
 
-// Column path with a rounded data-end (top) and a square base
-function columnPath(x: number, y: number, width: number, height: number, rounded: boolean): string {
-  if (height <= 0) return '';
-  const r = rounded ? Math.min(4, width / 2, height) : 0;
-  return [
-    `M${x},${y + height}`,
-    `V${y + r}`,
-    r ? `Q${x},${y} ${x + r},${y}` : '',
-    `H${x + width - r}`,
-    r ? `Q${x + width},${y} ${x + width},${y + r}` : '',
-    `V${y + height}`,
-    'Z',
-  ].join(' ');
+// Smooth curve through points (monotone cubic: no overshoot below zero or above peaks)
+function monotonePath(points: { x: number; y: number }[]): string {
+  const n = points.length;
+  if (n === 0) return '';
+  if (n === 1) return `M${points[0].x},${points[0].y}`;
+
+  const dx: number[] = [];
+  const slopes: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    dx.push(points[i + 1].x - points[i].x);
+    slopes.push((points[i + 1].y - points[i].y) / dx[i]);
+  }
+
+  const tangents: number[] = [slopes[0]];
+  for (let i = 1; i < n - 1; i++) {
+    tangents.push(slopes[i - 1] * slopes[i] <= 0 ? 0 : (slopes[i - 1] + slopes[i]) / 2);
+  }
+  tangents.push(slopes[n - 2]);
+
+  for (let i = 0; i < n - 1; i++) {
+    if (slopes[i] === 0) {
+      tangents[i] = 0;
+      tangents[i + 1] = 0;
+      continue;
+    }
+    const a = tangents[i] / slopes[i];
+    const b = tangents[i + 1] / slopes[i];
+    const h = a * a + b * b;
+    if (h > 9) {
+      const t = 3 / Math.sqrt(h);
+      tangents[i] = t * a * slopes[i];
+      tangents[i + 1] = t * b * slopes[i];
+    }
+  }
+
+  let d = `M${points[0].x},${points[0].y}`;
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = points[i];
+    const p1 = points[i + 1];
+    const step = dx[i] / 3;
+    d += ` C${p0.x + step},${p0.y + tangents[i] * step} ${p1.x - step},${p1.y - tangents[i + 1] * step} ${p1.x},${p1.y}`;
+  }
+  return d;
 }
 
 function formatHourRange(iso: string): string {
@@ -90,13 +118,14 @@ export function ActivityChart() {
     [buckets],
   );
 
-  const yMax = niceMax(Math.max(0, ...buckets.map((b) => b.plants + b.history)));
+  const yStep = niceStep(Math.max(0, ...buckets.map((b) => Math.max(b.plants, b.history))));
+  const yMax = yStep * 4;
+  const yTicks = [0, 1, 2, 3, 4].map((k) => k * yStep);
   const innerWidth = Math.max(0, width - MARGIN.left - MARGIN.right);
   const innerHeight = HEIGHT - MARGIN.top - MARGIN.bottom;
-  const band = buckets.length ? innerWidth / buckets.length : 0;
-  const barWidth = Math.max(1, Math.min(MAX_BAR_WIDTH, band * (band > 6 ? 0.7 : 0.8)));
-  const y = (value: number) => (value / yMax) * innerHeight;
-  const yTicks = [0, yMax / 4, yMax / 2, (yMax * 3) / 4, yMax];
+  const xStep = buckets.length > 1 ? innerWidth / (buckets.length - 1) : 0;
+  const xAt = (i: number) => MARGIN.left + xStep * i;
+  const yAt = (value: number) => MARGIN.top + innerHeight - (value / yMax) * innerHeight;
 
   // X labels: every 3h for a day, every 12h for 3 days, midnights for a week
   const labelEvery = range === 'day' ? 3 : range === 'threeDays' ? 12 : 24;
@@ -105,8 +134,15 @@ export function ActivityChart() {
     .filter(({ date }) => date.getHours() % labelEvery === 0);
 
   const hoveredBucket = hovered !== null ? buckets[hovered] : null;
-  const tooltipLeft =
-    hovered !== null ? Math.min(Math.max(MARGIN.left + band * (hovered + 0.5), 90), width - 90) : 0;
+  const tooltipLeft = hovered !== null ? Math.min(Math.max(xAt(hovered), 90), width - 90) : 0;
+
+  // Crosshair: nearest hour to the pointer
+  const handlePointer = (event: React.PointerEvent<SVGRectElement>) => {
+    if (!buckets.length || xStep === 0) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const index = Math.round((event.clientX - rect.left) / xStep);
+    setHovered(Math.min(Math.max(index, 0), buckets.length - 1));
+  };
 
   return (
     <Card>
@@ -154,7 +190,7 @@ export function ActivityChart() {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
               {SERIES.map((s) => (
                 <div key={s.key} className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-sm shrink-0" style={{ background: s.color }} />
+                  <span className="h-0.5 w-4 rounded-full shrink-0" style={{ background: s.color }} />
                   <span className="text-muted-foreground">{s.label}</span>
                   <span className="font-semibold">{totals[s.key].toLocaleString('ru-RU')}</span>
                 </div>
@@ -177,68 +213,33 @@ export function ActivityChart() {
                   className="block"
                 >
                   {/* Grid + Y labels */}
-                  {yTicks.map((tick) => {
-                    const ty = MARGIN.top + innerHeight - y(tick);
-                    return (
-                      <g key={tick}>
-                        <line
-                          x1={MARGIN.left}
-                          x2={width - MARGIN.right}
-                          y1={ty}
-                          y2={ty}
-                          className={tick === 0 ? 'stroke-border' : 'stroke-border/50'}
-                          strokeWidth={1}
-                        />
-                        <text
-                          x={MARGIN.left - 6}
-                          y={ty}
-                          dy="0.32em"
-                          textAnchor="end"
-                          className="fill-muted-foreground text-[10px] tabular-nums"
-                        >
-                          {Number.isInteger(tick) ? tick : tick.toFixed(1)}
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  {/* Stacked columns */}
-                  {buckets.map((b, i) => {
-                    const x = MARGIN.left + band * i + (band - barWidth) / 2;
-                    const plantsHeight = y(b.plants);
-                    const historyHeight = y(b.history);
-                    const base = MARGIN.top + innerHeight;
-                    const gap = b.plants > 0 && b.history > 0 ? SEGMENT_GAP : 0;
-                    const dimmed = hovered !== null && hovered !== i;
-                    return (
-                      <g key={b.hour} opacity={dimmed ? 0.45 : 1}>
-                        {b.plants > 0 && (
-                          <path
-                            d={columnPath(x, base - plantsHeight, barWidth, plantsHeight, b.history === 0)}
-                            fill={SERIES[0].color}
-                          />
-                        )}
-                        {b.history > 0 && (
-                          <path
-                            d={columnPath(
-                              x,
-                              base - plantsHeight - historyHeight,
-                              barWidth,
-                              Math.max(historyHeight - gap, 1),
-                              true,
-                            )}
-                            fill={SERIES[1].color}
-                          />
-                        )}
-                      </g>
-                    );
-                  })}
+                  {yTicks.map((tick) => (
+                    <g key={tick}>
+                      <line
+                        x1={MARGIN.left}
+                        x2={width - MARGIN.right}
+                        y1={yAt(tick)}
+                        y2={yAt(tick)}
+                        className={tick === 0 ? 'stroke-border' : 'stroke-border/50'}
+                        strokeWidth={1}
+                      />
+                      <text
+                        x={MARGIN.left - 6}
+                        y={yAt(tick)}
+                        dy="0.32em"
+                        textAnchor="end"
+                        className="fill-muted-foreground text-[10px] tabular-nums"
+                      >
+                        {tick}
+                      </text>
+                    </g>
+                  ))}
 
                   {/* X labels */}
                   {xLabels.map(({ date, i }) => (
                     <text
                       key={i}
-                      x={MARGIN.left + band * (i + 0.5)}
+                      x={xAt(i)}
                       y={HEIGHT - 8}
                       textAnchor="middle"
                       className="fill-muted-foreground text-[10px] tabular-nums"
@@ -249,25 +250,61 @@ export function ActivityChart() {
                     </text>
                   ))}
 
-                  {/* Hit targets: full-height band per hour */}
-                  {buckets.map((b, i) => (
-                    <rect
-                      key={`hit-${b.hour}`}
-                      x={MARGIN.left + band * i}
-                      y={MARGIN.top}
-                      width={band}
-                      height={innerHeight}
-                      fill="transparent"
-                      onPointerEnter={() => setHovered(i)}
-                      onPointerDown={() => setHovered(i)}
+                  {/* Crosshair */}
+                  {hovered !== null && (
+                    <line
+                      x1={xAt(hovered)}
+                      x2={xAt(hovered)}
+                      y1={MARGIN.top}
+                      y2={MARGIN.top + innerHeight}
+                      className="stroke-muted-foreground/40"
+                      strokeWidth={1}
+                    />
+                  )}
+
+                  {/* Curves */}
+                  {SERIES.map((s) => (
+                    <path
+                      key={s.key}
+                      d={monotonePath(buckets.map((b, i) => ({ x: xAt(i), y: yAt(b[s.key]) })))}
+                      fill="none"
+                      stroke={s.color}
+                      strokeWidth={2}
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
                     />
                   ))}
+
+                  {/* Hovered points */}
+                  {hoveredBucket &&
+                    SERIES.map((s) => (
+                      <circle
+                        key={s.key}
+                        cx={xAt(hovered!)}
+                        cy={yAt(hoveredBucket[s.key])}
+                        r={4}
+                        fill={s.color}
+                        className="stroke-card"
+                        strokeWidth={2}
+                      />
+                    ))}
+
+                  {/* Hit target for the crosshair */}
+                  <rect
+                    x={MARGIN.left - xStep / 2}
+                    y={MARGIN.top}
+                    width={innerWidth + xStep}
+                    height={innerHeight}
+                    fill="transparent"
+                    onPointerMove={handlePointer}
+                    onPointerDown={handlePointer}
+                  />
                 </svg>
               )}
 
               {hoveredBucket && (
                 <div
-                  className="pointer-events-none absolute top-0 z-10 -translate-x-1/2 rounded-md border bg-popover px-3 py-2 text-xs shadow-md"
+                  className="pointer-events-none absolute -top-2 z-10 -translate-x-1/2 -translate-y-full rounded-md border bg-popover px-3 py-2 text-xs shadow-md"
                   style={{ left: tooltipLeft }}
                 >
                   <div className="mb-1 text-muted-foreground">{formatHourRange(hoveredBucket.hour)}</div>
