@@ -36,6 +36,12 @@ interface AdminInfoResponse {
   };
 }
 
+export interface ActivityBucket {
+  hour: string; // ISO start of the hour (UTC)
+  plants: number;
+  history: number;
+}
+
 export type TelegramCommunityTopic = 'general' | 'plants' | 'history';
 
 export const adminApi = {
@@ -52,6 +58,12 @@ export const adminApi = {
     const response = await apiClient.post<{ sent: number }>('/admin/telegram/broadcast', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return response.data;
+  },
+
+  /** Hourly counts of new plants and plant history entries (up to the last 168 hours) */
+  async getActivity(hours = 168): Promise<ActivityBucket[]> {
+    const response = await apiClient.get<ActivityBucket[]>('/admin/activity', { params: { hours } });
     return response.data;
   },
 

@@ -25,6 +25,7 @@ import {
   Archive,
 } from 'lucide-react';
 import { ApiError } from '@/lib/api/errors';
+import { ActivityChart } from '@/components/admin/ActivityChart';
 
 type PeriodKey = 'today' | 'last3days' | 'lastWeek' | 'lastMonth';
 
@@ -109,6 +110,9 @@ export default function AdminInfoPage() {
           Информация об использовании хранилища и ключевые метрики
         </p>
       </div>
+
+      {/* Hourly activity */}
+      {user.role === Role.ADMIN && <ActivityChart />}
 
       {/* Uploads Section */}
       {uploads && (
