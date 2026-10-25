@@ -10,6 +10,15 @@ export interface SocialLink {
   isPublic: boolean;
 }
 
+export type DeviceType = 'mobile' | 'tablet' | 'desktop' | 'unknown';
+
+export interface DeviceInfo {
+  userAgent: string;
+  os: string;
+  browser: string;
+  deviceType: DeviceType;
+}
+
 export interface UserResponse {
   id: string;
   email: string;
@@ -27,6 +36,10 @@ export interface UserResponse {
   bio?: string;
   avatar?: string;
   socialLinks?: SocialLink[];
+  // Admin listing only
+  registrationDevice?: DeviceInfo | null;
+  lastDevice?: DeviceInfo | null;
+  lastSeenAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

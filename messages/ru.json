@@ -522,7 +522,12 @@
       "found": "Найдено: {count}",
       "noUsers": "Нет пользователей",
       "loading": "Загрузка...",
-      "registered": "Зарегистрирован: {date}"
+      "registered": "Зарегистрирован: {date}",
+      "registrationDevice": "Регистрация: {device}",
+      "lastDevice": "Последний вход: {device}, {date}",
+      "noDevice": "Устройство неизвестно",
+      "osStats": "Системы:",
+      "unknownDevice": "нет данных"
     },
     "create": {
       "button": "Создать пользователя",

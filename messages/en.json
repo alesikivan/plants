@@ -522,7 +522,12 @@
       "found": "Found: {count}",
       "noUsers": "No users",
       "loading": "Loading...",
-      "registered": "Registered: {date}"
+      "registered": "Registered: {date}",
+      "registrationDevice": "Signed up: {device}",
+      "lastDevice": "Last seen: {device}, {date}",
+      "noDevice": "Device unknown",
+      "osStats": "Systems:",
+      "unknownDevice": "no data"
     },
     "create": {
       "button": "Create user",

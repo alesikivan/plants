@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/store/authStore';
 import { usersApi } from '@/lib/api/users';
-import { Role, UserResponse, AdminCreateUserDto, AdminUpdateUserDto } from '@/lib/types/user';
+import { Role, UserResponse, AdminCreateUserDto, AdminUpdateUserDto, DeviceInfo, DeviceType } from '@/lib/types/user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Pencil, Trash2, Ban, CheckCircle, Search, User } from 'lucide-react';
+import { Shield, UserPlus, Pencil, Trash2, Ban, CheckCircle, Search, User, Smartphone, Tablet, Monitor, HelpCircle } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 import { getAvatarUrl } from '@/lib/api/users';
 import Image from 'next/image';
@@ -48,6 +48,15 @@ const ROLE_BADGE_COLORS: Record<Role, string> = {
   [Role.MANAGER]: 'bg-blue-100 text-blue-700 border-blue-200',
   [Role.USER]: 'bg-gray-100 text-gray-700 border-gray-200',
 };
+
+const DEVICE_ICONS: Record<DeviceType, typeof Smartphone> = {
+  mobile: Smartphone,
+  tablet: Tablet,
+  desktop: Monitor,
+  unknown: HelpCircle,
+};
+
+const formatDevice = (device: DeviceInfo) => `${device.os} · ${device.browser}`;
 
 export default function AdminUsersPage() {
   const router = useRouter();
@@ -90,6 +99,15 @@ export default function AdminUsersPage() {
       u.email.toLowerCase().includes(search.toLowerCase()),
   );
   const pagedUsers = filteredUsers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // OS stats: registration device, falling back to the last seen one
+  const osStats = Object.entries(
+    users.reduce<Record<string, number>>((acc, u) => {
+      const os = (u.registrationDevice ?? u.lastDevice)?.os ?? t('table.unknownDevice');
+      acc[os] = (acc[os] || 0) + 1;
+      return acc;
+    }, {}),
+  ).sort((a, b) => b[1] - a[1]);
 
   const createMutation = useMutation({
     mutationFn: (data: AdminCreateUserDto) => usersApi.adminCreateUser(data),
@@ -161,6 +179,11 @@ export default function AdminUsersPage() {
             <p className="text-sm text-muted-foreground">
               {t('header.total', { count: users.length })}
             </p>
+            {osStats.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {t('table.osStats')} {osStats.map(([os, count]) => `${os} ${count}`).join(' · ')}
+              </p>
+            )}
           </div>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2 w-full sm:w-auto">
@@ -243,6 +266,27 @@ export default function AdminUsersPage() {
                           date: new Date(u.createdAt).toLocaleDateString()
                         })}
                       </p>
+                      {u.registrationDevice || u.lastDevice ? (
+                        <>
+                          {u.registrationDevice && (
+                            <DeviceLine
+                              device={u.registrationDevice}
+                              label={t('table.registrationDevice', { device: formatDevice(u.registrationDevice) })}
+                            />
+                          )}
+                          {u.lastDevice && (
+                            <DeviceLine
+                              device={u.lastDevice}
+                              label={t('table.lastDevice', {
+                                device: formatDevice(u.lastDevice),
+                                date: u.lastSeenAt ? new Date(u.lastSeenAt).toLocaleDateString() : '—',
+                              })}
+                            />
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">{t('table.noDevice')}</p>
+                      )}
                     </div>
                   </div>
 
@@ -455,5 +499,15 @@ export default function AdminUsersPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+function DeviceLine({ device, label }: { device: DeviceInfo; label: string }) {
+  const Icon = DEVICE_ICONS[device.deviceType] ?? HelpCircle;
+  return (
+    <p className="flex items-center gap-1 text-xs text-muted-foreground min-w-0" title={device.userAgent}>
+      <Icon className="w-3 h-3 shrink-0" />
+      <span className="truncate">{label}</span>
+    </p>
   );
 }
