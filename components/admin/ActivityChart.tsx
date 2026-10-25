@@ -241,7 +241,10 @@ export function ActivityChart() {
                       key={i}
                       x={xAt(i)}
                       y={HEIGHT - 8}
-                      textAnchor="middle"
+                      // Keep edge labels inside the chart
+                      textAnchor={
+                        xAt(i) < MARGIN.left + 16 ? 'start' : xAt(i) > width - MARGIN.right - 16 ? 'end' : 'middle'
+                      }
                       className="fill-muted-foreground text-[10px] tabular-nums"
                     >
                       {range === 'day' || date.getHours() !== 0
